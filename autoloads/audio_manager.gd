@@ -74,7 +74,16 @@ var sfx_tracks: Dictionary = {
 	"zone_transition": "res://assets/audio/sfx/zone_transition.wav",
 	"health_pickup": "res://assets/audio/sfx/health_pickup.wav",
 	"coin": "res://assets/audio/sfx/coin.wav",
-	"level_up": "res://assets/audio/sfx/level_up.wav"
+	"level_up": "res://assets/audio/sfx/level_up.wav",
+	# Phase P4: Audio polish
+	"footstep_walk": "res://assets/audio/sfx/footstep_walk.wav",
+	"footstep_run": "res://assets/audio/sfx/footstep_run.wav",
+	"block": "res://assets/audio/sfx/block.wav",
+	"parry": "res://assets/audio/sfx/parry.wav",
+	"heartbeat": "res://assets/audio/sfx/heartbeat.wav",
+	"ground_pound": "res://assets/audio/sfx/ground_pound.wav",
+	"charge_start": "res://assets/audio/sfx/charge_start.wav",
+	"charge_release": "res://assets/audio/sfx/charge_release.wav",
 }
 
 # =============================================================================
@@ -189,6 +198,12 @@ func _process(delta: float) -> void:
 	
 	# Update dynamic music state
 	_update_dynamic_music()
+	
+	# Footstep system
+	_update_footsteps(delta)
+	
+	# Heartbeat system
+	_update_heartbeat(delta)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -264,6 +279,18 @@ func _setup_audio_players() -> void:
 		sfx_players.append(sfx_player)
 
 
+## Heartbeat system for low HP
+var _heartbeat_active: bool = false
+var _heartbeat_timer: float = 0.0
+const HEARTBEAT_INTERVAL: float = 0.7  # Time between heartbeats
+
+## Footstep system
+var _footstep_timer: float = 0.0
+var _player_moving: bool = false
+var _player_running: bool = false
+const WALK_STEP_INTERVAL: float = 0.35
+const RUN_STEP_INTERVAL: float = 0.22
+
 func _connect_signals() -> void:
 	# Connect to game events for automatic audio
 	Events.player_attacked.connect(_on_player_attacked)
@@ -277,6 +304,13 @@ func _connect_signals() -> void:
 	Events.game_resumed.connect(_on_game_resumed)
 	Events.game_over.connect(_on_game_over)
 	Events.player_health_changed.connect(_on_player_health_changed)
+	# Phase P4: Block/parry sounds
+	Events.player_block_started.connect(_on_player_block_started)
+	Events.player_parried.connect(_on_player_parried)
+	# Phase P4: Combat abilities
+	Events.player_ground_pound_impact.connect(_on_ground_pound_audio)
+	Events.player_charge_started.connect(_on_charge_started_audio)
+	Events.player_charge_released.connect(_on_charge_released_audio)
 
 # =============================================================================
 # DYNAMIC MUSIC SYSTEM
@@ -615,6 +649,7 @@ func _on_player_damaged(_amount: int) -> void:
 func _on_player_died() -> void:
 	play_sfx("player_death")
 	end_combat()
+	_heartbeat_active = false  # Stop heartbeat on death
 
 
 func _on_player_dodged() -> void:
@@ -664,6 +699,14 @@ func _on_zone_entered(zone_name: String) -> void:
 
 func _on_player_health_changed(current: int, max_health: int) -> void:
 	player_health_percent = float(current) / float(max_health) if max_health > 0 else 1.0
+	
+	# Heartbeat: activate when low HP, deactivate when recovered
+	var should_heartbeat = player_health_percent <= LOW_HEALTH_THRESHOLD and player_health_percent > 0.0
+	if should_heartbeat and not _heartbeat_active:
+		_heartbeat_active = true
+		_heartbeat_timer = 0.0  # Play immediately
+	elif not should_heartbeat and _heartbeat_active:
+		_heartbeat_active = false
 
 
 func _on_game_paused() -> void:
@@ -710,3 +753,64 @@ func save_settings() -> void:
 	config.set_value("audio", "sfx_volume", get_sfx_volume())
 	config.set_value("audio", "enabled", audio_enabled)
 	config.save("user://audio_settings.cfg")
+
+# =============================================================================
+# FOOTSTEP SYSTEM
+# =============================================================================
+
+func _update_footsteps(delta: float) -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player or not is_instance_valid(player):
+		_player_moving = false
+		return
+	
+	# Check if player is moving (velocity > threshold)
+	var is_moving = player.velocity.length() > 10.0
+	var is_running = player.is_running() if player.has_method("is_running") else false
+	
+	_player_moving = is_moving
+	_player_running = is_running
+	
+	if not _player_moving:
+		_footstep_timer = 0.0
+		return
+	
+	_footstep_timer += delta
+	var interval = RUN_STEP_INTERVAL if _player_running else WALK_STEP_INTERVAL
+	
+	if _footstep_timer >= interval:
+		_footstep_timer -= interval
+		var sfx_name = "footstep_run" if _player_running else "footstep_walk"
+		play_sfx(sfx_name, -8.0, 0.15)  # Quiet with pitch variance
+
+# =============================================================================
+# HEARTBEAT SYSTEM
+# =============================================================================
+
+func _update_heartbeat(delta: float) -> void:
+	if not _heartbeat_active:
+		return
+	
+	_heartbeat_timer += delta
+	if _heartbeat_timer >= HEARTBEAT_INTERVAL:
+		_heartbeat_timer -= HEARTBEAT_INTERVAL
+		play_sfx("heartbeat", -4.0, 0.05)
+
+# =============================================================================
+# PHASE P4 EVENT HANDLERS
+# =============================================================================
+
+func _on_player_block_started() -> void:
+	play_sfx("block", -2.0, 0.1)
+
+func _on_player_parried(_attacker: Node, _reflected_damage: int) -> void:
+	play_sfx("parry", 0.0, 0.05)
+
+func _on_ground_pound_audio(_damage: int, _radius: float) -> void:
+	play_sfx("ground_pound", 0.0, 0.1)
+
+func _on_charge_started_audio() -> void:
+	play_sfx("charge_start", -3.0, 0.0)
+
+func _on_charge_released_audio(_damage: int, _charge_percent: float) -> void:
+	play_sfx("charge_release", 0.0, 0.1)
