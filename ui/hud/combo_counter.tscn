@@ -6,10 +6,10 @@
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -50.0
-offset_top = 50.0
-offset_right = 50.0
-offset_bottom = 90.0
+offset_left = -30.0
+offset_top = 35.0
+offset_right = 30.0
+offset_bottom = 60.0
 script = ExtResource("1_combo")
 
 [node name="HitContainer" type="HBoxContainer" parent="."]
@@ -19,39 +19,39 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -40.0
-offset_top = -15.0
-offset_right = 40.0
-offset_bottom = 15.0
-theme_override_constants/separation = 12
+offset_left = -20.0
+offset_top = -8.0
+offset_right = 20.0
+offset_bottom = 8.0
+theme_override_constants/separation = 4
 
 [node name="Hit1" type="Label" parent="HitContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 20
-text = "1"
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 8
+text = "●"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Hit2" type="Label" parent="HitContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 20
-text = "2"
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 8
+text = "●"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Hit3" type="Label" parent="HitContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 20
-text = "3"
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 8
+text = "●"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -60,14 +60,14 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -30.0
-offset_top = 20.0
-offset_right = 30.0
-offset_bottom = 40.0
+offset_left = -25.0
+offset_top = 10.0
+offset_right = 25.0
+offset_bottom = 22.0
 theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
 theme_override_colors/font_outline_color = Color(0.3, 0.2, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 14
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
 text = "COMBO!"
 horizontal_alignment = 1
 vertical_alignment = 1
