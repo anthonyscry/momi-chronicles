@@ -226,10 +226,10 @@ Full combat expansion with combos, abilities, leveling, and boss fight.
 
 ---
 
-## Phase 14: Save System
+## Phase 14: Save System ✅
 **Goal**: Persist player progress between sessions
 
-**Status**: IN PROGRESS - 1/2 plans complete
+**Status**: COMPLETE
 
 **Deliverables**:
 - SaveManager autoload (save/load logic)
@@ -243,7 +243,7 @@ Full combat expansion with combos, abilities, leveling, and boss fight.
 
 Plans:
 - [x] 14-01-PLAN.md — SaveManager autoload with atomic write & backup
-- [ ] 14-02-PLAN.md — Auto-save triggers & UI integration (title, pause)
+- [x] 14-02-PLAN.md — Auto-save triggers & UI integration (title, pause)
 
 ---
 
