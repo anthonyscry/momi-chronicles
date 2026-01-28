@@ -283,11 +283,13 @@ Plans:
   - **Philo** (Boston Terrier) - Support, Lazy/Motivated mechanic
 - Input: Tab to open, Left/Right to rotate, Up/Down to switch rings, Confirm to use
 
-**Plans:**
-- [ ] 16-01-PLAN.md — Ring menu core UI & navigation
-- [ ] 16-02-PLAN.md — Item system & usable consumables
-- [ ] 16-03-PLAN.md — Equipment system & collars
-- [ ] 16-04-PLAN.md — Bulldog companion system
+**Plans:** 4 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Ring menu core UI & navigation (Wave 1)
+- [ ] 16-02-PLAN.md — Item system & usable consumables (Wave 2)
+- [ ] 16-03-PLAN.md — Equipment system with 5 slots (Wave 2)
+- [ ] 16-04-PLAN.md — Bulldog party system - all 3 fight together (Wave 3)
 
 ---
 
