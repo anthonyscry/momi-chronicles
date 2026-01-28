@@ -21,7 +21,7 @@ func _update_display(current: int, max_health: int) -> void:
 		progress_bar.value = current
 	
 	if label:
-		label.text = "%d / %d" % [current, max_health]
+		label.text = "%d/%d" % [current, max_health]
 	
 	# Color based on health percentage
 	var percent = float(current) / float(max_health)

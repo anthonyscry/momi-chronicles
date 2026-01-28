@@ -6,8 +6,9 @@ class_name ExpBar
 # CONFIGURATION
 # =============================================================================
 
-const BAR_WIDTH: float = 80.0
+const BAR_WIDTH: float = 58.0
 const BAR_HEIGHT: float = 6.0
+const BAR_X_OFFSET: float = 1.0
 
 const BG_COLOR: Color = Color(0.15, 0.1, 0.2, 0.8)
 const FILL_COLOR: Color = Color(0.5, 0.3, 0.9, 1.0)  # Purple
@@ -45,13 +46,17 @@ func _ready() -> void:
 	_update_display()
 
 func _setup_visuals() -> void:
+	# Bar at left, label to the right
 	background.color = BG_COLOR
-	background.size = Vector2(BAR_WIDTH, BAR_HEIGHT)
+	background.size = Vector2(60, 8)
+	background.position = Vector2(0, 0)
 	
 	fill.color = FILL_COLOR
 	fill.size = Vector2(0, BAR_HEIGHT)
-	fill.position = Vector2(0, 0)
+	fill.position = Vector2(BAR_X_OFFSET, 1)
 	
+	# Label on right side
+	level_label.position = Vector2(62, -1)
 	level_label.text = "Lv.1"
 
 # =============================================================================
