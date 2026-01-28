@@ -43,14 +43,56 @@ func _on_button_focused() -> void:
 	AudioManager.play_sfx("menu_navigate")
 
 
+## Screen shake toggle (created dynamically)
+var shake_toggle: CheckButton = null
+
+func _setup_shake_toggle() -> void:
+	# Add screen shake toggle to the VBox after sliders
+	var vbox = $Panel/VBoxContainer
+	if not vbox:
+		return
+	
+	var container = HBoxContainer.new()
+	container.name = "ShakeContainer"
+	
+	var label = Label.new()
+	label.text = "Screen Shake"
+	label.add_theme_font_size_override("font_size", 9)
+	container.add_child(label)
+	
+	shake_toggle = CheckButton.new()
+	shake_toggle.name = "ShakeToggle"
+	shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
+	shake_toggle.toggled.connect(_on_shake_toggled)
+	shake_toggle.focus_entered.connect(_on_button_focused)
+	container.add_child(shake_toggle)
+	
+	# Insert before quit button
+	var quit_idx = quit_button.get_index()
+	vbox.add_child(container)
+	vbox.move_child(container, quit_idx)
+
+
+func _on_shake_toggled(enabled: bool) -> void:
+	EffectsManager.screen_shake_enabled = enabled
+
+
 func _on_game_paused() -> void:
 	# Don't show pause menu if ring menu is open (it has its own pause)
 	if RingMenu and RingMenu.is_open:
 		return
 	
+	# Create shake toggle on first open (lazy init)
+	if shake_toggle == null:
+		_setup_shake_toggle()
+	
 	# Update sliders to current values
 	music_slider.value = AudioManager.get_music_volume()
 	sfx_slider.value = AudioManager.get_sfx_volume()
+	
+	# Update shake toggle
+	if shake_toggle:
+		shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
 	
 	show()
 	_animate_in()

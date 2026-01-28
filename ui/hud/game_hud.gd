@@ -16,6 +16,9 @@ const LOW_HP_THRESHOLD: float = 0.25
 ## Buff status icons
 var buff_icons: BuffIcons
 
+## Save indicator
+var save_indicator: Label
+
 ## Whether debug panel is visible
 var debug_visible: bool = true
 
@@ -29,8 +32,14 @@ func _ready() -> void:
 	# Create buff icons display
 	_setup_buff_icons()
 	
+	# Create save indicator
+	_setup_save_indicator()
+	
 	# Connect to health changes
 	Events.player_health_changed.connect(_on_health_changed)
+	
+	# Connect to save events
+	Events.game_saved.connect(_on_game_saved)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -40,6 +49,30 @@ func _unhandled_input(event: InputEvent) -> void:
 			debug_visible = not debug_visible
 			debug_panel.visible = debug_visible
 			print("[HUD] Debug panel: %s (F3 to toggle)" % ("ON" if debug_visible else "OFF"))
+
+
+func _setup_save_indicator() -> void:
+	save_indicator = Label.new()
+	save_indicator.name = "SaveIndicator"
+	save_indicator.text = "SAVING..."
+	save_indicator.add_theme_font_size_override("font_size", 7)
+	save_indicator.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 0.8))
+	save_indicator.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	save_indicator.add_theme_constant_override("outline_size", 1)
+	# Bottom-right corner
+	save_indicator.position = Vector2(320, 200)
+	save_indicator.modulate.a = 0.0
+	add_child(save_indicator)
+
+
+func _on_game_saved() -> void:
+	if not save_indicator:
+		return
+	# Brief flash: fade in, hold, fade out
+	var tween = create_tween()
+	tween.tween_property(save_indicator, "modulate:a", 1.0, 0.15)
+	tween.tween_interval(1.0)
+	tween.tween_property(save_indicator, "modulate:a", 0.0, 0.4)
 
 
 func _setup_buff_icons() -> void:

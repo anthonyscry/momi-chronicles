@@ -48,6 +48,9 @@ const POOL_SIZE: int = 10
 # SCREEN SHAKE
 # =============================================================================
 
+## Toggle screen shake on/off (QoL accessibility option)
+var screen_shake_enabled: bool = true
+
 var shake_intensity: float = 0.0
 var shake_duration: float = 0.0
 var shake_timer: float = 0.0
@@ -269,6 +272,9 @@ func _get_enemy_heal_amount(enemy: Node) -> int:
 
 ## Shake the camera with given intensity and duration
 func screen_shake(intensity: float = 3.0, duration: float = 0.15) -> void:
+	if not screen_shake_enabled:
+		return
+	
 	var player = get_tree().get_first_node_in_group("player")
 	if player == null or not player.has_node("Camera2D"):
 		return
