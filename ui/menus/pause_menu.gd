@@ -4,6 +4,7 @@ class_name PauseMenu
 
 @onready var panel: Panel = $Panel
 @onready var resume_button: Button = $Panel/VBoxContainer/ResumeButton
+@onready var save_button: Button = $Panel/VBoxContainer/SaveButton
 @onready var quit_button: Button = $Panel/VBoxContainer/QuitButton
 @onready var music_slider: HSlider = $Panel/VBoxContainer/MusicContainer/MusicSlider
 @onready var sfx_slider: HSlider = $Panel/VBoxContainer/SFXContainer/SFXSlider
@@ -15,6 +16,7 @@ func _ready() -> void:
 	
 	# Connect buttons
 	resume_button.pressed.connect(_on_resume_pressed)
+	save_button.pressed.connect(_on_save_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
 	
 	# Connect sliders
@@ -44,6 +46,22 @@ func _on_game_resumed() -> void:
 func _on_resume_pressed() -> void:
 	AudioManager.play_sfx("menu_select")
 	GameManager.resume_game()
+
+
+func _on_save_pressed() -> void:
+	AudioManager.play_sfx("menu_select")
+	if SaveManager.save_game():
+		# Visual feedback - flash button text briefly
+		var original_text = save_button.text
+		save_button.text = "Saved!"
+		save_button.disabled = true
+		await get_tree().create_timer(1.0).timeout
+		save_button.text = original_text
+		save_button.disabled = false
+	else:
+		save_button.text = "Save Failed"
+		await get_tree().create_timer(1.0).timeout
+		save_button.text = "Save Game"
 
 
 func _on_quit_pressed() -> void:
