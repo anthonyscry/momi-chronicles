@@ -48,6 +48,12 @@ const BLOCK_DURATION_MIN: float = 0.2     # Minimum block hold time
 const BLOCK_DURATION_MAX: float = 1.5     # Maximum block hold time
 const PARRY_WINDOW: float = 0.15          # Parry window (must match PlayerBlock)
 
+## Phase 16: Ring Menu / Items / Companions settings
+const USE_ITEM_HEALTH_THRESHOLD: float = 0.5  # Use healing item below this HP%
+const COMPANION_CYCLE_INTERVAL: float = 15.0  # Cycle companions every N seconds
+const RING_MENU_TEST_INTERVAL: float = 30.0   # Test ring menu every N seconds
+const RING_MENU_BROWSE_TIME: float = 2.0      # How long to browse ring menu
+
 ## Zone boundaries to stay within
 const ZONE_PADDING: float = 40.0
 
@@ -136,6 +142,13 @@ var block_target_duration: float = 0.0
 var attempting_parry: bool = false
 var parry_cooldown: float = 0.0
 
+# Phase 16: Ring Menu / Items / Companions state
+var companion_cycle_timer: float = 5.0    # Start cycling after 5 seconds
+var ring_menu_test_timer: float = 10.0    # First ring menu test after 10 seconds
+var ring_menu_browse_timer: float = 0.0   # Time spent browsing ring menu
+var in_ring_menu: bool = false            # Currently in ring menu
+var last_item_use_time: float = 0.0       # When we last used an item
+
 # Debug info
 var debug_state: String = "INIT"
 var enemies_found: int = 0
@@ -206,6 +219,9 @@ func _physics_process(delta: float) -> void:
 	
 	# Update blocking state
 	_update_blocking(delta)
+	
+	# Update Phase 16 systems (ring menu, companions, items)
+	_update_phase16_systems(delta)
 	
 	# Update combo timing (chain attacks within window)
 	_update_combo_timing(delta)
@@ -1071,3 +1087,122 @@ func _check_if_surrounded(threat_vectors: Array[Vector2]) -> bool:
 	
 	# Consider surrounded if enemies in 3+ different sectors
 	return sectors_occupied >= 3
+
+# =============================================================================
+# PHASE 16: RING MENU / ITEMS / COMPANIONS
+# =============================================================================
+
+## Update Phase 16 systems (ring menu, item usage, companion cycling)
+func _update_phase16_systems(delta: float) -> void:
+	# Update timers
+	companion_cycle_timer -= delta
+	ring_menu_test_timer -= delta
+	
+	# Don't do Phase 16 actions while in combat or low health (focus on survival)
+	if nearby_enemy_count > 0 and nearest_enemy_dist < 100:
+		return
+	
+	# Use healing item if low health and not in combat
+	if is_low_health and nearby_enemy_count == 0:
+		_try_use_healing_item()
+	
+	# Cycle companions periodically
+	if companion_cycle_timer <= 0:
+		companion_cycle_timer = COMPANION_CYCLE_INTERVAL + randf_range(-3, 3)
+		_cycle_companion()
+	
+	# Test ring menu periodically (when safe)
+	if ring_menu_test_timer <= 0 and nearby_enemy_count == 0:
+		ring_menu_test_timer = RING_MENU_TEST_INTERVAL + randf_range(-5, 5)
+		_test_ring_menu()
+
+
+## Try to use a healing item from inventory
+func _try_use_healing_item() -> void:
+	# Don't spam item usage
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - last_item_use_time < 3.0:
+		return
+	
+	# Check if inventory exists and has healing items
+	if not GameManager.inventory:
+		return
+	
+	# Try to use health potion first, then acorn
+	var items_to_try = ["health_potion", "mega_potion", "full_heal", "acorn", "bird_seed"]
+	
+	for item_id in items_to_try:
+		if GameManager.inventory.has_item(item_id):
+			if GameManager.inventory.use_item(item_id):
+				last_item_use_time = current_time
+				print("[AutoBot] Used item: %s" % item_id)
+				return
+
+
+## Cycle to next companion using Q key
+func _cycle_companion() -> void:
+	if not GameManager.party_manager:
+		return
+	
+	# Only cycle if we have companions registered
+	if GameManager.party_manager.companions.size() == 0:
+		return
+	
+	# Simulate Q key press
+	var event = InputEventAction.new()
+	event.action = "cycle_companion"
+	event.pressed = true
+	Input.parse_input_event(event)
+	
+	print("[AutoBot] Cycled companion -> %s" % GameManager.party_manager.active_companion_id)
+
+
+## Test the ring menu by opening, browsing, and closing it
+func _test_ring_menu() -> void:
+	# Open ring menu
+	var open_event = InputEventAction.new()
+	open_event.action = "ring_menu"
+	open_event.pressed = true
+	Input.parse_input_event(open_event)
+	
+	print("[AutoBot] Testing ring menu...")
+	
+	# Schedule navigation actions
+	_schedule_ring_menu_navigation()
+
+
+## Schedule ring menu navigation actions
+func _schedule_ring_menu_navigation() -> void:
+	# Wait a bit, then navigate through rings
+	await get_tree().create_timer(0.5).timeout
+	
+	# Navigate right a few times
+	for i in range(3):
+		var nav_event = InputEventAction.new()
+		nav_event.action = "move_right"
+		nav_event.pressed = true
+		Input.parse_input_event(nav_event)
+		await get_tree().create_timer(0.3).timeout
+	
+	# Switch to next ring (down)
+	var switch_event = InputEventAction.new()
+	switch_event.action = "move_down"
+	switch_event.pressed = true
+	Input.parse_input_event(switch_event)
+	await get_tree().create_timer(0.5).timeout
+	
+	# Navigate a bit more
+	for i in range(2):
+		var nav_event = InputEventAction.new()
+		nav_event.action = "move_left"
+		nav_event.pressed = true
+		Input.parse_input_event(nav_event)
+		await get_tree().create_timer(0.3).timeout
+	
+	# Close ring menu
+	var close_event = InputEventAction.new()
+	close_event.action = "ring_menu"
+	close_event.pressed = true
+	Input.parse_input_event(close_event)
+	
+	print("[AutoBot] Ring menu test complete")
