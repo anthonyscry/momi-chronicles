@@ -1186,8 +1186,31 @@ func _test_ring_menu() -> void:
 	
 	print("[AutoBot] Testing ring menu...")
 	
+	# Take screenshot after a short delay to let menu animate open
+	await get_tree().create_timer(0.3).timeout
+	_capture_ring_menu_screenshot()
+	
 	# Schedule navigation actions
 	_schedule_ring_menu_navigation()
+
+## Capture a screenshot of the ring menu for UI verification
+func _capture_ring_menu_screenshot() -> void:
+	var viewport = get_viewport()
+	if viewport == null:
+		print("[AutoBot] No viewport for screenshot")
+		return
+	
+	var image = viewport.get_texture().get_image()
+	if image == null:
+		print("[AutoBot] Failed to get viewport image")
+		return
+	
+	# Save to project root for easy access
+	var error = image.save_png("res://screenshot.png")
+	if error == OK:
+		print("[AutoBot] Ring menu screenshot saved to screenshot.png")
+	else:
+		print("[AutoBot] Failed to save screenshot: error %d" % error)
 
 
 ## Schedule ring menu navigation actions

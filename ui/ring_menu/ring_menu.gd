@@ -2,10 +2,11 @@ extends CanvasLayer
 ## Ring Menu - Secret of Mana style radial menu
 ## NOTE: This is an autoload, so don't use class_name (would conflict)
 
-## Ring configuration - Compact design
-const RING_RADIUS: float = 38.0          # Distance from center to items (was 70)
-const ROTATION_SPEED: float = 10.0       # Animation speed (slightly faster)
-const MAX_VISIBLE_ITEMS: int = 6         # Items visible at once (was 8)
+## Ring configuration - Readable compact design
+const RING_RADIUS: float = 58.0          # Distance from center to items
+const RING_CENTER_OFFSET: Vector2 = Vector2(0, 12)  # Offset ring center down to avoid title overlap
+const ROTATION_SPEED: float = 10.0       # Animation speed
+const MAX_VISIBLE_ITEMS: int = 6         # Items visible at once
 
 ## Animation constants - Snappier feel
 const OPEN_DURATION: float = 0.12
@@ -294,7 +295,7 @@ func _update_item_positions() -> void:
 		return
 	
 	var angle_per_item = TAU / max(visible_count, 1)
-	var center = container.size / 2
+	var center = container.size / 2 + RING_CENTER_OFFSET  # Offset ring center down
 	
 	for i in visible_count:
 		var angle = current_rotation + (i * angle_per_item) - PI/2  # Start from top

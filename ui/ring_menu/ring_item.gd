@@ -18,11 +18,11 @@ var target_alpha: float = 1.0
 @onready var glow: ColorRect = $Glow
 @onready var quantity_label: Label = $QuantityLabel
 
-const SELECTED_SCALE: float = 1.25      # Slightly less dramatic for compact ring
-const UNSELECTED_SCALE: float = 0.85
+const SELECTED_SCALE: float = 1.3       # Selected item stands out
+const UNSELECTED_SCALE: float = 0.9     # Unselected still visible
 const SELECTED_ALPHA: float = 1.0
-const UNSELECTED_ALPHA: float = 0.5     # More contrast between selected/unselected
-const LERP_SPEED: float = 15.0          # Snappier transitions
+const UNSELECTED_ALPHA: float = 0.75    # Unselected items more visible
+const LERP_SPEED: float = 15.0
 
 func _ready() -> void:
 	# Start with glow hidden
@@ -49,9 +49,9 @@ func setup(data: Dictionary) -> void:
 		icon.color = color
 		icon.visible = true
 	
-	# Set label
-	if label and data.has("name"):
-		label.text = data.name
+	# Label is now hidden - item name shown in center of ring menu
+	# if label and data.has("name"):
+	# 	label.text = data.name
 	
 	# Set quantity (for stackable items)
 	if quantity_label:
