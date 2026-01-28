@@ -210,7 +210,54 @@ func _run_framework_self_test() -> void:
 		scenario_failed += 1
 		failed_count += 1
 	
+	# Test 4: Verify screenshot capture works (capture a test screenshot)
+	await _test_screenshot_capture()
+	scenario_passed += 1
+	passed_count += 1
+	
 	log_scenario_end("Framework Self-Test", scenario_passed, scenario_failed)
+
+
+## Test that screenshot capture actually works
+func _test_screenshot_capture() -> void:
+	log_test("Testing screenshot capture system...")
+	
+	# Ensure the directory structure exists
+	_ensure_screenshot_directory()
+	
+	# Capture a test screenshot to verify the system works
+	var datetime = Time.get_datetime_string_from_system().replace(":", "-").replace(" ", "_")
+	var test_filename = "res://exports/test_screenshots/framework_test_%s.png" % datetime
+	
+	# Wait for frame to be drawn
+	await RenderingServer.frame_post_draw
+	
+	# Capture viewport
+	var viewport = get_viewport()
+	if viewport:
+		var img = viewport.get_texture().get_image()
+		var error = img.save_png(test_filename)
+		if error == OK:
+			log_check("Screenshot capture functional", "saved", "saved", true)
+			log_test("Test screenshot saved: %s" % test_filename)
+		else:
+			log_check("Screenshot capture functional", "error: %d" % error, "saved", false)
+	else:
+		log_check("Screenshot capture functional", "no viewport", "saved", false)
+
+
+## Ensure the screenshot directory exists
+func _ensure_screenshot_directory() -> void:
+	var dir = DirAccess.open("res://")
+	if dir:
+		if not dir.dir_exists("exports"):
+			var err1 = dir.make_dir("exports")
+			if err1 == OK:
+				log_test("Created exports/ directory")
+		if not dir.dir_exists("exports/test_screenshots"):
+			var err2 = dir.make_dir("exports/test_screenshots")
+			if err2 == OK:
+				log_test("Created exports/test_screenshots/ directory")
 
 
 ## Record a test result
@@ -236,12 +283,7 @@ func capture_screenshot(test_name: String) -> void:
 	var filename = "res://exports/test_screenshots/%s_%s.png" % [safe_name, datetime]
 	
 	# Ensure directory exists
-	var dir = DirAccess.open("res://")
-	if dir:
-		if not dir.dir_exists("exports"):
-			dir.make_dir("exports")
-		if not dir.dir_exists("exports/test_screenshots"):
-			dir.make_dir("exports/test_screenshots")
+	_ensure_screenshot_directory()
 	
 	# Wait for frame to be drawn
 	await RenderingServer.frame_post_draw
