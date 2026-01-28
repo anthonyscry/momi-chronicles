@@ -68,6 +68,9 @@ func _on_body_entered(body: Node2D) -> void:
 			var health = body.get_node("HealthComponent")
 			health.heal(heal_amount)
 		
+		# Emit pickup signal
+		Events.pickup_collected.emit("health", heal_amount)
+		
 		# Play pickup sound
 		AudioManager.play_sfx("health_pickup")
 		
