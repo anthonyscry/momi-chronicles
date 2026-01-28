@@ -156,3 +156,16 @@ signal game_over
 
 ## Emitted when game restarts
 signal game_restarted
+
+# =============================================================================
+# SAVE SYSTEM SIGNALS
+# =============================================================================
+
+## Emitted when game is saved
+signal game_saved
+
+## Emitted when game is loaded
+signal game_loaded
+
+## Emitted if save file is corrupt
+signal save_corrupted
