@@ -156,6 +156,9 @@ var nearest_enemy_dist: float = 0.0
 var debug_frame_counter: int = 0
 const DEBUG_LOG_INTERVAL: int = 300  # Log every 5 seconds at 60fps
 
+# Auto-start flag to prevent spam clicking
+var auto_start_attempted: bool = false
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -177,12 +180,27 @@ func _physics_process(delta: float) -> void:
 	# Toggle with F1
 	_handle_toggle_input()
 	
-	# Auto-start: If on title screen and no player, click Start button
-	if enabled and player_ref == null:
-		var start_btn = get_tree().root.find_child("StartButton", true, false)
-		if start_btn and start_btn is Button and start_btn.visible:
-			print("[AutoBot] Auto-starting game!")
-			start_btn.emit_signal("pressed")
+	# Auto-start: If on title screen and no player, click appropriate button (once)
+	if enabled and player_ref == null and not auto_start_attempted:
+		# First check for confirmation dialog (overwrite save prompt)
+		var confirm_dialog = get_tree().root.find_child("ConfirmationDialog", true, false)
+		if confirm_dialog and confirm_dialog is ConfirmationDialog and confirm_dialog.visible:
+			auto_start_attempted = true
+			print("[AutoBot] Confirming new game!")
+			confirm_dialog.confirmed.emit()
+		else:
+			# Prefer Continue if it exists (has save), otherwise Start
+			var continue_btn = get_tree().root.find_child("ContinueButton", true, false)
+			if continue_btn and continue_btn is Button and continue_btn.visible:
+				auto_start_attempted = true
+				print("[AutoBot] Continuing saved game!")
+				continue_btn.pressed.emit()
+			else:
+				var start_btn = get_tree().root.find_child("StartButton", true, false)
+				if start_btn and start_btn is Button and start_btn.visible:
+					auto_start_attempted = true
+					print("[AutoBot] Starting new game!")
+					start_btn.pressed.emit()
 	
 	# Get player reference
 	_ensure_player_reference()
@@ -268,6 +286,7 @@ func _ensure_player_reference() -> void:
 		player_ref = get_tree().get_first_node_in_group("player")
 		if player_ref != null:
 			print("[AutoBot] Found player")
+			auto_start_attempted = false  # Reset for next title screen visit
 			_update_player_control()
 
 

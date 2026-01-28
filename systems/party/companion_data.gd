@@ -1,5 +1,6 @@
 extends Node
-class_name CompanionData
+## Companion Data - Companion definitions for the Bulldog Squad
+## NOTE: This is an autoload, so don't use class_name
 
 ## Companion roles
 enum Role { DPS, TANK, SUPPORT }

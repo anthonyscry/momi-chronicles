@@ -44,5 +44,6 @@ func _start_random_wander() -> void:
 	var wander_target = spawn_position + random_offset
 	
 	# Temporarily add as patrol point and go patrol
-	player.patrol_points = [wander_target]
+	var points: Array[Vector2] = [wander_target]
+	player.patrol_points = points
 	state_machine.transition_to("Patrol")

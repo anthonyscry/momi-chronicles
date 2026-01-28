@@ -1,5 +1,6 @@
 extends CanvasLayer
-class_name RingMenu
+## Ring Menu - Secret of Mana style radial menu
+## NOTE: This is an autoload, so don't use class_name (would conflict)
 
 ## Ring configuration
 const RING_RADIUS: float = 70.0          # Distance from center to items
@@ -44,7 +45,7 @@ var ring_names: Dictionary = {
 @onready var item_desc_label: Label = $Container/ItemDescLabel
 
 ## Pooled ring items
-var ring_items: Array[RingItem] = []
+var ring_items: Array = []  # Array of RingItem nodes
 var RingItemScene: PackedScene = preload("res://ui/ring_menu/ring_item.tscn")
 
 ## Animation tween

@@ -1,5 +1,6 @@
 extends Node
-class_name EquipmentDatabase
+## Equipment Database - All equipment definitions
+## NOTE: This is an autoload, so don't use class_name
 
 ## Equipment slot types (5 slots as per CONTEXT.md)
 enum Slot {

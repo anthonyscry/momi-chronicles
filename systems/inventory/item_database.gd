@@ -1,5 +1,6 @@
 extends Node
-class_name ItemDatabase
+## Item Database - All item definitions
+## NOTE: This is an autoload, so don't use class_name
 
 ## Item effect types
 enum EffectType {

@@ -17,14 +17,15 @@ var is_player_alive: bool = true
 ## Currency system
 var coins: int = 0
 
-## Inventory system (Phase 16)
-var inventory: Inventory = null
+## Phase 16 systems - loaded dynamically to avoid autoload ordering issues
+var inventory = null           # Inventory
+var equipment_manager = null   # EquipmentManager
+var party_manager = null       # PartyManager
 
-## Equipment system (Phase 16)
-var equipment_manager: EquipmentManager = null
-
-## Party system (Phase 16)
-var party_manager: PartyManager = null
+## Preload Phase 16 classes
+const InventoryClass = preload("res://systems/inventory/inventory.gd")
+const EquipmentManagerClass = preload("res://systems/equipment/equipment_manager.gd")
+const PartyManagerClass = preload("res://systems/party/party_manager.gd")
 
 # =============================================================================
 # LIFECYCLE
@@ -57,17 +58,17 @@ func _ready() -> void:
 	Events.boss_defeated.connect(_on_boss_defeated_autosave)
 	
 	# Initialize inventory system (Phase 16)
-	inventory = Inventory.new()
+	inventory = InventoryClass.new()
 	inventory.name = "Inventory"
 	add_child(inventory)
 	
 	# Initialize equipment system (Phase 16)
-	equipment_manager = EquipmentManager.new()
+	equipment_manager = EquipmentManagerClass.new()
 	equipment_manager.name = "EquipmentManager"
 	add_child(equipment_manager)
 	
 	# Initialize party system (Phase 16)
-	party_manager = PartyManager.new()
+	party_manager = PartyManagerClass.new()
 	party_manager.name = "PartyManager"
 	add_child(party_manager)
 
