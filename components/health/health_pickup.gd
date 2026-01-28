@@ -74,6 +74,10 @@ func _on_body_entered(body: Node2D) -> void:
 		# Play pickup sound
 		AudioManager.play_sfx("health_pickup")
 		
+		# Visual effects - pink burst
+		EffectsManager.spawn_pickup_effect(global_position, Color(1.0, 0.4, 0.5))  # Pink
+		EffectsManager.flash_pickup(global_position, Color(1.0, 0.8, 0.8))
+		
 		# Pickup effect - quick scale up and fade
 		var tween = create_tween()
 		tween.set_parallel(true)

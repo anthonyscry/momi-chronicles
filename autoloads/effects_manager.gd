@@ -551,3 +551,44 @@ func _create_exp_popup(pos: Vector2, amount: int) -> void:
 	tween.tween_property(label, "global_position:y", label.global_position.y - 25, 0.8)
 	tween.tween_property(label, "modulate:a", 0.0, 0.8).set_delay(0.3)
 	tween.chain().tween_callback(label.queue_free)
+
+
+# =============================================================================
+# PICKUP COLLECTION EFFECTS
+# =============================================================================
+
+## Spawn pickup collection particles
+func spawn_pickup_effect(pos: Vector2, color: Color) -> void:
+	# Spawn 5-8 small particles that burst outward
+	var particle_count = randi_range(5, 8)
+	for i in particle_count:
+		var particle = ColorRect.new()
+		particle.size = Vector2(2, 2)
+		particle.color = color
+		particle.position = pos - Vector2(1, 1)  # Center
+		get_tree().current_scene.add_child(particle)
+		
+		# Animate outward and fade
+		var tween = particle.create_tween()
+		var direction = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		var end_pos = pos + direction * randf_range(12, 20)
+		tween.set_parallel(true)
+		tween.tween_property(particle, "position", end_pos, 0.25)
+		tween.tween_property(particle, "modulate:a", 0.0, 0.25)
+		tween.chain().tween_callback(particle.queue_free)
+
+
+## Quick flash at position (for emphasis)
+func flash_pickup(pos: Vector2, color: Color) -> void:
+	var flash = ColorRect.new()
+	flash.size = Vector2(12, 12)
+	flash.position = pos - Vector2(6, 6)
+	flash.color = color
+	flash.modulate.a = 0.7
+	get_tree().current_scene.add_child(flash)
+	
+	var tween = flash.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(flash, "scale", Vector2(1.5, 1.5), 0.12)
+	tween.tween_property(flash, "modulate:a", 0.0, 0.12)
+	tween.chain().tween_callback(flash.queue_free)

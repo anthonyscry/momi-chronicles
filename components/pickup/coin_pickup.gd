@@ -71,6 +71,10 @@ func _on_body_entered(body: Node2D) -> void:
 		# Play coin sound
 		AudioManager.play_sfx("coin")
 		
+		# Visual effects - gold burst
+		EffectsManager.spawn_pickup_effect(global_position, Color(1.0, 0.85, 0.2))  # Gold
+		EffectsManager.flash_pickup(global_position, Color(1.0, 1.0, 0.7))
+		
 		# Pickup effect - quick scale up and fade
 		var tween = create_tween()
 		tween.set_parallel(true)
