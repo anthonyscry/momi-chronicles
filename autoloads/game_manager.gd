@@ -41,6 +41,11 @@ func _ready() -> void:
 	Events.zone_entered.connect(_on_zone_entered)
 	Events.zone_transition_requested.connect(_on_zone_transition_requested)
 	Events.boss_defeated.connect(_on_boss_defeated)
+	
+	# Auto-save on zone entry
+	Events.zone_entered.connect(_on_zone_entered_autosave)
+	# Auto-save after boss defeat (delayed for celebration)
+	Events.boss_defeated.connect(_on_boss_defeated_autosave)
 
 func _on_boss_defeated(_boss: Node) -> void:
 	boss_defeated = true
@@ -153,3 +158,25 @@ func spend_coins(amount: int) -> bool:
 		Events.coins_changed.emit(coins)
 		return true
 	return false
+
+
+# =============================================================================
+# AUTO-SAVE
+# =============================================================================
+
+## Auto-save on zone entry
+func _on_zone_entered_autosave(zone_name: String) -> void:
+	# Skip if this is initial game load (no player yet)
+	await get_tree().process_frame
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.progression and player.progression.current_level > 0:
+		SaveManager.save_game()
+		print("[GameManager] Auto-saved on zone entry: ", zone_name)
+
+
+## Auto-save after boss defeat (delayed for celebration/rewards)
+func _on_boss_defeated_autosave(_boss: Node) -> void:
+	# Wait 3 seconds for victory celebration and rewards
+	await get_tree().create_timer(3.0).timeout
+	SaveManager.save_game()
+	print("[GameManager] Auto-saved after boss defeat")
