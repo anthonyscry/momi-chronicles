@@ -14,3 +14,11 @@ func _ready() -> void:
 	
 	# Call parent ready
 	super._ready()
+
+
+## Raccoon drops: 80% chance for 1-2 coins, 25% chance for health
+func _init_default_drops() -> void:
+	drop_table = [
+		{"scene": COIN_PICKUP_SCENE, "chance": 0.8, "min": 1, "max": 2},
+		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.25, "min": 1, "max": 1},
+	]

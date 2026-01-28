@@ -140,8 +140,19 @@ func _on_died() -> void:
 	# Boss death is special
 	Events.boss_defeated.emit(self)
 	
+	# Spawn drops (boss always drops lots of loot!)
+	_spawn_drops()
+	
 	# Dramatic death sequence
 	_play_death_sequence()
+
+
+## Boss drops: 100% chance for 10-20 coins, 100% chance for 3-5 health
+func _init_default_drops() -> void:
+	drop_table = [
+		{"scene": COIN_PICKUP_SCENE, "chance": 1.0, "min": 10, "max": 20},
+		{"scene": HEALTH_PICKUP_SCENE, "chance": 1.0, "min": 3, "max": 5},
+	]
 
 func _play_death_sequence() -> void:
 	# Disable collision
