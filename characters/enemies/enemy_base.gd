@@ -183,6 +183,19 @@ func get_direction_to_target() -> Vector2:
 		return Vector2.ZERO
 	return (target.global_position - global_position).normalized()
 
+## Get separation force from nearby enemies to prevent stacking
+func get_separation_force() -> Vector2:
+	var separation = Vector2.ZERO
+	var neighbors = get_tree().get_nodes_in_group("enemies")
+	for enemy in neighbors:
+		if enemy == self or not is_instance_valid(enemy):
+			continue
+		var dist = global_position.distance_to(enemy.global_position)
+		if dist < 20.0 and dist > 0.01:  # Within separation range
+			var away = (global_position - enemy.global_position).normalized()
+			separation += away * (20.0 - dist) / 20.0  # Stronger when closer
+	return separation
+
 func get_distance_to_target() -> float:
 	if not target:
 		return INF
