@@ -374,6 +374,8 @@ func _on_player_hit_enemy(enemy: Node) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		spawn_hit_spark(player.global_position, enemy.global_position)
+		# Attack swoosh arc
+		_create_attack_swoosh(player)
 	
 	# Light hitstop for hitting enemy
 	hitstop_light()
@@ -396,9 +398,15 @@ func _on_enemy_defeated(enemy: Node) -> void:
 	
 	spawn_death_poof(enemy.global_position)
 	
+	# Enhanced death explosion particles
+	_create_death_explosion(enemy.global_position)
+	
 	# Heavy effects for kill
 	shake_medium()
 	hitstop_heavy()
+	
+	# Brief flash at enemy position
+	_flash_screen(Color(1, 1, 1, 0.25), 0.1)
 	
 	# Try to spawn health pickup
 	_try_spawn_health_pickup(enemy)
@@ -408,6 +416,8 @@ func _on_player_dodged() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		spawn_dust(player.global_position)
+		# Start afterimage trail during dodge
+		_create_dodge_afterimages(player)
 
 
 func _on_player_damaged(amount: int) -> void:
@@ -730,6 +740,130 @@ func flash_pickup(pos: Vector2, color: Color) -> void:
 	tween.tween_property(flash, "scale", Vector2(1.5, 1.5), 0.12)
 	tween.tween_property(flash, "modulate:a", 0.0, 0.12)
 	tween.chain().tween_callback(flash.queue_free)
+
+# =============================================================================
+# ATTACK SWOOSH EFFECT
+# =============================================================================
+
+## Create an arc swoosh trail when player attacks
+func _create_attack_swoosh(attacker: Node2D) -> void:
+	var pos = attacker.global_position
+	var facing_left = attacker.get("facing_left")
+	if facing_left == null:
+		facing_left = false
+	var facing_dir = attacker.get("facing_direction")
+	if facing_dir == null:
+		facing_dir = "side"
+	
+	# Determine arc direction based on facing
+	var arc_center: Vector2
+	var arc_start_angle: float
+	var arc_sweep: float = 2.2  # ~130 degrees
+	var arc_radius: float = 14.0
+	
+	match facing_dir:
+		"down":
+			arc_center = pos + Vector2(0, 6)
+			arc_start_angle = -0.5
+		"up":
+			arc_center = pos + Vector2(0, -6)
+			arc_start_angle = PI - 0.5
+		_:  # side
+			if facing_left:
+				arc_center = pos + Vector2(-6, 0)
+				arc_start_angle = PI * 0.5 - 0.5
+			else:
+				arc_center = pos + Vector2(6, 0)
+				arc_start_angle = -PI * 0.5 - 0.5
+	
+	# Create swoosh particles along the arc
+	var swoosh_count = 8
+	for i in range(swoosh_count):
+		var t = float(i) / float(swoosh_count - 1)
+		var angle = arc_start_angle + t * arc_sweep
+		var swoosh_pos = arc_center + Vector2(cos(angle), sin(angle)) * arc_radius
+		
+		var particle = ColorRect.new()
+		particle.size = Vector2(3, 2)
+		particle.pivot_offset = particle.size / 2
+		particle.rotation = angle
+		particle.color = Color(1, 1, 1, 0.8 - t * 0.4)
+		particle.global_position = swoosh_pos
+		particle.z_index = 50
+		particle.modulate.a = 0.0
+		get_tree().current_scene.add_child(particle)
+		
+		# Staggered appear then fade
+		var tween = create_tween()
+		tween.tween_property(particle, "modulate:a", 1.0, 0.02).set_delay(t * 0.04)
+		tween.tween_property(particle, "modulate:a", 0.0, 0.1)
+		tween.tween_callback(particle.queue_free)
+
+# =============================================================================
+# DODGE AFTERIMAGE EFFECT
+# =============================================================================
+
+## Create ghost afterimages during dodge
+func _create_dodge_afterimages(player_node: Node2D) -> void:
+	var sprite = player_node.get_node_or_null("Sprite2D")
+	if sprite == null:
+		return
+	
+	# Create 3 afterimages spaced during the dodge
+	for i in range(3):
+		await get_tree().create_timer(0.06).timeout
+		
+		if not is_instance_valid(player_node):
+			return
+		
+		# Create ghost copy
+		var ghost = Polygon2D.new()
+		ghost.polygon = sprite.polygon.duplicate() if sprite is Polygon2D else PackedVector2Array([Vector2(-6,-6), Vector2(6,-6), Vector2(6,6), Vector2(-6,6)])
+		ghost.color = Color(0.5, 0.8, 1.0, 0.5 - i * 0.12)
+		ghost.global_position = player_node.global_position
+		ghost.z_index = player_node.z_index - 1
+		
+		# Match player scale/flip
+		if sprite is Polygon2D:
+			ghost.scale = sprite.scale
+		
+		get_tree().current_scene.add_child(ghost)
+		
+		# Fade out
+		var tween = create_tween()
+		tween.tween_property(ghost, "modulate:a", 0.0, 0.2)
+		tween.tween_callback(ghost.queue_free)
+
+# =============================================================================
+# ENHANCED ENEMY DEATH EXPLOSION
+# =============================================================================
+
+## More dramatic death particles
+func _create_death_explosion(pos: Vector2) -> void:
+	# Burst of colored fragments
+	for i in range(10):
+		var particle = ColorRect.new()
+		particle.size = Vector2(randf_range(2, 5), randf_range(2, 5))
+		# Random warm colors (enemy guts lol)
+		var colors = [Color(0.9, 0.3, 0.2), Color(0.8, 0.5, 0.2), Color(1, 0.8, 0.3), Color(0.7, 0.2, 0.2)]
+		particle.color = colors[randi() % colors.size()]
+		particle.global_position = pos
+		particle.z_index = 80
+		get_tree().current_scene.add_child(particle)
+		
+		# Explode outward in random directions
+		var angle = randf() * TAU
+		var distance = randf_range(15, 35)
+		var end_pos = pos + Vector2(cos(angle), sin(angle)) * distance
+		
+		var tween = create_tween()
+		tween.set_parallel(true)
+		# Arc upward then fall
+		tween.tween_property(particle, "global_position:x", end_pos.x, 0.4).set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "global_position:y", end_pos.y - 10, 0.2).set_ease(Tween.EASE_OUT)
+		tween.chain().tween_property(particle, "global_position:y", end_pos.y + 5, 0.2).set_ease(Tween.EASE_IN)
+		tween.tween_property(particle, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(particle.queue_free)
 
 # =============================================================================
 # COMBAT JUICE - SPECIAL ABILITIES
