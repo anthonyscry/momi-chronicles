@@ -23,9 +23,13 @@ class_name EnemyBase
 var health_bar = null  # EnemyHealthBar - removed type to avoid cyclic dependency
 const HEALTH_BAR_SCENE = preload("res://components/health/enemy_health_bar.tscn")
 
-## Health pickup spawning
+## Pickup scenes for drop table
 const HEALTH_PICKUP_SCENE = preload("res://components/health/health_pickup.tscn")
-@export var health_drop_chance: float = 0.3  # 30% chance to drop health
+const COIN_PICKUP_SCENE = preload("res://components/pickup/coin_pickup.tscn")
+
+## Drop table: Array of {scene, chance, min, max}
+## Override in subclass using _init_default_drops() or configure in editor
+var drop_table: Array[Dictionary] = []
 
 var target = null  # Player - removed type to avoid cyclic dependency
 var facing_direction: Vector2 = Vector2.DOWN
@@ -46,6 +50,10 @@ func _ready() -> void:
 	_setup_health_bar()
 	if hitbox:
 		hitbox.damage = attack_damage
+	
+	# Initialize drop table if not set by subclass or editor
+	if drop_table.is_empty():
+		_init_default_drops()
 
 
 func _setup_health_bar() -> void:
@@ -127,16 +135,40 @@ func _on_died() -> void:
 	state_machine.transition_to("Death")
 	Events.enemy_defeated.emit(self)
 	
-	# Chance to spawn health pickup
-	_try_spawn_health_pickup()
+	# Spawn drops from drop table
+	_spawn_drops()
 
 
-func _try_spawn_health_pickup() -> void:
-	if randf() <= health_drop_chance:
-		var pickup = HEALTH_PICKUP_SCENE.instantiate()
-		# Add to parent (the zone) so it persists after enemy is freed
-		get_parent().add_child(pickup)
-		pickup.global_position = global_position
+## Override in subclass to set default drops
+func _init_default_drops() -> void:
+	# Base enemy: 30% health, 50% coin (1)
+	drop_table = [
+		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.3, "min": 1, "max": 1},
+		{"scene": COIN_PICKUP_SCENE, "chance": 0.5, "min": 1, "max": 1},
+	]
+
+
+## Spawn drops on death based on drop table
+func _spawn_drops() -> void:
+	for drop in drop_table:
+		var scene = drop.get("scene")
+		var chance = drop.get("chance", 0.0)
+		if scene and randf() <= chance:
+			var min_count = drop.get("min", 1)
+			var max_count = drop.get("max", 1)
+			var count = randi_range(min_count, max_count)
+			for i in count:
+				_spawn_single_drop(scene, i)
+
+
+## Spawn a single drop with slight offset to prevent stacking
+func _spawn_single_drop(scene: PackedScene, index: int) -> void:
+	var pickup = scene.instantiate()
+	# Offset drops slightly so they don't stack
+	var offset = Vector2(randf_range(-8, 8), randf_range(-8, 8))
+	pickup.global_position = global_position + offset
+	# Add to parent (the zone) so it persists after enemy is freed
+	get_parent().add_child(pickup)
 
 func _on_detection_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
