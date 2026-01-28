@@ -2,30 +2,38 @@
 
 ## Current Position
 
-Phase: 14 of 16 (Save System)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-27 - Completed 14-02-PLAN.md
+Phase: 15 of 16 (UI Testing Automation)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-28 - Completed 15-01-PLAN.md
 
-Progress: ██████████████████░░ 87%
+Progress: ██████████████████░░ 90%
 
 ## Current Status
 - **Version**: v1.2 New Mechanics IN PROGRESS
-- **Last Updated**: 2026-01-27
-- **Godot Files**: 91+
-- **Status**: Phase 14 COMPLETE (2/2 plans complete)
+- **Last Updated**: 2026-01-28
+- **Godot Files**: 92+
+- **Status**: Phase 15 IN PROGRESS (1/3 plans complete)
 
 ## v1.2 Progress
 - [x] Phase 12: Block & Parry System (COMPLETE)
 - [x] Phase 13: Items & Pickups (COMPLETE - HUD counter, effects, drop tables)
 - [x] Phase 14: Save System (COMPLETE - SaveManager, auto-save, title/pause menus)
-- [ ] Phase 15: UI Testing Automation
+- [ ] Phase 15: UI Testing Automation (1/3 - UITester foundation complete)
 - [ ] Phase 16: Ring Menu System
 
 ## Session Continuity
-Last session: 2026-01-27
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-01-28
+Stopped at: Completed 15-01-PLAN.md
 Resume file: None
+
+## Phase 15 Decisions
+| Decision | Rationale |
+|----------|-----------|
+| F2 key for UITester toggle | F1 already used by AutoBot |
+| ISO timestamp in logs | Standardized, sortable format |
+| exports/test_screenshots/ | Keep test artifacts separate from game assets |
+| Retry with fix callback | Self-healing tests before final failure |
 
 ## Phase 14 Decisions
 | Decision | Rationale |
