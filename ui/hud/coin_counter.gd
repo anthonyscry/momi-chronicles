@@ -2,7 +2,7 @@ extends Control
 class_name CoinCounter
 ## Displays player's coin count with smooth counting animation.
 
-@onready var icon: Polygon2D = $HBoxContainer/Icon
+@onready var icon: ColorRect = $HBoxContainer/Icon
 @onready var label: Label = $HBoxContainer/Label
 
 var display_coins: int = 0

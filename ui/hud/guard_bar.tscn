@@ -3,9 +3,9 @@
 [ext_resource type="Script" path="res://ui/hud/guard_bar.gd" id="1_guard_bar"]
 
 [node name="GuardBar" type="Control"]
-custom_minimum_size = Vector2(100, 10)
-offset_right = 100.0
-offset_bottom = 10.0
+custom_minimum_size = Vector2(110, 12)
+offset_right = 110.0
+offset_bottom = 12.0
 script = ExtResource("1_guard_bar")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -27,13 +27,13 @@ show_percentage = false
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
 offset_left = 62.0
-offset_top = -1.0
-offset_right = 100.0
-offset_bottom = 9.0
+offset_top = 0.0
+offset_right = 110.0
+offset_bottom = 12.0
 theme_override_colors/font_color = Color(0.7, 0.9, 1.0, 1.0)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1.0)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 7
+theme_override_font_sizes/font_size = 9
 text = "100"
 horizontal_alignment = 0
 vertical_alignment = 1
