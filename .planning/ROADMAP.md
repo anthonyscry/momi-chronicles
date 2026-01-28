@@ -209,7 +209,7 @@ Full combat expansion with combos, abilities, leveling, and boss fight.
 ## Phase 13: Items & Pickups
 **Goal**: Collectible items that drop from enemies
 
-**Status**: READY FOR EXECUTION (partial - health pickups exist, needs coins)
+**Status**: IN PROGRESS (2/3 plans complete)
 
 **Deliverables**:
 - Health pickup with magnet effect (heart, restores 20 HP)
@@ -220,8 +220,8 @@ Full combat expansion with combos, abilities, leveling, and boss fight.
 - Coin counter in HUD
 
 **Plans:**
-- [ ] 13-01-PLAN.md — Enhance health pickup with magnet & signals
-- [ ] 13-02-PLAN.md — Coin system & enemy drop tables
+- [x] 13-01-PLAN.md — Enhance health pickup with magnet & signals
+- [x] 13-02-PLAN.md — Coin system & enemy drop tables
 - [ ] 13-03-PLAN.md — Coin counter HUD & collection effects
 
 ---

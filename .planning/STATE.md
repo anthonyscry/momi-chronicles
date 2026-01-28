@@ -3,28 +3,28 @@
 ## Current Position
 
 Phase: 13 of 16 (Items & Pickups)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-28 - Completed 13-01-PLAN.md
+Last activity: 2026-01-28 - Completed 13-02-PLAN.md
 
-Progress: ████████████████░░░░ 80%
+Progress: █████████████████░░░ 82%
 
 ## Current Status
 - **Version**: v1.2 New Mechanics IN PROGRESS
 - **Last Updated**: 2026-01-28
-- **Godot Files**: 85+
-- **Status**: Phase 13 IN PROGRESS (1/3 plans complete)
+- **Godot Files**: 88+
+- **Status**: Phase 13 IN PROGRESS (2/3 plans complete)
 
 ## v1.2 Progress
 - [x] Phase 12: Block & Parry System (COMPLETE)
-- [ ] Phase 13: Items & Pickups (1/3 - magnet pickups done, needs coins/HUD)
+- [ ] Phase 13: Items & Pickups (2/3 - coins and drop tables done, needs HUD)
 - [ ] Phase 14: Save System
 - [ ] Phase 15: UI Testing Automation
 - [ ] Phase 16: Ring Menu System
 
 ## Session Continuity
-Last session: 2026-01-28T04:36:18Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-01-28T04:41:40Z
+Stopped at: Completed 13-02-PLAN.md
 Resume file: None
 
 ## v1.1 Progress (COMPLETE)
@@ -154,7 +154,7 @@ momi-chronicles/
 ├── assets/
 │   ├── audio/
 │   │   ├── music/ (7 placeholder WAV files)
-│   │   └── sfx/ (11 placeholder WAV files)
+│   │   └── sfx/ (12 placeholder WAV files)
 │   └── tiles/
 │       ├── tile_atlas.png
 │       ├── world_tileset.tres
@@ -171,7 +171,8 @@ momi-chronicles/
 │   ├── state_machine/ (3 files)
 │   ├── hitbox/ (2 files)
 │   ├── hurtbox/ (2 files)
-│   ├── health/ (2 files)
+│   ├── health/ (5 files)
+│   ├── pickup/ (2 files)
 │   └── zone_exit/ (2 files)
 │
 ├── characters/
