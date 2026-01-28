@@ -152,20 +152,34 @@ func run_all_tests() -> void:
 		return
 	
 	_test_running = true
-	log_test("Starting test suite...")
 	
-	# Placeholder: In subsequent plans, these will be implemented
-	# Scenario 1: HUD Display Tests
-	# Scenario 2: Menu Navigation Tests
-	# Scenario 3: Save/Load UI Tests
-	# Scenario 4: Combat UI Tests
-	# Scenario 5: Zone Transition Tests
+	log_test("========================================")
+	log_test("   UI TESTER - FULL TEST SUITE")
+	log_test("========================================")
 	
-	# For now, run a simple self-test to verify the framework works
+	# Reset counters for new test run
+	passed_count = 0
+	failed_count = 0
+	fixed_on_retry_count = 0
+	test_results.clear()
+	
+	# Framework self-test first
 	await _run_framework_self_test()
 	
-	# Log final summary
-	log_summary()
+	# Scenario 1: Title Screen Flow
+	var s1_passed = await test_scenario_title_screen()
+	test_results.append({"scenario": "Title Screen Flow", "passed": s1_passed})
+	log_test("SCENARIO RESULT: Title Screen Flow - " + ("PASS" if s1_passed else "FAIL"))
+	
+	# Scenario 2: Gameplay HUD
+	var s2_passed = await test_scenario_gameplay_hud()
+	test_results.append({"scenario": "Gameplay HUD", "passed": s2_passed})
+	log_test("SCENARIO RESULT: Gameplay HUD - " + ("PASS" if s2_passed else "FAIL"))
+	
+	# Scenarios 3-5 will be added in Plan 03
+	
+	# Print final summary
+	print_test_summary()
 	
 	_test_running = false
 	log_test("Test suite complete")
@@ -345,6 +359,192 @@ func run_check_with_retry(check_name: String, check_func: Callable, fix_func: Ca
 
 
 # =============================================================================
+# TEST SCENARIOS
+# =============================================================================
+
+## Scenario 1: Title Screen Flow
+## Tests that title screen loads correctly and Start button works
+func test_scenario_title_screen() -> bool:
+	log_scenario_start("Title Screen Flow")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+	
+	# Navigate to title screen if not already there
+	var title = find_ui_node("TitleScreen")
+	if not title:
+		log_test("Navigating to title screen...")
+		get_tree().change_scene_to_file("res://ui/menus/title_screen.tscn")
+		await get_tree().create_timer(1.0).timeout
+	
+	# Check 1: Title screen loaded
+	var title_exists = await verify_exists("TitleScreen", "Title Screen root")
+	if title_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check 2: Start or Continue button exists
+	var start_btn = find_ui_node("StartButton")
+	var continue_btn = find_ui_node("ContinueButton")
+	var has_start_btn = start_btn != null or continue_btn != null
+	if not has_start_btn:
+		log_check("EXISTS: Start or Continue button", "neither found", "at least one", false)
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+		await capture_screenshot("missing_start_button")
+	else:
+		log_check("EXISTS: Start or Continue button", "found", "found", true)
+		passed_count += 1
+		scenario_passed += 1
+	
+	# Check 3: Start button visible (or Continue if save exists)
+	if start_btn:
+		var start_visible = await verify_visible("StartButton", "Start Button visible")
+		if start_visible:
+			scenario_passed += 1
+		else:
+			scenario_failed += 1
+			all_passed = false
+	elif continue_btn:
+		var continue_visible = await verify_visible("ContinueButton", "Continue Button visible")
+		if continue_visible:
+			scenario_passed += 1
+		else:
+			scenario_failed += 1
+			all_passed = false
+	
+	# Check 4: Quit button exists
+	var quit_exists = await verify_exists("QuitButton", "Quit Button")
+	if quit_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check 5: Simulate Start button press and verify scene change
+	log_test("Testing Start button interaction...")
+	var btn = start_btn if start_btn else continue_btn
+	if btn and btn is Button:
+		btn.emit_signal("pressed")
+		await get_tree().create_timer(2.0).timeout  # Wait for scene change
+		
+		# Check 6: Scene changed to gameplay (player should exist)
+		var player = get_player()
+		var scene_changed = player != null
+		log_check("SCENE: Gameplay loaded after Start", str(scene_changed), "true", scene_changed)
+		if scene_changed:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+			await capture_screenshot("scene_change_failed")
+	else:
+		log_failure("Start Button", "Could not interact with button")
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	log_scenario_end("Title Screen Flow", scenario_passed, scenario_failed)
+	return all_passed
+
+
+## Scenario 2: Gameplay HUD
+## Tests that all HUD elements are present and showing correct values
+func test_scenario_gameplay_hud() -> bool:
+	log_scenario_start("Gameplay HUD")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+	
+	# Ensure we're in gameplay (player must exist)
+	var player = get_player()
+	if not player:
+		log_test("Not in gameplay - running title screen test first to get there")
+		await test_scenario_title_screen()
+		await get_tree().create_timer(1.0).timeout
+		player = get_player()
+	
+	if not player:
+		log_failure("Gameplay HUD", "Cannot test - no player found after title screen test")
+		return false
+	
+	log_test("Player found, proceeding with HUD verification...")
+	
+	# Run HUD element verification (checks all 5 elements)
+	var hud_results = await verify_hud_elements()
+	
+	# Count results from HUD verification
+	for element in hud_results:
+		if hud_results[element]:
+			scenario_passed += 1
+		else:
+			scenario_failed += 1
+			all_passed = false
+	
+	# Value verification - check HUD matches player state
+	log_test("--- HUD Value Verification ---")
+	
+	# Health bar value check
+	var player_hp = get_player_health()
+	log_test("Player HP from HealthComponent: " + str(player_hp))
+	
+	if player_hp >= 0:
+		var health_bar = find_ui_node("HealthBar")
+		if health_bar:
+			# HealthBar contains a ProgressBar child
+			var progress_bar = health_bar.find_child("ProgressBar", true, false)
+			if progress_bar and progress_bar.get("value") != null:
+				var hp_matches = await verify_value(progress_bar.value, player_hp, "Health bar matches player HP", 1.0)
+				if hp_matches:
+					scenario_passed += 1
+				else:
+					scenario_failed += 1
+			else:
+				log_test("HealthBar ProgressBar not found or has no value property")
+	
+	# Coin counter check
+	var coins = 0
+	if is_instance_valid(GameManager):
+		coins = GameManager.coins
+	log_test("Current coins from GameManager: " + str(coins))
+	
+	var coin_counter = find_ui_node("CoinCounter")
+	if coin_counter:
+		# Find label within coin counter
+		var label = coin_counter.find_child("Label", true, false)
+		if label and label is Label:
+			var label_text = label.text
+			var has_coins = str(coins) in label_text
+			log_check("VALUE: Coin counter shows correct count", label_text, "contains " + str(coins), has_coins)
+			if has_coins:
+				passed_count += 1
+				scenario_passed += 1
+			else:
+				failed_count += 1
+				scenario_failed += 1
+		else:
+			log_test("CoinCounter Label child not found")
+	
+	# Level/EXP check
+	var player_level = get_player_level()
+	if player_level > 0:
+		log_test("Player level: " + str(player_level))
+		# Check if ExpBar exists and is showing something
+		var exp_bar = find_ui_node("ExpBar")
+		if exp_bar:
+			log_test("ExpBar found and level is " + str(player_level))
+	
+	log_test("Gameplay HUD verification complete")
+	log_scenario_end("Gameplay HUD", scenario_passed, scenario_failed)
+	return all_passed
+
+
+# =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
 
@@ -365,3 +565,184 @@ func is_running() -> bool:
 ## Get test results
 func get_results() -> Array:
 	return test_results.duplicate()
+
+
+# =============================================================================
+# NODE FINDING HELPERS
+# =============================================================================
+
+## Find a UI node anywhere in the scene tree (recursive search)
+func find_ui_node(node_name: String) -> Node:
+	return get_tree().root.find_child(node_name, true, false)
+
+
+## Get the player node from the "player" group
+func get_player() -> Node:
+	return get_tree().get_first_node_in_group("player")
+
+
+## Get player's current health value
+func get_player_health() -> float:
+	var player = get_player()
+	if player and player.has_node("HealthComponent"):
+		var health = player.get_node("HealthComponent")
+		if health.get("current_health") != null:
+			return health.current_health
+	return -1.0
+
+
+## Get player's current level
+func get_player_level() -> int:
+	var player = get_player()
+	if player and player.get("progression") != null:
+		return player.progression.current_level
+	return -1
+
+
+# =============================================================================
+# VERIFICATION HELPERS
+# =============================================================================
+
+## Verify a node exists in the scene tree
+func verify_exists(node_name: String, description: String) -> bool:
+	var node = find_ui_node(node_name)
+	var exists = node != null
+	var actual = "found" if exists else "not found"
+	log_check("EXISTS: " + description, actual, "found", exists)
+	if not exists:
+		passed_count -= 1 if exists else 0  # Don't double-decrement
+		failed_count += 1
+		await capture_screenshot("missing_" + node_name.to_snake_case())
+	else:
+		passed_count += 1
+	return exists
+
+
+## Verify a node is visible
+func verify_visible(node_name: String, description: String) -> bool:
+	var node = find_ui_node(node_name)
+	if not node:
+		log_check("VISIBLE: " + description, "node not found", "visible", false)
+		failed_count += 1
+		await capture_screenshot("not_found_" + node_name.to_snake_case())
+		return false
+	
+	var visible_val: bool = true
+	if node is CanvasItem:
+		visible_val = node.visible
+	elif node is CanvasLayer:
+		visible_val = node.visible
+	
+	log_check("VISIBLE: " + description, str(visible_val), "true", visible_val)
+	if not visible_val:
+		failed_count += 1
+		await capture_screenshot("hidden_" + node_name.to_snake_case())
+	else:
+		passed_count += 1
+	return visible_val
+
+
+## Verify a value matches expected (with optional tolerance for floats)
+func verify_value(actual, expected, description: String, tolerance: float = 0.0) -> bool:
+	var passed: bool
+	if typeof(actual) == TYPE_FLOAT and typeof(expected) == TYPE_FLOAT:
+		passed = abs(actual - expected) <= tolerance
+	elif typeof(actual) == TYPE_INT and typeof(expected) == TYPE_INT:
+		passed = actual == expected
+	else:
+		passed = str(actual) == str(expected)
+	
+	log_check("VALUE: " + description, str(actual), str(expected), passed)
+	if not passed:
+		failed_count += 1
+		await capture_screenshot("wrong_value_" + description.to_snake_case().replace(" ", "_"))
+	else:
+		passed_count += 1
+	return passed
+
+
+## Verify a property on a node matches expected value
+func verify_property(node_name: String, property: String, expected, description: String) -> bool:
+	var node = find_ui_node(node_name)
+	if not node:
+		log_check("PROPERTY: " + description, "node not found", str(expected), false)
+		failed_count += 1
+		return false
+	
+	var actual = node.get(property)
+	var passed = actual == expected
+	log_check("PROPERTY: " + description, str(actual), str(expected), passed)
+	if not passed:
+		failed_count += 1
+		await capture_screenshot("wrong_prop_" + node_name.to_snake_case())
+	else:
+		passed_count += 1
+	return passed
+
+
+# =============================================================================
+# HUD-SPECIFIC VERIFICATION
+# =============================================================================
+
+## Verify all HUD elements exist and are visible
+## Returns a dictionary with results for each element
+func verify_hud_elements() -> Dictionary:
+	log_test("--- Verifying HUD Elements ---")
+	var results = {}
+	
+	# Health bar (from game_hud.tscn - node name is "HealthBar")
+	results["health_bar"] = await verify_exists("HealthBar", "Health Bar")
+	if results["health_bar"]:
+		results["health_bar"] = await verify_visible("HealthBar", "Health Bar visible") and results["health_bar"]
+	
+	# Guard bar (from Phase 12 - node name is "GuardBar")
+	results["guard_bar"] = await verify_exists("GuardBar", "Guard Bar")
+	if results["guard_bar"]:
+		results["guard_bar"] = await verify_visible("GuardBar", "Guard Bar visible") and results["guard_bar"]
+	
+	# EXP bar (from Phase 9 - node name is "ExpBar")
+	results["exp_bar"] = await verify_exists("ExpBar", "EXP Bar")
+	if results["exp_bar"]:
+		results["exp_bar"] = await verify_visible("ExpBar", "EXP Bar visible") and results["exp_bar"]
+	
+	# Coin counter (from Phase 13 - node name is "CoinCounter")
+	results["coin_counter"] = await verify_exists("CoinCounter", "Coin Counter")
+	if results["coin_counter"]:
+		results["coin_counter"] = await verify_visible("CoinCounter", "Coin Counter visible") and results["coin_counter"]
+	
+	# Combo counter (may only show during combos - node name is "ComboCounter")
+	results["combo_counter"] = await verify_exists("ComboCounter", "Combo Counter")
+	# Don't fail visibility check - combo counter may be hidden when no combo active
+	if results["combo_counter"]:
+		var combo_node = find_ui_node("ComboCounter")
+		if combo_node and combo_node is CanvasItem:
+			log_test("ComboCounter visibility: " + str(combo_node.visible) + " (may be hidden when no active combo)")
+	
+	# Summary
+	var all_passed = true
+	var passed_elements = []
+	var failed_elements = []
+	for key in results:
+		if results[key]:
+			passed_elements.append(key)
+		else:
+			failed_elements.append(key)
+			all_passed = false
+	
+	log_test("HUD Elements Summary: " + str(passed_elements.size()) + "/" + str(results.size()) + " passed")
+	if failed_elements.size() > 0:
+		log_test("Failed elements: " + str(failed_elements))
+	
+	return results
+
+
+## Print final test summary
+func print_test_summary() -> void:
+	log_summary()
+	
+	# Print scenario results
+	if test_results.size() > 0:
+		log_test("Scenario Results:")
+		for result in test_results:
+			var status = "PASS" if result.get("passed", false) else "FAIL"
+			log_test("  - %s: %s" % [result.get("scenario", "Unknown"), status])
