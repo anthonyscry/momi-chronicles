@@ -1,0 +1,1377 @@
+[gd_scene load_steps=10 format=3 uid="uid://dne7k3m2p5x8q"]
+
+[ext_resource type="Script" path="res://world/zones/neighborhood.gd" id="1_neighborhood"]
+[ext_resource type="TileSet" uid="uid://cwt7k3m2p5x8q" path="res://assets/tiles/world_tileset.tres" id="2_tileset"]
+[ext_resource type="PackedScene" uid="uid://c1kpwx5v8mh5r" path="res://characters/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dpk3q7x8nvw2r" path="res://characters/enemies/raccoon.tscn" id="4_raccoon"]
+[ext_resource type="PackedScene" uid="uid://b5yqk2w8m1pxc" path="res://characters/enemies/crow.tscn" id="5_crow"]
+[ext_resource type="PackedScene" uid="uid://dkp7q2m8x5w1r" path="res://ui/hud/game_hud.tscn" id="6_hud"]
+[ext_resource type="PackedScene" uid="uid://cxr7k3m2p5w8q" path="res://ui/menus/pause_menu.tscn" id="7_pause"]
+[ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="8_game_over"]
+[ext_resource type="PackedScene" uid="uid://bze7k3m2p5x8q" path="res://components/zone_exit/zone_exit.tscn" id="9_zone_exit"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_h"]
+size = Vector2(800, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_v"]
+size = Vector2(16, 600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house_large"]
+size = Vector2(96, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house_medium"]
+size = Vector2(80, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house_small"]
+size = Vector2(64, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_store"]
+size = Vector2(100, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tree"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bench"]
+size = Vector2(32, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fountain"]
+size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fence_h"]
+size = Vector2(64, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fence_v"]
+size = Vector2(8, 48)
+
+[node name="Neighborhood" type="Node2D"]
+script = ExtResource("1_neighborhood")
+zone_size = Vector2(800, 600)
+zone_id = "neighborhood"
+player_spawn = Vector2(100, 500)
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0.38, 0.55, 0.35, 1)
+
+;; ============================================================================
+;; ROADS AND PATHS
+;; ============================================================================
+
+[node name="Roads" type="Node2D" parent="."]
+
+;; Main horizontal road
+[node name="MainRoad" type="ColorRect" parent="Roads"]
+offset_left = 0.0
+offset_top = 280.0
+offset_right = 800.0
+offset_bottom = 320.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+[node name="MainRoadLine" type="ColorRect" parent="Roads"]
+offset_left = 0.0
+offset_top = 298.0
+offset_right = 800.0
+offset_bottom = 302.0
+color = Color(0.95, 0.85, 0.2, 1)
+
+;; Vertical road connecting to backyard
+[node name="VerticalRoad" type="ColorRect" parent="Roads"]
+offset_left = 700.0
+offset_top = 280.0
+offset_right = 740.0
+offset_bottom = 600.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+[node name="VerticalRoadLine" type="ColorRect" parent="Roads"]
+offset_left = 718.0
+offset_top = 280.0
+offset_right = 722.0
+offset_bottom = 600.0
+color = Color(0.95, 0.85, 0.2, 1)
+
+;; Sidewalks
+[node name="SidewalkTop" type="ColorRect" parent="Roads"]
+offset_left = 0.0
+offset_top = 260.0
+offset_right = 800.0
+offset_bottom = 280.0
+color = Color(0.75, 0.72, 0.65, 1)
+
+[node name="SidewalkBottom" type="ColorRect" parent="Roads"]
+offset_left = 0.0
+offset_top = 320.0
+offset_right = 800.0
+offset_bottom = 340.0
+color = Color(0.75, 0.72, 0.65, 1)
+
+;; Cross walks
+[node name="Crosswalk1" type="ColorRect" parent="Roads"]
+offset_left = 200.0
+offset_top = 282.0
+offset_right = 210.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+[node name="Crosswalk2" type="ColorRect" parent="Roads"]
+offset_left = 220.0
+offset_top = 282.0
+offset_right = 230.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+[node name="Crosswalk3" type="ColorRect" parent="Roads"]
+offset_left = 240.0
+offset_top = 282.0
+offset_right = 250.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+[node name="Crosswalk4" type="ColorRect" parent="Roads"]
+offset_left = 500.0
+offset_top = 282.0
+offset_right = 510.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+[node name="Crosswalk5" type="ColorRect" parent="Roads"]
+offset_left = 520.0
+offset_top = 282.0
+offset_right = 530.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+[node name="Crosswalk6" type="ColorRect" parent="Roads"]
+offset_left = 540.0
+offset_top = 282.0
+offset_right = 550.0
+offset_bottom = 318.0
+color = Color(1, 1, 1, 1)
+
+;; ============================================================================
+;; PARK AREA (Bottom left)
+;; ============================================================================
+
+[node name="Park" type="Node2D" parent="."]
+
+[node name="ParkGrass" type="ColorRect" parent="Park"]
+offset_left = 20.0
+offset_top = 380.0
+offset_right = 280.0
+offset_bottom = 580.0
+color = Color(0.45, 0.65, 0.4, 1)
+
+[node name="ParkBorder" type="ColorRect" parent="Park"]
+offset_left = 16.0
+offset_top = 376.0
+offset_right = 284.0
+offset_bottom = 384.0
+color = Color(0.55, 0.4, 0.25, 1)
+
+[node name="ParkBorderLeft" type="ColorRect" parent="Park"]
+offset_left = 16.0
+offset_top = 376.0
+offset_right = 24.0
+offset_bottom = 584.0
+color = Color(0.55, 0.4, 0.25, 1)
+
+[node name="ParkBorderRight" type="ColorRect" parent="Park"]
+offset_left = 276.0
+offset_top = 376.0
+offset_right = 284.0
+offset_bottom = 584.0
+color = Color(0.55, 0.4, 0.25, 1)
+
+[node name="ParkBorderBottom" type="ColorRect" parent="Park"]
+offset_left = 16.0
+offset_top = 576.0
+offset_right = 284.0
+offset_bottom = 584.0
+color = Color(0.55, 0.4, 0.25, 1)
+
+;; Park paths
+[node name="ParkPathH" type="ColorRect" parent="Park"]
+offset_left = 24.0
+offset_top = 470.0
+offset_right = 276.0
+offset_bottom = 490.0
+color = Color(0.82, 0.76, 0.58, 1)
+
+[node name="ParkPathV" type="ColorRect" parent="Park"]
+offset_left = 140.0
+offset_top = 384.0
+offset_right = 160.0
+offset_bottom = 576.0
+color = Color(0.82, 0.76, 0.58, 1)
+
+;; Fountain in park center
+[node name="Fountain" type="StaticBody2D" parent="Park"]
+position = Vector2(150, 480)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Park/Fountain"]
+shape = SubResource("RectangleShape2D_fountain")
+
+[node name="FountainBase" type="ColorRect" parent="Park/Fountain"]
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+color = Color(0.6, 0.6, 0.65, 1)
+
+[node name="FountainWater" type="ColorRect" parent="Park/Fountain"]
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
+color = Color(0.4, 0.7, 0.9, 1)
+
+[node name="FountainCenter" type="ColorRect" parent="Park/Fountain"]
+offset_left = -6.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 6.0
+color = Color(0.5, 0.5, 0.55, 1)
+
+;; ============================================================================
+;; HOUSES - TOP ROW (North side of road)
+;; ============================================================================
+
+[node name="Buildings" type="Node2D" parent="."]
+
+;; Momi's House (Player's home) - Yellow
+[node name="MomisHouse" type="StaticBody2D" parent="Buildings"]
+position = Vector2(80, 100)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/MomisHouse"]
+shape = SubResource("RectangleShape2D_house_large")
+
+[node name="Visual" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = -48.0
+offset_top = -32.0
+offset_right = 48.0
+offset_bottom = 32.0
+color = Color(0.95, 0.85, 0.4, 1)
+
+[node name="Roof" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = -52.0
+offset_top = -48.0
+offset_right = 52.0
+offset_bottom = -28.0
+color = Color(0.7, 0.35, 0.2, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = -8.0
+offset_top = 8.0
+offset_right = 8.0
+offset_bottom = 32.0
+color = Color(0.5, 0.3, 0.15, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = -36.0
+offset_top = -12.0
+offset_right = -20.0
+offset_bottom = 8.0
+color = Color(0.7, 0.85, 0.95, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = 20.0
+offset_top = -12.0
+offset_right = 36.0
+offset_bottom = 8.0
+color = Color(0.7, 0.85, 0.95, 1)
+
+[node name="Chimney" type="ColorRect" parent="Buildings/MomisHouse"]
+offset_left = 25.0
+offset_top = -60.0
+offset_right = 40.0
+offset_bottom = -40.0
+color = Color(0.6, 0.3, 0.2, 1)
+
+;; Blue House
+[node name="BlueHouse" type="StaticBody2D" parent="Buildings"]
+position = Vector2(220, 110)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/BlueHouse"]
+shape = SubResource("RectangleShape2D_house_medium")
+
+[node name="Visual" type="ColorRect" parent="Buildings/BlueHouse"]
+offset_left = -40.0
+offset_top = -28.0
+offset_right = 40.0
+offset_bottom = 28.0
+color = Color(0.6, 0.75, 0.9, 1)
+
+[node name="Roof" type="ColorRect" parent="Buildings/BlueHouse"]
+offset_left = -44.0
+offset_top = -42.0
+offset_right = 44.0
+offset_bottom = -24.0
+color = Color(0.3, 0.35, 0.5, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/BlueHouse"]
+offset_left = -6.0
+offset_top = 6.0
+offset_right = 6.0
+offset_bottom = 28.0
+color = Color(0.25, 0.2, 0.15, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/BlueHouse"]
+offset_left = -30.0
+offset_top = -10.0
+offset_right = -16.0
+offset_bottom = 6.0
+color = Color(0.9, 0.95, 1, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/BlueHouse"]
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 6.0
+color = Color(0.9, 0.95, 1, 1)
+
+;; Pink House
+[node name="PinkHouse" type="StaticBody2D" parent="Buildings"]
+position = Vector2(350, 105)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/PinkHouse"]
+shape = SubResource("RectangleShape2D_house_small")
+
+[node name="Visual" type="ColorRect" parent="Buildings/PinkHouse"]
+offset_left = -32.0
+offset_top = -24.0
+offset_right = 32.0
+offset_bottom = 24.0
+color = Color(0.95, 0.75, 0.8, 1)
+
+[node name="Roof" type="ColorRect" parent="Buildings/PinkHouse"]
+offset_left = -36.0
+offset_top = -36.0
+offset_right = 36.0
+offset_bottom = -20.0
+color = Color(0.85, 0.45, 0.55, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/PinkHouse"]
+offset_left = -5.0
+offset_top = 4.0
+offset_right = 5.0
+offset_bottom = 24.0
+color = Color(0.7, 0.35, 0.4, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/PinkHouse"]
+offset_left = -24.0
+offset_top = -8.0
+offset_right = -12.0
+offset_bottom = 6.0
+color = Color(0.85, 0.92, 1, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/PinkHouse"]
+offset_left = 12.0
+offset_top = -8.0
+offset_right = 24.0
+offset_bottom = 6.0
+color = Color(0.85, 0.92, 1, 1)
+
+;; Green House
+[node name="GreenHouse" type="StaticBody2D" parent="Buildings"]
+position = Vector2(470, 100)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/GreenHouse"]
+shape = SubResource("RectangleShape2D_house_large")
+
+[node name="Visual" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = -48.0
+offset_top = -32.0
+offset_right = 48.0
+offset_bottom = 32.0
+color = Color(0.6, 0.8, 0.55, 1)
+
+[node name="Roof" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = -52.0
+offset_top = -48.0
+offset_right = 52.0
+offset_bottom = -28.0
+color = Color(0.35, 0.5, 0.3, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = -8.0
+offset_top = 8.0
+offset_right = 8.0
+offset_bottom = 32.0
+color = Color(0.4, 0.55, 0.35, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = -36.0
+offset_top = -12.0
+offset_right = -20.0
+offset_bottom = 8.0
+color = Color(0.85, 0.95, 0.85, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = 20.0
+offset_top = -12.0
+offset_right = 36.0
+offset_bottom = 8.0
+color = Color(0.85, 0.95, 0.85, 1)
+
+[node name="Garage" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = 52.0
+offset_top = -10.0
+offset_right = 88.0
+offset_bottom = 32.0
+color = Color(0.55, 0.75, 0.5, 1)
+
+[node name="GarageDoor" type="ColorRect" parent="Buildings/GreenHouse"]
+offset_left = 56.0
+offset_top = 2.0
+offset_right = 84.0
+offset_bottom = 32.0
+color = Color(0.5, 0.45, 0.4, 1)
+
+;; Orange House
+[node name="OrangeHouse" type="StaticBody2D" parent="Buildings"]
+position = Vector2(620, 110)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/OrangeHouse"]
+shape = SubResource("RectangleShape2D_house_medium")
+
+[node name="Visual" type="ColorRect" parent="Buildings/OrangeHouse"]
+offset_left = -40.0
+offset_top = -28.0
+offset_right = 40.0
+offset_bottom = 28.0
+color = Color(0.95, 0.7, 0.4, 1)
+
+[node name="Roof" type="ColorRect" parent="Buildings/OrangeHouse"]
+offset_left = -44.0
+offset_top = -42.0
+offset_right = 44.0
+offset_bottom = -24.0
+color = Color(0.8, 0.4, 0.2, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/OrangeHouse"]
+offset_left = -6.0
+offset_top = 6.0
+offset_right = 6.0
+offset_bottom = 28.0
+color = Color(0.6, 0.35, 0.2, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/OrangeHouse"]
+offset_left = -30.0
+offset_top = -10.0
+offset_right = -16.0
+offset_bottom = 6.0
+color = Color(0.95, 0.98, 1, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/OrangeHouse"]
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 6.0
+color = Color(0.95, 0.98, 1, 1)
+
+;; ============================================================================
+;; STORES - BOTTOM ROW (South side of road)
+;; ============================================================================
+
+;; Pet Store (Paw symbol on sign)
+[node name="PetStore" type="StaticBody2D" parent="Buildings"]
+position = Vector2(380, 430)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/PetStore"]
+shape = SubResource("RectangleShape2D_store")
+
+[node name="Visual" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -50.0
+offset_top = -30.0
+offset_right = 50.0
+offset_bottom = 30.0
+color = Color(0.9, 0.85, 0.7, 1)
+
+[node name="Awning" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -54.0
+offset_top = -42.0
+offset_right = 54.0
+offset_bottom = -26.0
+color = Color(0.85, 0.45, 0.35, 1)
+
+[node name="Sign" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -30.0
+offset_top = -58.0
+offset_right = 30.0
+offset_bottom = -42.0
+color = Color(0.3, 0.6, 0.4, 1)
+
+[node name="SignText" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -24.0
+offset_top = -54.0
+offset_right = 24.0
+offset_bottom = -46.0
+color = Color(1, 1, 0.9, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -10.0
+offset_top = 6.0
+offset_right = 10.0
+offset_bottom = 30.0
+color = Color(0.5, 0.7, 0.85, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = -42.0
+offset_top = -16.0
+offset_right = -18.0
+offset_bottom = 8.0
+color = Color(0.75, 0.9, 0.95, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/PetStore"]
+offset_left = 18.0
+offset_top = -16.0
+offset_right = 42.0
+offset_bottom = 8.0
+color = Color(0.75, 0.9, 0.95, 1)
+
+;; Bakery
+[node name="Bakery" type="StaticBody2D" parent="Buildings"]
+position = Vector2(520, 435)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/Bakery"]
+shape = SubResource("RectangleShape2D_store")
+
+[node name="Visual" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -50.0
+offset_top = -30.0
+offset_right = 50.0
+offset_bottom = 30.0
+color = Color(1, 0.95, 0.85, 1)
+
+[node name="Awning" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -54.0
+offset_top = -42.0
+offset_right = 54.0
+offset_bottom = -26.0
+color = Color(0.95, 0.6, 0.7, 1)
+
+[node name="AwningStripe1" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -54.0
+offset_top = -42.0
+offset_right = -36.0
+offset_bottom = -26.0
+color = Color(1, 0.85, 0.9, 1)
+
+[node name="AwningStripe2" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -18.0
+offset_top = -42.0
+offset_right = 0.0
+offset_bottom = -26.0
+color = Color(1, 0.85, 0.9, 1)
+
+[node name="AwningStripe3" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = 18.0
+offset_top = -42.0
+offset_right = 36.0
+offset_bottom = -26.0
+color = Color(1, 0.85, 0.9, 1)
+
+[node name="Sign" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -25.0
+offset_top = -58.0
+offset_right = 25.0
+offset_bottom = -42.0
+color = Color(0.85, 0.55, 0.4, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -8.0
+offset_top = 6.0
+offset_right = 8.0
+offset_bottom = 30.0
+color = Color(0.6, 0.45, 0.35, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = -42.0
+offset_top = -16.0
+offset_right = -16.0
+offset_bottom = 8.0
+color = Color(0.9, 0.95, 1, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/Bakery"]
+offset_left = 16.0
+offset_top = -16.0
+offset_right = 42.0
+offset_bottom = 8.0
+color = Color(0.9, 0.95, 1, 1)
+
+;; Cafe
+[node name="Cafe" type="StaticBody2D" parent="Buildings"]
+position = Vector2(650, 430)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Buildings/Cafe"]
+shape = SubResource("RectangleShape2D_house_medium")
+
+[node name="Visual" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = -40.0
+offset_top = -28.0
+offset_right = 40.0
+offset_bottom = 28.0
+color = Color(0.55, 0.4, 0.35, 1)
+
+[node name="Awning" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = -44.0
+offset_top = -40.0
+offset_right = 44.0
+offset_bottom = -24.0
+color = Color(0.3, 0.5, 0.4, 1)
+
+[node name="Sign" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = -20.0
+offset_top = -54.0
+offset_right = 20.0
+offset_bottom = -40.0
+color = Color(0.8, 0.7, 0.5, 1)
+
+[node name="Door" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = -6.0
+offset_top = 6.0
+offset_right = 6.0
+offset_bottom = 28.0
+color = Color(0.4, 0.3, 0.25, 1)
+
+[node name="Window1" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = -32.0
+offset_top = -12.0
+offset_right = -14.0
+offset_bottom = 6.0
+color = Color(0.85, 0.9, 0.85, 1)
+
+[node name="Window2" type="ColorRect" parent="Buildings/Cafe"]
+offset_left = 14.0
+offset_top = -12.0
+offset_right = 32.0
+offset_bottom = 6.0
+color = Color(0.85, 0.9, 0.85, 1)
+
+;; ============================================================================
+;; DECORATIONS - TREES
+;; ============================================================================
+
+[node name="Decorations" type="Node2D" parent="."]
+
+;; Trees along the top
+[node name="Tree1" type="StaticBody2D" parent="Decorations"]
+position = Vector2(155, 70)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Tree1"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/Tree1"]
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 4.0
+offset_bottom = 20.0
+color = Color(0.45, 0.3, 0.2, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/Tree1"]
+offset_left = -16.0
+offset_top = -24.0
+offset_right = 16.0
+offset_bottom = 4.0
+color = Color(0.3, 0.6, 0.3, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/Tree1"]
+offset_left = -10.0
+offset_top = -32.0
+offset_right = 10.0
+offset_bottom = -20.0
+color = Color(0.35, 0.65, 0.35, 1)
+
+[node name="Tree2" type="StaticBody2D" parent="Decorations"]
+position = Vector2(280, 50)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Tree2"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/Tree2"]
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 4.0
+offset_bottom = 20.0
+color = Color(0.5, 0.35, 0.22, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/Tree2"]
+offset_left = -18.0
+offset_top = -28.0
+offset_right = 18.0
+offset_bottom = 4.0
+color = Color(0.25, 0.55, 0.28, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/Tree2"]
+offset_left = -12.0
+offset_top = -38.0
+offset_right = 12.0
+offset_bottom = -24.0
+color = Color(0.3, 0.6, 0.32, 1)
+
+[node name="Tree3" type="StaticBody2D" parent="Decorations"]
+position = Vector2(410, 180)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Tree3"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/Tree3"]
+offset_left = -5.0
+offset_top = 0.0
+offset_right = 5.0
+offset_bottom = 24.0
+color = Color(0.42, 0.28, 0.18, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/Tree3"]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = 6.0
+color = Color(0.28, 0.58, 0.3, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/Tree3"]
+offset_left = -14.0
+offset_top = -42.0
+offset_right = 14.0
+offset_bottom = -26.0
+color = Color(0.32, 0.62, 0.34, 1)
+
+[node name="Tree4" type="StaticBody2D" parent="Decorations"]
+position = Vector2(560, 170)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Tree4"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/Tree4"]
+offset_left = -4.0
+offset_top = 0.0
+offset_right = 4.0
+offset_bottom = 18.0
+color = Color(0.48, 0.32, 0.2, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/Tree4"]
+offset_left = -14.0
+offset_top = -22.0
+offset_right = 14.0
+offset_bottom = 4.0
+color = Color(0.32, 0.62, 0.32, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/Tree4"]
+offset_left = -8.0
+offset_top = -30.0
+offset_right = 8.0
+offset_bottom = -18.0
+color = Color(0.36, 0.66, 0.36, 1)
+
+;; Park trees
+[node name="ParkTree1" type="StaticBody2D" parent="Decorations"]
+position = Vector2(60, 420)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/ParkTree1"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/ParkTree1"]
+offset_left = -5.0
+offset_top = 0.0
+offset_right = 5.0
+offset_bottom = 22.0
+color = Color(0.4, 0.28, 0.18, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/ParkTree1"]
+offset_left = -18.0
+offset_top = -28.0
+offset_right = 18.0
+offset_bottom = 4.0
+color = Color(0.35, 0.65, 0.38, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/ParkTree1"]
+offset_left = -12.0
+offset_top = -40.0
+offset_right = 12.0
+offset_bottom = -24.0
+color = Color(0.4, 0.7, 0.42, 1)
+
+[node name="ParkTree2" type="StaticBody2D" parent="Decorations"]
+position = Vector2(240, 420)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/ParkTree2"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/ParkTree2"]
+offset_left = -5.0
+offset_top = 0.0
+offset_right = 5.0
+offset_bottom = 22.0
+color = Color(0.4, 0.28, 0.18, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/ParkTree2"]
+offset_left = -18.0
+offset_top = -28.0
+offset_right = 18.0
+offset_bottom = 4.0
+color = Color(0.35, 0.65, 0.38, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/ParkTree2"]
+offset_left = -12.0
+offset_top = -40.0
+offset_right = 12.0
+offset_bottom = -24.0
+color = Color(0.4, 0.7, 0.42, 1)
+
+[node name="ParkTree3" type="StaticBody2D" parent="Decorations"]
+position = Vector2(60, 540)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/ParkTree3"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/ParkTree3"]
+offset_left = -5.0
+offset_top = 0.0
+offset_right = 5.0
+offset_bottom = 22.0
+color = Color(0.4, 0.28, 0.18, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/ParkTree3"]
+offset_left = -18.0
+offset_top = -28.0
+offset_right = 18.0
+offset_bottom = 4.0
+color = Color(0.35, 0.65, 0.38, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/ParkTree3"]
+offset_left = -12.0
+offset_top = -40.0
+offset_right = 12.0
+offset_bottom = -24.0
+color = Color(0.4, 0.7, 0.42, 1)
+
+[node name="ParkTree4" type="StaticBody2D" parent="Decorations"]
+position = Vector2(240, 540)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/ParkTree4"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Decorations/ParkTree4"]
+offset_left = -5.0
+offset_top = 0.0
+offset_right = 5.0
+offset_bottom = 22.0
+color = Color(0.4, 0.28, 0.18, 1)
+
+[node name="Leaves" type="ColorRect" parent="Decorations/ParkTree4"]
+offset_left = -18.0
+offset_top = -28.0
+offset_right = 18.0
+offset_bottom = 4.0
+color = Color(0.35, 0.65, 0.38, 1)
+
+[node name="LeavesTop" type="ColorRect" parent="Decorations/ParkTree4"]
+offset_left = -12.0
+offset_top = -40.0
+offset_right = 12.0
+offset_bottom = -24.0
+color = Color(0.4, 0.7, 0.42, 1)
+
+;; ============================================================================
+;; DECORATIONS - BUSHES
+;; ============================================================================
+
+;; Bushes near houses
+[node name="Bush1" type="ColorRect" parent="Decorations"]
+offset_left = 30.0
+offset_top = 135.0
+offset_right = 50.0
+offset_bottom = 148.0
+color = Color(0.25, 0.5, 0.28, 1)
+
+[node name="Bush2" type="ColorRect" parent="Decorations"]
+offset_left = 110.0
+offset_top = 135.0
+offset_right = 130.0
+offset_bottom = 148.0
+color = Color(0.28, 0.52, 0.3, 1)
+
+[node name="Bush3" type="ColorRect" parent="Decorations"]
+offset_left = 178.0
+offset_top = 140.0
+offset_right = 198.0
+offset_bottom = 153.0
+color = Color(0.25, 0.5, 0.28, 1)
+
+[node name="Bush4" type="ColorRect" parent="Decorations"]
+offset_left = 242.0
+offset_top = 140.0
+offset_right = 262.0
+offset_bottom = 153.0
+color = Color(0.28, 0.52, 0.3, 1)
+
+[node name="Bush5" type="ColorRect" parent="Decorations"]
+offset_left = 318.0
+offset_top = 132.0
+offset_right = 336.0
+offset_bottom = 145.0
+color = Color(0.26, 0.51, 0.29, 1)
+
+[node name="Bush6" type="ColorRect" parent="Decorations"]
+offset_left = 364.0
+offset_top = 132.0
+offset_right = 382.0
+offset_bottom = 145.0
+color = Color(0.24, 0.49, 0.27, 1)
+
+;; Flower bushes (colorful)
+[node name="FlowerBush1" type="ColorRect" parent="Decorations"]
+offset_left = 52.0
+offset_top = 135.0
+offset_right = 70.0
+offset_bottom = 148.0
+color = Color(0.28, 0.52, 0.3, 1)
+
+[node name="Flowers1" type="ColorRect" parent="Decorations"]
+offset_left = 54.0
+offset_top = 134.0
+offset_right = 60.0
+offset_bottom = 140.0
+color = Color(0.95, 0.4, 0.5, 1)
+
+[node name="Flowers1b" type="ColorRect" parent="Decorations"]
+offset_left = 62.0
+offset_top = 136.0
+offset_right = 68.0
+offset_bottom = 142.0
+color = Color(0.95, 0.8, 0.3, 1)
+
+[node name="FlowerBush2" type="ColorRect" parent="Decorations"]
+offset_left = 578.0
+offset_top = 140.0
+offset_right = 598.0
+offset_bottom = 153.0
+color = Color(0.26, 0.5, 0.28, 1)
+
+[node name="Flowers2" type="ColorRect" parent="Decorations"]
+offset_left = 580.0
+offset_top = 139.0
+offset_right = 586.0
+offset_bottom = 145.0
+color = Color(0.9, 0.5, 0.9, 1)
+
+[node name="Flowers2b" type="ColorRect" parent="Decorations"]
+offset_left = 590.0
+offset_top = 141.0
+offset_right = 596.0
+offset_bottom = 147.0
+color = Color(0.95, 0.95, 0.4, 1)
+
+;; ============================================================================
+;; DECORATIONS - LAMP POSTS
+;; ============================================================================
+
+[node name="LampPost1" type="ColorRect" parent="Decorations"]
+offset_left = 196.0
+offset_top = 230.0
+offset_right = 204.0
+offset_bottom = 260.0
+color = Color(0.3, 0.3, 0.32, 1)
+
+[node name="LampLight1" type="ColorRect" parent="Decorations"]
+offset_left = 192.0
+offset_top = 222.0
+offset_right = 208.0
+offset_bottom = 232.0
+color = Color(0.95, 0.9, 0.6, 1)
+
+[node name="LampPost2" type="ColorRect" parent="Decorations"]
+offset_left = 396.0
+offset_top = 230.0
+offset_right = 404.0
+offset_bottom = 260.0
+color = Color(0.3, 0.3, 0.32, 1)
+
+[node name="LampLight2" type="ColorRect" parent="Decorations"]
+offset_left = 392.0
+offset_top = 222.0
+offset_right = 408.0
+offset_bottom = 232.0
+color = Color(0.95, 0.9, 0.6, 1)
+
+[node name="LampPost3" type="ColorRect" parent="Decorations"]
+offset_left = 596.0
+offset_top = 230.0
+offset_right = 604.0
+offset_bottom = 260.0
+color = Color(0.3, 0.3, 0.32, 1)
+
+[node name="LampLight3" type="ColorRect" parent="Decorations"]
+offset_left = 592.0
+offset_top = 222.0
+offset_right = 608.0
+offset_bottom = 232.0
+color = Color(0.95, 0.9, 0.6, 1)
+
+;; ============================================================================
+;; DECORATIONS - BENCHES
+;; ============================================================================
+
+[node name="Bench1" type="StaticBody2D" parent="Decorations"]
+position = Vector2(100, 480)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Bench1"]
+shape = SubResource("RectangleShape2D_bench")
+
+[node name="Seat" type="ColorRect" parent="Decorations/Bench1"]
+offset_left = -16.0
+offset_top = -4.0
+offset_right = 16.0
+offset_bottom = 4.0
+color = Color(0.55, 0.4, 0.28, 1)
+
+[node name="Back" type="ColorRect" parent="Decorations/Bench1"]
+offset_left = -16.0
+offset_top = -10.0
+offset_right = 16.0
+offset_bottom = -4.0
+color = Color(0.5, 0.35, 0.24, 1)
+
+[node name="Leg1" type="ColorRect" parent="Decorations/Bench1"]
+offset_left = -14.0
+offset_top = 4.0
+offset_right = -10.0
+offset_bottom = 10.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+[node name="Leg2" type="ColorRect" parent="Decorations/Bench1"]
+offset_left = 10.0
+offset_top = 4.0
+offset_right = 14.0
+offset_bottom = 10.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+[node name="Bench2" type="StaticBody2D" parent="Decorations"]
+position = Vector2(200, 480)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/Bench2"]
+shape = SubResource("RectangleShape2D_bench")
+
+[node name="Seat" type="ColorRect" parent="Decorations/Bench2"]
+offset_left = -16.0
+offset_top = -4.0
+offset_right = 16.0
+offset_bottom = 4.0
+color = Color(0.55, 0.4, 0.28, 1)
+
+[node name="Back" type="ColorRect" parent="Decorations/Bench2"]
+offset_left = -16.0
+offset_top = -10.0
+offset_right = 16.0
+offset_bottom = -4.0
+color = Color(0.5, 0.35, 0.24, 1)
+
+[node name="Leg1" type="ColorRect" parent="Decorations/Bench2"]
+offset_left = -14.0
+offset_top = 4.0
+offset_right = -10.0
+offset_bottom = 10.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+[node name="Leg2" type="ColorRect" parent="Decorations/Bench2"]
+offset_left = 10.0
+offset_top = 4.0
+offset_right = 14.0
+offset_bottom = 10.0
+color = Color(0.35, 0.35, 0.38, 1)
+
+;; ============================================================================
+;; DECORATIONS - MAILBOXES
+;; ============================================================================
+
+[node name="Mailbox1" type="ColorRect" parent="Decorations"]
+offset_left = 74.0
+offset_top = 150.0
+offset_right = 86.0
+offset_bottom = 170.0
+color = Color(0.2, 0.35, 0.6, 1)
+
+[node name="MailboxPost1" type="ColorRect" parent="Decorations"]
+offset_left = 78.0
+offset_top = 170.0
+offset_right = 82.0
+offset_bottom = 185.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="Mailbox2" type="ColorRect" parent="Decorations"]
+offset_left = 214.0
+offset_top = 155.0
+offset_right = 226.0
+offset_bottom = 175.0
+color = Color(0.7, 0.2, 0.2, 1)
+
+[node name="MailboxPost2" type="ColorRect" parent="Decorations"]
+offset_left = 218.0
+offset_top = 175.0
+offset_right = 222.0
+offset_bottom = 190.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+[node name="Mailbox3" type="ColorRect" parent="Decorations"]
+offset_left = 464.0
+offset_top = 150.0
+offset_right = 476.0
+offset_bottom = 170.0
+color = Color(0.3, 0.5, 0.35, 1)
+
+[node name="MailboxPost3" type="ColorRect" parent="Decorations"]
+offset_left = 468.0
+offset_top = 170.0
+offset_right = 472.0
+offset_bottom = 185.0
+color = Color(0.45, 0.35, 0.28, 1)
+
+;; ============================================================================
+;; DECORATIONS - FIRE HYDRANTS
+;; ============================================================================
+
+[node name="FireHydrant1" type="ColorRect" parent="Decorations"]
+offset_left = 165.0
+offset_top = 248.0
+offset_right = 179.0
+offset_bottom = 262.0
+color = Color(0.85, 0.2, 0.15, 1)
+
+[node name="FireHydrant2" type="ColorRect" parent="Decorations"]
+offset_left = 445.0
+offset_top = 248.0
+offset_right = 459.0
+offset_bottom = 262.0
+color = Color(0.85, 0.2, 0.15, 1)
+
+[node name="FireHydrant3" type="ColorRect" parent="Decorations"]
+offset_left = 665.0
+offset_top = 248.0
+offset_right = 679.0
+offset_bottom = 262.0
+color = Color(0.85, 0.2, 0.15, 1)
+
+;; ============================================================================
+;; DECORATIONS - TRASH CANS
+;; ============================================================================
+
+[node name="TrashCan1" type="ColorRect" parent="Decorations"]
+offset_left = 260.0
+offset_top = 248.0
+offset_right = 276.0
+offset_bottom = 264.0
+color = Color(0.35, 0.45, 0.35, 1)
+
+[node name="TrashCanLid1" type="ColorRect" parent="Decorations"]
+offset_left = 258.0
+offset_top = 244.0
+offset_right = 278.0
+offset_bottom = 250.0
+color = Color(0.4, 0.5, 0.4, 1)
+
+[node name="TrashCan2" type="ColorRect" parent="Decorations"]
+offset_left = 550.0
+offset_top = 248.0
+offset_right = 566.0
+offset_bottom = 264.0
+color = Color(0.35, 0.45, 0.35, 1)
+
+[node name="TrashCanLid2" type="ColorRect" parent="Decorations"]
+offset_left = 548.0
+offset_top = 244.0
+offset_right = 568.0
+offset_bottom = 250.0
+color = Color(0.4, 0.5, 0.4, 1)
+
+;; ============================================================================
+;; DECORATIONS - FENCES
+;; ============================================================================
+
+;; Picket fence sections between houses
+[node name="PicketFence1" type="StaticBody2D" parent="Decorations"]
+position = Vector2(155, 170)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Decorations/PicketFence1"]
+shape = SubResource("RectangleShape2D_fence_h")
+
+[node name="Rail" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = -32.0
+offset_top = -2.0
+offset_right = 32.0
+offset_bottom = 2.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post1" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = -30.0
+offset_top = -12.0
+offset_right = -26.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post2" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = -18.0
+offset_top = -10.0
+offset_right = -14.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post3" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = -6.0
+offset_top = -12.0
+offset_right = -2.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post4" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = 6.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post5" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = 18.0
+offset_top = -12.0
+offset_right = 22.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+[node name="Post6" type="ColorRect" parent="Decorations/PicketFence1"]
+offset_left = 26.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 8.0
+color = Color(0.9, 0.88, 0.85, 1)
+
+;; ============================================================================
+;; BOUNDARIES (invisible walls)
+;; ============================================================================
+
+[node name="Boundaries" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(400, -8)
+shape = SubResource("RectangleShape2D_boundary_h")
+
+[node name="Bottom" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(400, 608)
+shape = SubResource("RectangleShape2D_boundary_h")
+
+[node name="Left" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(-8, 300)
+shape = SubResource("RectangleShape2D_boundary_v")
+
+[node name="Right" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(808, 300)
+shape = SubResource("RectangleShape2D_boundary_v")
+
+;; ============================================================================
+;; PLAYER
+;; ============================================================================
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(100, 500)
+
+;; ============================================================================
+;; ENEMIES
+;; ============================================================================
+
+[node name="Enemies" type="Node2D" parent="."]
+
+;; Raccoons lurking around trash cans and alleys
+[node name="Raccoon1" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(275, 220)
+
+[node name="Raccoon2" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(560, 220)
+
+[node name="Raccoon3" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(450, 520)
+
+[node name="Raccoon4" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(620, 520)
+
+[node name="Raccoon5" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(180, 200)
+
+;; Crows perched and flying around
+[node name="Crow1" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(320, 180)
+
+[node name="Crow2" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(500, 150)
+
+[node name="Crow3" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(680, 180)
+
+[node name="Crow4" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(550, 380)
+
+[node name="Crow5" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(350, 550)
+
+;; ============================================================================
+;; ZONE EXITS
+;; ============================================================================
+
+[node name="ZoneExits" type="Node2D" parent="."]
+
+[node name="ToBackyard" parent="ZoneExits" instance=ExtResource("9_zone_exit")]
+position = Vector2(720, 580)
+exit_id = "to_backyard"
+target_zone = "backyard"
+target_spawn = "from_neighborhood"
+
+;; ============================================================================
+;; UI
+;; ============================================================================
+
+[node name="UI" type="Node" parent="."]
+
+[node name="GameHUD" parent="UI" instance=ExtResource("6_hud")]
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("7_pause")]
+
+[node name="GameOver" parent="UI" instance=ExtResource("8_game_over")]

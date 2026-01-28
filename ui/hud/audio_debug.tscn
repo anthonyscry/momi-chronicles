@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4aud10d3bug"]
+
+[ext_resource type="Script" path="res://ui/hud/audio_debug.gd" id="1_script"]
+
+[node name="AudioDebug" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 70.0
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="Panel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
+text = "♪ TITLE [A]
+F2 = Switch A/B"
+horizontal_alignment = 1
+vertical_alignment = 1

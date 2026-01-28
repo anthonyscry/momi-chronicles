@@ -1,0 +1,111 @@
+Metadata for: momi_chronicle-Backyard_Zone_(Danger_Area)-064916c2-4988-4726-8c76-531c228bfead.wav
+Generated: 2026-01-28T00:03:29.723Z
+
+--- Track Information ---
+Title: Backyard Zone (Danger Area)
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Moody 16-bit SNES exploration cue at 90 BPM; brooding sampled bass and muted tom groove pulse under glassy square leads and airy pads. Melody snakes in small intervals, hinting at danger; counterlines creep in with pizzicato-style stabs and bell tones. Loop points hit on a resolved-but-restless cadence so the track cycles seamlessly for tense backyard prowling in a pixel art action RPG., theme
+
+--- Lyrics ---
+[Instrumental]
+
+Cover Art URL: https://cdn2.suno.ai/image_064916c2-4988-4726-8c76-531c228bfead.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "Backyard Zone (Danger Area)",
+  "play_count": 1,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "064916c2-4988-4726-8c76-531c228bfead",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/064916c2-4988-4726-8c76-531c228bfead.mp3",
+  "image_url": "https://cdn2.suno.ai/image_064916c2-4988-4726-8c76-531c228bfead.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_064916c2-4988-4726-8c76-531c228bfead.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Moody 16-bit SNES exploration cue at 90 BPM; brooding sampled bass and muted tom groove pulse under glassy square leads and airy pads. Melody snakes in small intervals, hinting at danger; counterlines creep in with pizzicato-style stabs and bell tones. Loop points hit on a resolved-but-restless cadence so the track cycles seamlessly for tense backyard prowling in a pixel art action RPG., theme",
+    "prompt": "[Instrumental]",
+    "gpt_description_prompt": "3. Backyard Zone (Danger Area)\nTense 16-bit SNES exploration theme, slightly ominous but adventurous, overgrown backyard mystery, pixel art action RPG, deeper sampled bass, suspenseful Super Nintendo style, prowling through shadows, layered atmosphere, 90 BPM, instrumental, seamless loop, 2 minutes",
+    "type": "gen",
+    "duration": 111.64,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": false,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-27T14:52:23.732Z",
+  "is_public": false,
+  "reaction": {
+    "play_count": 1,
+    "skip_count": 0,
+    "flagged": false,
+    "clip": "064916c2-4988-4726-8c76-531c228bfead",
+    "updated_at": "2026-01-27T23:45:38.011Z"
+  },
+  "is_following_creator": false,
+  "project": {
+    "id": "ed73dc80-8e93-4e8b-b86f-ad9c0c4264d5",
+    "name": "momi chronicle",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "video game music, ambient, chiptune",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 1
+}

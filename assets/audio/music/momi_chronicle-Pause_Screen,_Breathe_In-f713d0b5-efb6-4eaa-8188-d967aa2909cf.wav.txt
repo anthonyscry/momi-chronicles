@@ -1,0 +1,111 @@
+Metadata for: momi_chronicle-Pause_Screen,_Breathe_In-f713d0b5-efb6-4eaa-8188-d967aa2909cf.wav
+Generated: 2026-01-28T00:02:24.567Z
+
+--- Track Information ---
+Title: Pause Screen, Breathe In
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Soft 16-bit chill loop at 80 BPM, glassy arps over warm SNES-style pads, gentle triangle plucks and rounded square-wave accents; harmony holds in a sleepy I–vi–IV–V cycle with small color tones. Dynamics stay low and steady for a peaceful break from action, seamless 60-second loop with a short, sigh-like swell at the turn to keep it alive yet unobtrusive., theme, gentle, ambient, soft
+
+--- Lyrics ---
+[Instrumental]
+
+Cover Art URL: https://cdn2.suno.ai/image_f713d0b5-efb6-4eaa-8188-d967aa2909cf.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "Pause Screen, Breathe In",
+  "play_count": 1,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "f713d0b5-efb6-4eaa-8188-d967aa2909cf",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/f713d0b5-efb6-4eaa-8188-d967aa2909cf.mp3",
+  "image_url": "https://cdn2.suno.ai/image_f713d0b5-efb6-4eaa-8188-d967aa2909cf.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_f713d0b5-efb6-4eaa-8188-d967aa2909cf.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Soft 16-bit chill loop at 80 BPM, glassy arps over warm SNES-style pads, gentle triangle plucks and rounded square-wave accents; harmony holds in a sleepy I–vi–IV–V cycle with small color tones. Dynamics stay low and steady for a peaceful break from action, seamless 60-second loop with a short, sigh-like swell at the turn to keep it alive yet unobtrusive., theme, gentle, ambient, soft",
+    "prompt": "[Instrumental]",
+    "gpt_description_prompt": "7. Pause Menu\nCalm ambient 16-bit SNES theme, muted and relaxed, pixel art game pause screen, gentle arpeggios with soft pads, Super Nintendo holding pattern, peaceful break from action, subtle and unobtrusive, 80 BPM, instrumental, seamless loop, 60 seconds",
+    "type": "gen",
+    "duration": 195,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": false,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-27T14:53:02.249Z",
+  "is_public": false,
+  "reaction": {
+    "play_count": 1,
+    "skip_count": 0,
+    "flagged": false,
+    "clip": "f713d0b5-efb6-4eaa-8188-d967aa2909cf",
+    "updated_at": "2026-01-27T23:46:13.819Z"
+  },
+  "is_following_creator": false,
+  "project": {
+    "id": "ed73dc80-8e93-4e8b-b86f-ad9c0c4264d5",
+    "name": "momi chronicle",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "ambient, chillout",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 1
+}

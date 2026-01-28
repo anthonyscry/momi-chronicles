@@ -1,0 +1,111 @@
+Metadata for: momi_chronicle-Game_Over_Screen-7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160.wav
+Generated: 2026-01-28T00:03:01.044Z
+
+--- Track Information ---
+Title: Game Over Screen
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Melancholic 16-bit SNES orchestral cue at 70 BPM, male-hero tragedy vibe; slow descending strings and choir pads over soft timpani and celesta hits, harmonies grow darker then bloom on a single hopeful final chord that lingers, designed as a 20-second, one-shot ending sting rather than a loop, somber, theme, orchestral, slow
+
+--- Lyrics ---
+[Instrumental]
+
+Cover Art URL: https://cdn2.suno.ai/image_7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "Game Over Screen",
+  "play_count": 1,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160.mp3",
+  "image_url": "https://cdn2.suno.ai/image_7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Melancholic 16-bit SNES orchestral cue at 70 BPM, male-hero tragedy vibe; slow descending strings and choir pads over soft timpani and celesta hits, harmonies grow darker then bloom on a single hopeful final chord that lingers, designed as a 20-second, one-shot ending sting rather than a loop, somber, theme, orchestral, slow",
+    "prompt": "[Instrumental]",
+    "gpt_description_prompt": "5. Game Over Screen (No Loop)\nMelancholic 16-bit SNES game over theme, short and somber, pixel art defeat music, slow descending melody, bittersweet Super Nintendo style, orchestral samples, hopeful ending note suggesting retry, 70 BPM, instrumental, no loop, 20 seconds",
+    "type": "gen",
+    "duration": 137.96,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": false,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-27T14:52:41.982Z",
+  "is_public": false,
+  "reaction": {
+    "play_count": 1,
+    "skip_count": 0,
+    "flagged": false,
+    "clip": "7e61d2fb-3f2d-4e60-8a02-c1f7b10bc160",
+    "updated_at": "2026-01-27T23:45:50.401Z"
+  },
+  "is_following_creator": false,
+  "project": {
+    "id": "ed73dc80-8e93-4e8b-b86f-ad9c0c4264d5",
+    "name": "momi chronicle",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "orchestral, soundtrack",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 0
+}

@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://cdustpuff001"]
+
+[ext_resource type="Script" path="res://components/effects/dust_puff.gd" id="1_dust"]
+
+[sub_resource type="Curve" id="Curve_dust_scale"]
+_data = [Vector2(0, 0.5), 0.0, 2.0, 0, 0, Vector2(0.3, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.5, 0.0, 0, 0]
+point_count = 3
+
+[node name="DustPuff" type="Node2D"]
+script = ExtResource("1_dust")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 6
+lifetime = 0.4
+one_shot = true
+explosiveness = 0.8
+direction = Vector2(0, -1)
+spread = 45.0
+initial_velocity_min = 15.0
+initial_velocity_max = 30.0
+gravity = Vector2(0, 20)
+scale_amount_min = 1.5
+scale_amount_max = 2.5
+scale_amount_curve = SubResource("Curve_dust_scale")
+color = Color(0.7, 0.65, 0.55, 0.8)

@@ -1,0 +1,111 @@
+Metadata for: momi_chronicle-Momi's_Theme_(Hero)-779a6531-d616-470a-a69e-cc36af05d320.wav
+Generated: 2026-01-28T00:04:39.637Z
+
+--- Track Information ---
+Title: Momi's Theme (Hero)
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Bright 8-bit chiptune at 110 BPM with a bouncy, marching groove; square-wave lead carries an instantly hummable hero melody, doubled by a slightly detuned pulse for extra charm. Tight, clicky kick and snare pattern keeps a steady “onward” march, with arpeggiated triads fluttering underneath like loyal companions. Mid-song key change lifts the courage factor, adding simple triangle bass runs and twinkling noise-channel shakers that sparkle like pixel dust. Arrangement loops cleanly for in-game use, keeping energy determined yet adorably heroic., theme, chiptune
+
+--- Lyrics ---
+[Instrumental]
+
+Cover Art URL: https://cdn2.suno.ai/image_779a6531-d616-470a-a69e-cc36af05d320.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "Momi's Theme (Hero)",
+  "play_count": 1,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "779a6531-d616-470a-a69e-cc36af05d320",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/779a6531-d616-470a-a69e-cc36af05d320.mp3",
+  "image_url": "https://cdn2.suno.ai/image_779a6531-d616-470a-a69e-cc36af05d320.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_779a6531-d616-470a-a69e-cc36af05d320.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Bright 8-bit chiptune at 110 BPM with a bouncy, marching groove; square-wave lead carries an instantly hummable hero melody, doubled by a slightly detuned pulse for extra charm. Tight, clicky kick and snare pattern keeps a steady “onward” march, with arpeggiated triads fluttering underneath like loyal companions. Mid-song key change lifts the courage factor, adding simple triangle bass runs and twinkling noise-channel shakers that sparkle like pixel dust. Arrangement loops cleanly for in-game use, keeping energy determined yet adorably heroic., theme, chiptune",
+    "prompt": "[Instrumental]",
+    "gpt_description_prompt": "Momi's Theme (Hero)\nBrave little hero 8-bit theme, determined French bulldog energy, pixel art protagonist melody, courageous but cute, marching chiptune with heart, loyal guardian vibes, adventure awaits, 110 BPM, instrumental",
+    "type": "gen",
+    "duration": 87.4,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": false,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-27T14:48:13.754Z",
+  "is_public": false,
+  "reaction": {
+    "play_count": 1,
+    "skip_count": 0,
+    "flagged": false,
+    "clip": "779a6531-d616-470a-a69e-cc36af05d320",
+    "updated_at": "2026-01-27T23:43:51.896Z"
+  },
+  "is_following_creator": false,
+  "project": {
+    "id": "ed73dc80-8e93-4e8b-b86f-ad9c0c4264d5",
+    "name": "momi chronicle",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "chiptune",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 1
+}

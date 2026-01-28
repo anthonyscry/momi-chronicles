@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3 uid="uid://boss_health_bar_001"]
+
+[ext_resource type="Script" path="res://ui/hud/boss_health_bar.gd" id="1_boss_bar"]
+
+[node name="BossHealthBar" type="Control"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -110.0
+offset_top = 10.0
+offset_right = 110.0
+offset_bottom = 50.0
+script = ExtResource("1_boss_bar")
+
+[node name="Container" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -20.0
+offset_right = 100.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="BossName" type="Label" parent="Container"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0.1, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14
+text = "RACCOON KING"
+horizontal_alignment = 1
+
+[node name="BarContainer" type="Control" parent="Container"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 12)
+
+[node name="Background" type="ColorRect" parent="Container/BarContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.15, 0.1, 0.1, 0.9)
+
+[node name="Fill" type="ColorRect" parent="Container/BarContainer"]
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 12.0
+color = Color(0.9, 0.3, 0.2, 1)
+
+[node name="DamageFill" type="ColorRect" parent="Container/BarContainer"]
+layout_mode = 0
+offset_right = 0.0
+offset_bottom = 12.0
+color = Color(1, 1, 1, 0.7)

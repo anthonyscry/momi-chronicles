@@ -1,0 +1,76 @@
+[gd_scene load_steps=8 format=3 uid="uid://dkp7q2m8x5w1r"]
+
+[ext_resource type="Script" path="res://ui/hud/game_hud.gd" id="1_hud"]
+[ext_resource type="PackedScene" uid="uid://c8r5kvm2t1hq3" path="res://ui/hud/health_bar.tscn" id="2_health_bar"]
+[ext_resource type="PackedScene" uid="uid://combo_counter_001" path="res://ui/hud/combo_counter.tscn" id="3_combo_counter"]
+[ext_resource type="PackedScene" uid="uid://exp_bar_001" path="res://ui/hud/exp_bar.tscn" id="4_exp_bar"]
+[ext_resource type="PackedScene" uid="uid://ability_bar_001" path="res://ui/hud/ability_bar.tscn" id="5_ability_bar"]
+[ext_resource type="PackedScene" uid="uid://boss_health_bar_001" path="res://ui/hud/boss_health_bar.tscn" id="6_boss_health_bar"]
+[ext_resource type="PackedScene" uid="uid://guard_bar_001" path="res://ui/hud/guard_bar.tscn" id="7_guard_bar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug"]
+bg_color = Color(0, 0, 0, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[node name="GameHUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="HealthBar" parent="MarginContainer/VBoxContainer" instance=ExtResource("2_health_bar")]
+layout_mode = 2
+
+[node name="GuardBar" parent="MarginContainer/VBoxContainer" instance=ExtResource("7_guard_bar")]
+layout_mode = 2
+
+[node name="ExpBar" parent="MarginContainer/VBoxContainer" instance=ExtResource("4_exp_bar")]
+layout_mode = 2
+
+[node name="DebugPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_debug")
+
+[node name="AutoBotLabel" type="Label" parent="MarginContainer/VBoxContainer/DebugPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 8
+text = "[AutoBot: ON] F1 to toggle"
+
+[node name="ComboCounter" parent="." instance=ExtResource("3_combo_counter")]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 45.0
+offset_right = 50.0
+offset_bottom = 85.0
+
+[node name="AbilityBar" parent="." instance=ExtResource("5_ability_bar")]
+
+[node name="BossHealthBar" parent="." instance=ExtResource("6_boss_health_bar")]

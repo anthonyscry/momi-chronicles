@@ -1,0 +1,98 @@
+{
+  "essential": [
+    {
+      "name": "Title Screen",
+      "prompt": "Heroic 16-bit SNES theme, adventurous and uplifting, pixel art video game style, French bulldog protagonist vibes, neighborhood adventure, catchy melody with orchestral samples, retro Super Nintendo era inspired, rich layered synth, 120 BPM, instrumental, seamless loop, 90 seconds"
+    },
+    {
+      "name": "Neighborhood Zone",
+      "prompt": "Cheerful 16-bit SNES exploration theme, sunny suburban afternoon, pixel art RPG overworld music, light and bouncy, playful melody with sampled percussion, cozy neighborhood vibes, Super Nintendo soundtrack style, warm synth pads, 100 BPM, instrumental, perfect loop, 2 minutes"
+    },
+    {
+      "name": "Backyard Zone",
+      "prompt": "Tense 16-bit SNES exploration theme, slightly ominous but adventurous, overgrown backyard mystery, pixel art action RPG, deeper sampled bass, suspenseful Super Nintendo style, prowling through shadows, layered atmosphere, 90 BPM, instrumental, seamless loop, 2 minutes"
+    },
+    {
+      "name": "Combat Music",
+      "prompt": "Intense 16-bit SNES battle theme, fast-paced action RPG combat, pixel art boss fight energy, driving sampled drums and aggressive synth leads, heroic dog vs raccoon battle, urgent and exciting, Super Nintendo fighter style, 140 BPM, instrumental, perfect loop, 90 seconds"
+    },
+    {
+      "name": "Game Over",
+      "prompt": "Melancholic 16-bit SNES game over theme, short and somber, pixel art defeat music, slow descending melody, bittersweet Super Nintendo style, orchestral samples, hopeful ending note suggesting retry, 70 BPM, instrumental, no loop, 20 seconds"
+    },
+    {
+      "name": "Victory Fanfare",
+      "prompt": "Triumphant 16-bit SNES victory fanfare, short celebratory jingle, pixel art RPG level complete, ascending cheerful melody with brass samples, retro Super Nintendo achievement sound, heroic and satisfying, instrumental, no loop, 15 seconds"
+    },
+    {
+      "name": "Pause Menu",
+      "prompt": "Calm ambient 16-bit SNES theme, muted and relaxed, pixel art game pause screen, gentle arpeggios with soft pads, Super Nintendo holding pattern, peaceful break from action, subtle and unobtrusive, 80 BPM, instrumental, seamless loop, 60 seconds"
+    }
+  ],
+  "character_themes": [
+    {
+      "name": "Momi Hero Theme",
+      "prompt": "Brave little hero 16-bit SNES theme, determined French bulldog energy, pixel art protagonist melody, courageous but cute, marching rhythm with orchestral samples, loyal guardian vibes, Super Nintendo adventure style, 110 BPM, instrumental, seamless loop, 90 seconds"
+    },
+    {
+      "name": "Momi Emotional",
+      "prompt": "Heartfelt 16-bit SNES character theme, loyal dog protecting home, bittersweet pixel art melody, gentle Super Nintendo emotional depth, small hero big heart, nostalgic retro RPG music, string samples and soft piano, 85 BPM, instrumental, perfect loop, 2 minutes"
+    },
+    {
+      "name": "Raccoon Gang",
+      "prompt": "Mischievous 16-bit SNES villain theme, sneaky raccoon troublemakers, playfully menacing Super Nintendo style, pixel art antagonist music, trash panda chaos energy, comedic but threatening, minor key with jazzy samples, 95 BPM, instrumental, seamless loop, 90 seconds"
+    },
+    {
+      "name": "Crow Theme",
+      "prompt": "Ominous 16-bit SNES flying enemy theme, circling crows overhead, sharp staccato Super Nintendo notes, pixel art aerial threat, quick and darting melody, unsettling atmospheric samples, 120 BPM, instrumental, perfect loop, 60 seconds"
+    }
+  ],
+  "zone_variations": [
+    {
+      "name": "Neighborhood Morning",
+      "prompt": "Bright cheerful 16-bit SNES morning theme, sunrise in suburbia, birds chirping with sampled sounds, pixel art new day beginning, optimistic and fresh, light bells and warm synth pads, Super Nintendo RPG style, 105 BPM, instrumental, seamless loop, 2 minutes"
+    },
+    {
+      "name": "Neighborhood Evening",
+      "prompt": "Warm sunset 16-bit SNES theme, golden hour in pixel art suburb, relaxed but alert Super Nintendo style, orange sky vibes, gentle melody winding down, peaceful patrol music with soft strings, 90 BPM, instrumental, perfect loop, 2 minutes"
+    },
+    {
+      "name": "Neighborhood Night",
+      "prompt": "Mysterious 16-bit SNES night theme, moonlit suburban patrol, pixel art stealth vibes, gentle but alert Super Nintendo atmosphere, quiet neighborhood after dark, subtle tension with muted samples, 85 BPM, instrumental, seamless loop, 2 minutes"
+    },
+    {
+      "name": "Backyard Deep Woods",
+      "prompt": "Dark mysterious 16-bit SNES forest theme, overgrown backyard jungle, creeping Super Nintendo tension, pixel art unknown territory, rustling leaves with ambient samples, exploration anxiety, layered atmosphere, 80 BPM, instrumental, perfect loop, 2 minutes"
+    },
+    {
+      "name": "Backyard Shed",
+      "prompt": "Eerie 16-bit SNES abandoned building theme, creaky old shed vibes, unsettling Super Nintendo ambience, pixel art horror lite, something lurking inside, building dread with dark samples, 75 BPM, instrumental, seamless loop, 90 seconds"
+    }
+  ],
+  "combat_variations": [
+    {
+      "name": "First Encounter",
+      "prompt": "Exciting 16-bit SNES first battle theme, tutorial fight energy, encouraging Super Nintendo combat music, pixel art beginner battle, you can do this feeling, heroic but not overwhelming, bright sampled brass, 125 BPM, instrumental, seamless loop, 60 seconds"
+    },
+    {
+      "name": "Surrounded",
+      "prompt": "Intense 16-bit SNES surrounded theme, multiple enemies closing in, frantic Super Nintendo desperation, pixel art last stand music, rapid sampled drums and urgent melody, fight for survival, 150 BPM, instrumental, perfect loop, 90 seconds"
+    },
+    {
+      "name": "Winning",
+      "prompt": "Triumphant 16-bit SNES gaining ground theme, turning the tide in battle, confident Super Nintendo momentum, pixel art combat advantage, aggressive but controlled, victory within reach, bold brass samples, 135 BPM, instrumental, seamless loop, 60 seconds"
+    },
+    {
+      "name": "Low Health",
+      "prompt": "Desperate 16-bit SNES low HP theme, heartbeat warning drums, tense Super Nintendo danger music, pixel art critical health, alarm bells with urgent samples, one hit from death, scary and intense, 140 BPM, instrumental, perfect loop, 60 seconds"
+    },
+    {
+      "name": "Boss Fight",
+      "prompt": "Epic 16-bit SNES boss battle theme, ultimate showdown Super Nintendo style, pixel art final confrontation, dramatic and intense, heavy bass drops and soaring orchestral samples, legendary fight music, 145 BPM, instrumental, seamless loop, 2 minutes"
+    },
+    {
+      "name": "Chase",
+      "prompt": "Frantic 16-bit SNES chase theme, being hunted by raccoons, pixel art escape music, rapid heartbeat sampled drums, urgent Super Nintendo melody, comedic but tense, 150 BPM, instrumental, perfect loop, 90 seconds"
+    }
+  ]
+}

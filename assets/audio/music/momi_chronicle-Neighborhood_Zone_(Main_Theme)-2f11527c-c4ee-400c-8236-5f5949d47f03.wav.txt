@@ -1,0 +1,111 @@
+Metadata for: momi_chronicle-Neighborhood_Zone_(Main_Theme)-2f11527c-c4ee-400c-8236-5f5949d47f03.wav
+Generated: 2026-01-28T00:03:47.358Z
+
+--- Track Information ---
+Title: Neighborhood Zone (Main Theme)
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Cheerful 16-bit SNES overworld loop at 100 BPM, bright chiptune leads over warm pads and sampled percussion. Bouncy, singable top-line with call-and-response countermelodies; gentle modulation in the B section to keep a 2-minute loop engaging. Soft bass pulses and simple triad arps evoke sunny suburb comfort, with a short tag that resolves cleanly into the loop point., light, warm, soundtrack, theme, playful
+
+--- Lyrics ---
+[Instrumental]
+
+Cover Art URL: https://cdn2.suno.ai/image_2f11527c-c4ee-400c-8236-5f5949d47f03.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "Neighborhood Zone (Main Theme)",
+  "play_count": 1,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "2f11527c-c4ee-400c-8236-5f5949d47f03",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/2f11527c-c4ee-400c-8236-5f5949d47f03.mp3",
+  "image_url": "https://cdn2.suno.ai/image_2f11527c-c4ee-400c-8236-5f5949d47f03.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_2f11527c-c4ee-400c-8236-5f5949d47f03.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Cheerful 16-bit SNES overworld loop at 100 BPM, bright chiptune leads over warm pads and sampled percussion. Bouncy, singable top-line with call-and-response countermelodies; gentle modulation in the B section to keep a 2-minute loop engaging. Soft bass pulses and simple triad arps evoke sunny suburb comfort, with a short tag that resolves cleanly into the loop point., light, warm, soundtrack, theme, playful",
+    "prompt": "[Instrumental]",
+    "gpt_description_prompt": "2. Neighborhood Zone (Main Theme)\nCheerful 16-bit SNES exploration theme, sunny suburban afternoon, pixel art RPG overworld music, light and bouncy, playful melody with sampled percussion, cozy neighborhood vibes, Super Nintendo soundtrack style, warm synth pads, 100 BPM, instrumental, perfect loop, 2 minutes",
+    "type": "gen",
+    "duration": 51.6,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": false,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-27T14:52:06.671Z",
+  "is_public": false,
+  "reaction": {
+    "play_count": 1,
+    "skip_count": 0,
+    "flagged": false,
+    "clip": "2f11527c-c4ee-400c-8236-5f5949d47f03",
+    "updated_at": "2026-01-27T23:45:31.513Z"
+  },
+  "is_following_creator": false,
+  "project": {
+    "id": "ed73dc80-8e93-4e8b-b86f-ad9c0c4264d5",
+    "name": "momi chronicle",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "chiptune, soundtrack",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 1
+}

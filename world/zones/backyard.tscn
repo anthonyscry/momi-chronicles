@@ -1,0 +1,236 @@
+[gd_scene load_steps=10 format=3 uid="uid://cby7k3m2p5x8q"]
+
+[ext_resource type="Script" path="res://world/zones/backyard.gd" id="1_backyard"]
+[ext_resource type="TileSet" uid="uid://cwt7k3m2p5x8q" path="res://assets/tiles/world_tileset.tres" id="2_tileset"]
+[ext_resource type="PackedScene" uid="uid://c1kpwx5v8mh5r" path="res://characters/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://dpk3q7x8nvw2r" path="res://characters/enemies/raccoon.tscn" id="4_raccoon"]
+[ext_resource type="PackedScene" uid="uid://b5yqk2w8m1pxc" path="res://characters/enemies/crow.tscn" id="5_crow"]
+[ext_resource type="PackedScene" uid="uid://dkp7q2m8x5w1r" path="res://ui/hud/game_hud.tscn" id="6_hud"]
+[ext_resource type="PackedScene" uid="uid://cxr7k3m2p5w8q" path="res://ui/menus/pause_menu.tscn" id="7_pause"]
+[ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="8_game_over"]
+[ext_resource type="PackedScene" uid="uid://bze7k3m2p5x8q" path="res://components/zone_exit/zone_exit.tscn" id="9_zone_exit"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_h"]
+size = Vector2(384, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_v"]
+size = Vector2(16, 216)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shed"]
+size = Vector2(48, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tree"]
+size = Vector2(24, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bush"]
+size = Vector2(20, 16)
+
+[node name="Backyard" type="Node2D"]
+script = ExtResource("1_backyard")
+zone_size = Vector2(384, 216)
+zone_id = "backyard"
+player_spawn = Vector2(30, 108)
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 384.0
+offset_bottom = 216.0
+color = Color(0.25, 0.45, 0.25, 1)
+
+[node name="GroundTileMap" type="TileMap" parent="."]
+tile_set = ExtResource("2_tileset")
+format = 2
+
+[node name="GrassPatches" type="Node2D" parent="."]
+
+[node name="Grass1" type="ColorRect" parent="GrassPatches"]
+offset_left = 100.0
+offset_top = 50.0
+offset_right = 180.0
+offset_bottom = 100.0
+color = Color(0.35, 0.55, 0.3, 1)
+
+[node name="Grass2" type="ColorRect" parent="GrassPatches"]
+offset_left = 200.0
+offset_top = 120.0
+offset_right = 300.0
+offset_bottom = 180.0
+color = Color(0.4, 0.6, 0.35, 1)
+
+[node name="DirtPath" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 90.0
+offset_right = 60.0
+offset_bottom = 126.0
+color = Color(0.55, 0.45, 0.35, 1)
+
+[node name="Boundaries" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(192, -8)
+shape = SubResource("RectangleShape2D_boundary_h")
+
+[node name="Bottom" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(192, 224)
+shape = SubResource("RectangleShape2D_boundary_h")
+
+[node name="Left" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(-8, 108)
+shape = SubResource("RectangleShape2D_boundary_v")
+
+[node name="Right" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(392, 108)
+shape = SubResource("RectangleShape2D_boundary_v")
+
+[node name="Obstacles" type="Node2D" parent="."]
+
+[node name="Shed" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(320, 50)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/Shed"]
+shape = SubResource("RectangleShape2D_shed")
+
+[node name="Visual" type="ColorRect" parent="Obstacles/Shed"]
+offset_left = -24.0
+offset_top = -20.0
+offset_right = 24.0
+offset_bottom = 20.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="Roof" type="ColorRect" parent="Obstacles/Shed"]
+offset_left = -28.0
+offset_top = -26.0
+offset_right = 28.0
+offset_bottom = -18.0
+color = Color(0.3, 0.2, 0.15, 1)
+
+[node name="Tree1" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(100, 160)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/Tree1"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Obstacles/Tree1"]
+offset_left = -6.0
+offset_top = -8.0
+offset_right = 6.0
+offset_bottom = 12.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="Leaves" type="ColorRect" parent="Obstacles/Tree1"]
+offset_left = -16.0
+offset_top = -28.0
+offset_right = 16.0
+offset_bottom = -4.0
+color = Color(0.2, 0.5, 0.2, 1)
+
+[node name="Tree2" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(280, 180)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/Tree2"]
+shape = SubResource("RectangleShape2D_tree")
+
+[node name="Trunk" type="ColorRect" parent="Obstacles/Tree2"]
+offset_left = -6.0
+offset_top = -8.0
+offset_right = 6.0
+offset_bottom = 12.0
+color = Color(0.35, 0.25, 0.15, 1)
+
+[node name="Leaves" type="ColorRect" parent="Obstacles/Tree2"]
+offset_left = -16.0
+offset_top = -28.0
+offset_right = 16.0
+offset_bottom = -4.0
+color = Color(0.2, 0.5, 0.2, 1)
+
+[node name="Bush1" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(150, 80)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/Bush1"]
+shape = SubResource("RectangleShape2D_bush")
+
+[node name="Visual" type="ColorRect" parent="Obstacles/Bush1"]
+offset_left = -10.0
+offset_top = -8.0
+offset_right = 10.0
+offset_bottom = 8.0
+color = Color(0.15, 0.45, 0.15, 1)
+
+[node name="Bush2" type="StaticBody2D" parent="Obstacles"]
+position = Vector2(220, 60)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Obstacles/Bush2"]
+shape = SubResource("RectangleShape2D_bush")
+
+[node name="Visual" type="ColorRect" parent="Obstacles/Bush2"]
+offset_left = -10.0
+offset_top = -8.0
+offset_right = 10.0
+offset_bottom = 8.0
+color = Color(0.15, 0.45, 0.15, 1)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(30, 108)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Raccoon1" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(200, 140)
+
+[node name="Raccoon2" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(300, 120)
+
+[node name="Raccoon3" parent="Enemies" instance=ExtResource("4_raccoon")]
+position = Vector2(180, 80)
+
+[node name="Crow1" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(250, 50)
+
+[node name="Crow2" parent="Enemies" instance=ExtResource("5_crow")]
+position = Vector2(350, 150)
+
+[node name="ZoneExits" type="Node2D" parent="."]
+
+[node name="ToNeighborhood" parent="ZoneExits" instance=ExtResource("9_zone_exit")]
+position = Vector2(16, 108)
+exit_id = "to_neighborhood"
+target_zone = "neighborhood"
+target_spawn = "from_backyard"
+
+[node name="ToBossArena" parent="ZoneExits" instance=ExtResource("9_zone_exit")]
+position = Vector2(368, 108)
+exit_id = "to_boss_arena"
+target_zone = "boss_arena"
+target_spawn = "default"
+
+[node name="BossEntranceSign" type="Label" parent="ZoneExits"]
+offset_left = 330.0
+offset_top = 80.0
+offset_right = 390.0
+offset_bottom = 95.0
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
+text = "DANGER!"
+horizontal_alignment = 1
+
+[node name="UI" type="Node" parent="."]
+
+[node name="GameHUD" parent="UI" instance=ExtResource("6_hud")]
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("7_pause")]
+
+[node name="GameOver" parent="UI" instance=ExtResource("8_game_over")]

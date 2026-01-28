@@ -1,0 +1,100 @@
+Metadata for: momichronicles2-Untitled-58fd4781-48db-499b-959c-0fe033c40644.wav
+Generated: 2026-01-28T00:53:53.325Z
+
+--- Track Information ---
+Artist: Tony Tran
+Year: 2026
+
+--- Musical Information ---
+
+--- Creation Details ---
+Prompt: Mysterious 16-bit SNES night theme, moonlit suburban patrol, pixel art stealth vibes, gentle but alert Super Nintendo atmosphere, quiet neighborhood after dark, subtle tension with muted samples, 85 BPM, instrumental, seamless loop, 2 minutes
+
+
+Cover Art URL: https://cdn2.suno.ai/image_58fd4781-48db-499b-959c-0fe033c40644.jpeg
+
+--- Raw API Response ---
+{
+  "status": "complete",
+  "title": "",
+  "play_count": 0,
+  "upvote_count": 0,
+  "allow_comments": true,
+  "id": "58fd4781-48db-499b-959c-0fe033c40644",
+  "entity_type": "song_schema",
+  "video_url": "",
+  "audio_url": "https://cdn1.suno.ai/58fd4781-48db-499b-959c-0fe033c40644.mp3",
+  "image_url": "https://cdn2.suno.ai/image_58fd4781-48db-499b-959c-0fe033c40644.jpeg",
+  "image_large_url": "https://cdn2.suno.ai/image_large_58fd4781-48db-499b-959c-0fe033c40644.jpeg",
+  "major_model_version": "v5",
+  "model_name": "chirp-crow",
+  "metadata": {
+    "tags": "Mysterious 16-bit SNES night theme, moonlit suburban patrol, pixel art stealth vibes, gentle but alert Super Nintendo atmosphere, quiet neighborhood after dark, subtle tension with muted samples, 85 BPM, instrumental, seamless loop, 2 minutes",
+    "prompt": "",
+    "type": "gen",
+    "duration": 150.16,
+    "refund_credits": false,
+    "stream": true,
+    "make_instrumental": true,
+    "can_remix": true,
+    "is_remix": false,
+    "priority": 10,
+    "has_stem": false,
+    "uses_latest_model": true,
+    "model_badges": {
+      "songcard": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "0000004D",
+          "border_color": "00000000"
+        }
+      },
+      "songrow": {
+        "display_name": "v5",
+        "light": {
+          "text_color": "FD429C",
+          "background_color": "FD429C1A",
+          "border_color": "00000000"
+        },
+        "dark": {
+          "text_color": "FD429C",
+          "background_color": "FD429C40",
+          "border_color": "00000000"
+        }
+      }
+    }
+  },
+  "is_liked": false,
+  "user_id": "63c4b7ec-d6c8-473d-9c8a-56acb0becb36",
+  "display_name": "Tony Tran",
+  "handle": "anthonyscry",
+  "is_handle_updated": true,
+  "avatar_image_url": "https://cdn1.suno.ai/723f6d07.webp",
+  "is_trashed": false,
+  "created_at": "2026-01-28T00:39:45.675Z",
+  "is_public": false,
+  "is_following_creator": false,
+  "project": {
+    "id": "14d8d014-e48c-4d33-9943-8a6fa34dd3b6",
+    "name": "momichronicles2",
+    "description": "",
+    "is_trashed": false,
+    "is_public": false
+  },
+  "ownership": {
+    "ownership_reason": "subscribed"
+  },
+  "explicit": false,
+  "comment_count": 0,
+  "flag_count": 0,
+  "display_tags": "chiptune, ambient, instrumental",
+  "is_contest_clip": false,
+  "has_hook": false,
+  "batch_index": 1
+}

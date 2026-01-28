@@ -1,0 +1,71 @@
+[gd_scene load_steps=8 format=3 uid="uid://bx8qp5ckyt7hd"]
+
+[ext_resource type="Script" path="res://world/zones/test_zone.gd" id="1_test_zone"]
+[ext_resource type="PackedScene" uid="uid://c1kpwx5v8mh5r" path="res://characters/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://dpk3q7x8nvw2r" path="res://characters/enemies/raccoon.tscn" id="3_raccoon"]
+[ext_resource type="PackedScene" uid="uid://b5yqk2w8m1pxc" path="res://characters/enemies/crow.tscn" id="4_crow"]
+[ext_resource type="PackedScene" uid="uid://dkp7q2m8x5w1r" path="res://ui/hud/game_hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" uid="uid://cxr7k3m2p5w8q" path="res://ui/menus/pause_menu.tscn" id="6_pause"]
+[ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="7_game_over"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary"]
+size = Vector2(640, 16)
+
+[node name="TestZone" type="Node2D"]
+script = ExtResource("1_test_zone")
+zone_size = Vector2(640, 360)
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 360.0
+color = Color(0.2, 0.35, 0.2, 1)
+
+[node name="Boundaries" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="Top" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(320, -8)
+shape = SubResource("RectangleShape2D_boundary")
+
+[node name="Bottom" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(320, 368)
+shape = SubResource("RectangleShape2D_boundary")
+
+[node name="Left" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(-8, 180)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_boundary")
+
+[node name="Right" type="CollisionShape2D" parent="Boundaries"]
+position = Vector2(648, 180)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_boundary")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(100, 180)
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Raccoon1" parent="Enemies" instance=ExtResource("3_raccoon")]
+position = Vector2(300, 150)
+
+[node name="Raccoon2" parent="Enemies" instance=ExtResource("3_raccoon")]
+position = Vector2(400, 250)
+
+[node name="Raccoon3" parent="Enemies" instance=ExtResource("3_raccoon")]
+position = Vector2(500, 180)
+
+[node name="Crow1" parent="Enemies" instance=ExtResource("4_crow")]
+position = Vector2(350, 80)
+
+[node name="Crow2" parent="Enemies" instance=ExtResource("4_crow")]
+position = Vector2(550, 300)
+
+[node name="UI" type="Node" parent="."]
+
+[node name="GameHUD" parent="UI" instance=ExtResource("5_hud")]
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("6_pause")]
+
+[node name="GameOver" parent="UI" instance=ExtResource("7_game_over")]

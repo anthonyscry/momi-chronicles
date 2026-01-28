@@ -1,0 +1,24 @@
+<svg height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="124" height="124" rx="14" fill="#363d52" stroke="#212532" stroke-width="4"/>
+  <g transform="translate(32, 24)">
+    <!-- Momi's face (French Bulldog) -->
+    <ellipse cx="32" cy="40" rx="28" ry="24" fill="#d4a574"/>
+    <!-- Ears -->
+    <ellipse cx="8" cy="20" rx="8" ry="12" fill="#d4a574"/>
+    <ellipse cx="56" cy="20" rx="8" ry="12" fill="#d4a574"/>
+    <!-- Inner ears -->
+    <ellipse cx="8" cy="22" rx="4" ry="6" fill="#c4956a"/>
+    <ellipse cx="56" cy="22" rx="4" ry="6" fill="#c4956a"/>
+    <!-- Eyes -->
+    <circle cx="20" cy="36" r="6" fill="#2d2d2d"/>
+    <circle cx="44" cy="36" r="6" fill="#2d2d2d"/>
+    <circle cx="22" cy="34" r="2" fill="white"/>
+    <circle cx="46" cy="34" r="2" fill="white"/>
+    <!-- Nose -->
+    <ellipse cx="32" cy="48" rx="8" ry="6" fill="#2d2d2d"/>
+    <!-- Mouth -->
+    <path d="M 24 54 Q 32 60 40 54" stroke="#2d2d2d" stroke-width="2" fill="none"/>
+  </g>
+  <!-- Text -->
+  <text x="64" y="108" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#cbd5e1">MOMI</text>
+</svg>
