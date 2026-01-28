@@ -1,18 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://bm5qk2p8x1w7r"]
+[gd_scene load_steps=3 format=3 uid="uid://bm5qk2p8x1w7r"]
 
 [ext_resource type="Script" path="res://ui/menus/game_over.gd" id="1_game_over"]
+[ext_resource type="Theme" uid="uid://menu_theme_001" path="res://ui/theme/menu_theme.tres" id="2_theme"]
 
 [node name="GameOver" type="CanvasLayer"]
 layer = 100
 script = ExtResource("1_game_over")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Overlay" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.2, 0, 0, 0.7)
+color = Color(0.15, 0.02, 0.02, 0.85)
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 8
@@ -20,29 +21,62 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -60.0
-offset_top = -50.0
-offset_right = 60.0
-offset_bottom = 50.0
+offset_left = -80.0
+offset_top = -70.0
+offset_right = 80.0
+offset_bottom = 70.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_theme")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 alignment = 1
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.9, 0.2, 0.2, 1)
+theme_override_colors/font_color = Color(0.95, 0.25, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.05, 0.05, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 16
 text = "GAME OVER"
 horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="LevelLabel" type="Label" parent="Panel/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.75, 0.9)
+theme_override_font_sizes/font_size = 9
+text = "Level Reached: 1"
+horizontal_alignment = 1
+
+[node name="CoinsLabel" type="Label" parent="Panel/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 0.9)
+theme_override_font_sizes/font_size = 9
+text = "Coins: 0"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
 
 [node name="RetryButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
@@ -50,4 +84,4 @@ text = "Retry"
 
 [node name="QuitButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-text = "Quit"
+text = "Quit to Title"
