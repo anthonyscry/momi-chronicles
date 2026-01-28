@@ -64,6 +64,9 @@ var is_frozen: bool = false
 # LIFECYCLE
 # =============================================================================
 
+## Ambient particle system (auto-spawned per zone)
+var _ambient_particles: Node2D = null
+
 func _ready() -> void:
 	# Pre-warm pools
 	for effect_name in effect_scenes.keys():
@@ -71,6 +74,10 @@ func _ready() -> void:
 	
 	# Connect to combat events for automatic effects
 	_connect_signals()
+	
+	# Auto-spawn ambient particles on zone entry
+	Events.zone_entered.connect(_on_zone_entered_particles)
+	
 	print("EffectsManager ready")
 
 
@@ -1154,6 +1161,22 @@ func camera_punch(zoom_amount: float = 1.1, duration: float = 0.15) -> void:
 	tween.tween_property(camera, "zoom", original_zoom, duration * 0.7)\
 		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_callback(func(): camera_punch_active = false)
+
+# =============================================================================
+# AMBIENT WORLD PARTICLES
+# =============================================================================
+
+## Spawn ambient particles for the current zone
+func _on_zone_entered_particles(zone_name: String) -> void:
+	# Remove old ambient particles
+	if _ambient_particles and is_instance_valid(_ambient_particles):
+		_ambient_particles.queue_free()
+	
+	# Create new ambient particles for this zone
+	var AmbientParticlesClass = preload("res://components/effects/ambient_particles.gd")
+	_ambient_particles = AmbientParticles.new()
+	_ambient_particles.set_style_for_zone(zone_name)
+	add_child(_ambient_particles)
 
 # =============================================================================
 # DAMAGE DIRECTION INDICATOR
