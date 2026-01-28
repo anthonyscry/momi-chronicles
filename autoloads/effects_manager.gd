@@ -461,54 +461,187 @@ func _on_player_level_up(new_level: int) -> void:
 	if not player:
 		return
 	
-	# Create level up visual
-	_create_level_up_effect(player)
+	# Play level up sound
+	AudioManager.play_sfx("level_up")
+	
+	# Brief slowmo for impact
+	_level_up_slowmo()
+	
+	# Create all visual effects
+	_create_level_up_celebration(player, new_level)
 	
 	# Screen effects
-	screen_shake(8.0, 0.3)
-	_flash_screen(Color(1, 0.95, 0.6, 0.4), 0.3)
+	screen_shake(12.0, 0.4)
+	_flash_screen(Color(1, 0.95, 0.5, 0.5), 0.4)
 
 
-func _create_level_up_effect(target: Node2D) -> void:
-	# Create expanding ring of particles
-	_create_ring_effect(target.global_position)
+func _level_up_slowmo() -> void:
+	# Brief slowmo for dramatic effect
+	Engine.time_scale = 0.3
+	await get_tree().create_timer(0.15 * 0.3).timeout  # Adjusted for slowmo
 	
-	# Create floating "LEVEL UP!" text
-	var label = Label.new()
-	label.text = "LEVEL UP!"
-	label.add_theme_font_size_override("font_size", 16)
-	label.add_theme_color_override("font_color", Color(1, 0.9, 0.3))
-	label.add_theme_color_override("font_outline_color", Color(0.3, 0.2, 0))
-	label.add_theme_constant_override("outline_size", 2)
-	label.global_position = target.global_position + Vector2(-35, -35)
-	label.z_index = 100
-	get_tree().current_scene.add_child(label)
-	
-	# Animate text floating up and fading
+	# Smoothly return to normal
 	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(label, "global_position:y", label.global_position.y - 40, 1.0)
-	tween.tween_property(label, "modulate:a", 0.0, 1.0).set_delay(0.5)
-	tween.chain().tween_callback(label.queue_free)
+	tween.set_ignore_time_scale(true)
+	tween.tween_property(Engine, "time_scale", 1.0, 0.2)
 
 
-func _create_ring_effect(pos: Vector2) -> void:
-	# Simple expanding circle using particles going outward
-	for i in range(8):
-		var angle = i * TAU / 8
-		var particle = ColorRect.new()
-		particle.size = Vector2(4, 4)
-		particle.color = Color(1, 0.9, 0.4, 1)
-		particle.global_position = pos
-		particle.z_index = 100
-		get_tree().current_scene.add_child(particle)
+func _create_level_up_celebration(target: Node2D, new_level: int) -> void:
+	var pos = target.global_position
+	
+	# 1. Golden aura glow around player
+	_create_level_up_aura(target)
+	
+	# 2. Multiple expanding rings
+	_create_level_up_rings(pos)
+	
+	# 3. Sparkle particles shooting up
+	_create_level_up_sparkles(pos)
+	
+	# 4. Big "LEVEL UP!" text
+	_create_level_up_text(pos, new_level)
+	
+	# 5. Stat increase popups (delayed)
+	await get_tree().create_timer(0.3).timeout
+	_create_stat_popups(pos)
+
+
+func _create_level_up_aura(target: Node2D) -> void:
+	# Golden glow circle around player
+	var aura = ColorRect.new()
+	aura.size = Vector2(40, 40)
+	aura.color = Color(1, 0.85, 0.3, 0.6)
+	aura.pivot_offset = aura.size / 2
+	aura.position = target.position - aura.size / 2
+	aura.z_index = -1
+	target.add_child(aura)
+	
+	# Pulse and fade
+	var tween = create_tween()
+	tween.tween_property(aura, "scale", Vector2(2.5, 2.5), 0.5).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(aura, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(aura.queue_free)
+
+
+func _create_level_up_rings(pos: Vector2) -> void:
+	# Multiple expanding rings with delay
+	for ring_idx in range(3):
+		await get_tree().create_timer(0.1 * ring_idx).timeout
 		
-		var end_pos = pos + Vector2(cos(angle), sin(angle)) * 30
+		var particle_count = 12 + ring_idx * 4
+		var ring_radius = 25 + ring_idx * 15
+		
+		for i in range(particle_count):
+			var angle = i * TAU / particle_count
+			var particle = ColorRect.new()
+			particle.size = Vector2(3, 3)
+			
+			# Color gradient: gold -> yellow -> white
+			var colors = [Color(1, 0.8, 0.2), Color(1, 0.95, 0.4), Color(1, 1, 0.8)]
+			particle.color = colors[ring_idx]
+			particle.global_position = pos
+			particle.z_index = 100
+			get_tree().current_scene.add_child(particle)
+			
+			var end_pos = pos + Vector2(cos(angle), sin(angle)) * ring_radius
+			var tween = create_tween()
+			tween.set_parallel(true)
+			tween.tween_property(particle, "global_position", end_pos, 0.3 + ring_idx * 0.1).set_ease(Tween.EASE_OUT)
+			tween.tween_property(particle, "modulate:a", 0.0, 0.3 + ring_idx * 0.1).set_delay(0.1)
+			tween.chain().tween_callback(particle.queue_free)
+
+
+func _create_level_up_sparkles(pos: Vector2) -> void:
+	# Sparkles shooting upward
+	for i in range(12):
+		var sparkle = ColorRect.new()
+		sparkle.size = Vector2(2, 4)
+		sparkle.color = Color(1, 1, 0.6, 1)
+		sparkle.global_position = pos + Vector2(randf_range(-15, 15), 0)
+		sparkle.z_index = 100
+		get_tree().current_scene.add_child(sparkle)
+		
+		var end_y = pos.y - randf_range(30, 60)
+		var drift_x = randf_range(-20, 20)
+		
 		var tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(particle, "global_position", end_pos, 0.4).set_ease(Tween.EASE_OUT)
-		tween.tween_property(particle, "modulate:a", 0.0, 0.4)
-		tween.chain().tween_callback(particle.queue_free)
+		tween.tween_property(sparkle, "global_position:y", end_y, randf_range(0.4, 0.8)).set_ease(Tween.EASE_OUT)
+		tween.tween_property(sparkle, "global_position:x", sparkle.global_position.x + drift_x, 0.6)
+		tween.tween_property(sparkle, "modulate:a", 0.0, 0.6).set_delay(0.2)
+		tween.chain().tween_callback(sparkle.queue_free)
+
+
+func _create_level_up_text(pos: Vector2, new_level: int) -> void:
+	# Container for text
+	var container = Control.new()
+	container.global_position = pos + Vector2(0, -40)
+	container.z_index = 100
+	get_tree().current_scene.add_child(container)
+	
+	# "LEVEL UP!" text - starts big, settles down
+	var label = Label.new()
+	label.text = "LEVEL UP!"
+	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_color_override("font_color", Color(1, 0.9, 0.2))
+	label.add_theme_color_override("font_outline_color", Color(0.4, 0.25, 0))
+	label.add_theme_constant_override("outline_size", 3)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(-40, 0)
+	label.pivot_offset = Vector2(40, 10)
+	label.scale = Vector2(2.0, 2.0)
+	container.add_child(label)
+	
+	# Level number below
+	var level_label = Label.new()
+	level_label.text = "Lv. %d" % new_level
+	level_label.add_theme_font_size_override("font_size", 11)
+	level_label.add_theme_color_override("font_color", Color(1, 1, 0.8))
+	level_label.add_theme_color_override("font_outline_color", Color(0.3, 0.2, 0))
+	level_label.add_theme_constant_override("outline_size", 2)
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	level_label.position = Vector2(-20, 18)
+	level_label.modulate.a = 0
+	container.add_child(level_label)
+	
+	# Animate: scale down, then float up
+	var tween = create_tween()
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.parallel().tween_property(level_label, "modulate:a", 1.0, 0.3).set_delay(0.15)
+	tween.tween_interval(0.8)
+	tween.tween_property(container, "global_position:y", container.global_position.y - 25, 0.6)
+	tween.parallel().tween_property(container, "modulate:a", 0.0, 0.6)
+	tween.tween_callback(container.queue_free)
+
+
+func _create_stat_popups(pos: Vector2) -> void:
+	# Show stat increases floating up from different positions
+	var stats = [
+		{text = "+10 HP", color = Color(0.4, 1, 0.4), offset = Vector2(-25, 10)},
+		{text = "+3 ATK", color = Color(1, 0.5, 0.4), offset = Vector2(0, 15)},
+		{text = "+2 SPD", color = Color(0.4, 0.8, 1), offset = Vector2(25, 10)}
+	]
+	
+	for i in range(stats.size()):
+		await get_tree().create_timer(0.15).timeout
+		
+		var stat = stats[i]
+		var label = Label.new()
+		label.text = stat.text
+		label.add_theme_font_size_override("font_size", 8)
+		label.add_theme_color_override("font_color", stat.color)
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+		label.add_theme_constant_override("outline_size", 1)
+		label.global_position = pos + stat.offset
+		label.z_index = 100
+		label.modulate.a = 0
+		get_tree().current_scene.add_child(label)
+		
+		var tween = create_tween()
+		tween.tween_property(label, "modulate:a", 1.0, 0.15)
+		tween.tween_property(label, "global_position:y", label.global_position.y - 20, 0.8).set_ease(Tween.EASE_OUT)
+		tween.parallel().tween_property(label, "modulate:a", 0.0, 0.4).set_delay(0.4)
+		tween.tween_callback(label.queue_free)
 
 
 func _flash_screen(color: Color, duration: float) -> void:

@@ -73,7 +73,8 @@ var sfx_tracks: Dictionary = {
 	"menu_navigate": "res://assets/audio/sfx/menu_navigate.wav",
 	"zone_transition": "res://assets/audio/sfx/zone_transition.wav",
 	"health_pickup": "res://assets/audio/sfx/health_pickup.wav",
-	"coin": "res://assets/audio/sfx/coin.wav"
+	"coin": "res://assets/audio/sfx/coin.wav",
+	"level_up": "res://assets/audio/sfx/level_up.wav"
 }
 
 # =============================================================================
