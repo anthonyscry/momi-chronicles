@@ -14,6 +14,9 @@ var current_zone: String = ""
 ## Whether player is alive
 var is_player_alive: bool = true
 
+## Currency system
+var coins: int = 0
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -126,3 +129,27 @@ func get_pending_spawn() -> String:
 	var spawn = pending_spawn_point
 	pending_spawn_point = ""
 	return spawn
+
+
+# =============================================================================
+# CURRENCY SYSTEM
+# =============================================================================
+
+## Add coins to player's wallet
+func add_coins(amount: int) -> void:
+	coins += amount
+	Events.coins_changed.emit(coins)
+
+
+## Get current coin count
+func get_coins() -> int:
+	return coins
+
+
+## Spend coins if player has enough
+func spend_coins(amount: int) -> bool:
+	if coins >= amount:
+		coins -= amount
+		Events.coins_changed.emit(coins)
+		return true
+	return false

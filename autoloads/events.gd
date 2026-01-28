@@ -125,6 +125,9 @@ signal boss_defeated(boss: Node)
 ## Emitted when any pickup is collected
 signal pickup_collected(pickup_type: String, value: int)
 
+## Emitted when coin count changes
+signal coins_changed(total: int)
+
 # =============================================================================
 # ZONE SIGNALS
 # =============================================================================
