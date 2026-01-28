@@ -247,10 +247,10 @@ Plans:
 
 ---
 
-## Phase 15: UI Testing Automation
+## Phase 15: UI Testing Automation ✅
 **Goal**: Automated testing for all UI flows and HUD elements
 
-**Status**: PLANNED - Ready for execution
+**Status**: COMPLETE
 
 **Deliverables**:
 - UITester mode in AutoBot (F2 to toggle)
@@ -258,14 +258,14 @@ Plans:
 - HUD verification (health bar, guard bar, coin counter, EXP bar)
 - Menu interaction tests (button clicks, slider changes)
 - New feature smoke tests (block/parry feedback, pickup collection)
-- Test report output to console
+- Test report output to console with pass rate percentage
 
 **Plans:** 3 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — UITester foundation, F2 toggle, screenshot capture
-- [ ] 15-02-PLAN.md — HUD verification, title screen & gameplay scenarios
-- [ ] 15-03-PLAN.md — Pause/game over scenarios, new features smoke test, final reporting
+- [x] 15-01-PLAN.md — UITester foundation, F2 toggle, screenshot capture
+- [x] 15-02-PLAN.md — HUD verification, title screen & gameplay scenarios
+- [x] 15-03-PLAN.md — Pause/game over scenarios, new features smoke test, final reporting
 
 ---
 
