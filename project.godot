@@ -25,6 +25,7 @@ EffectsManager="*res://autoloads/effects_manager.gd"
 AutoBot="*res://autoloads/auto_bot.gd"
 SaveManager="*res://autoloads/save_manager.gd"
 AudioDebug="*res://ui/hud/audio_debug.tscn"
+UITester="*res://autoloads/ui_tester.gd"
 
 [display]
 
