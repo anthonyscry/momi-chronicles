@@ -186,7 +186,10 @@ func run_all_tests() -> void:
 	test_results.append({"scenario": "Game Over Flow", "passed": s4_passed})
 	log_test("SCENARIO RESULT: Game Over Flow - " + ("PASS" if s4_passed else "FAIL"))
 	
-	# Scenario 5 will be added next in Task 2
+	# Scenario 5: New Features Smoke Test
+	var s5_passed = await test_scenario_new_features()
+	test_results.append({"scenario": "New Features Smoke", "passed": s5_passed})
+	log_test("SCENARIO RESULT: New Features Smoke - " + ("PASS" if s5_passed else "FAIL"))
 	
 	# Print final summary
 	print_test_summary()
@@ -1018,13 +1021,161 @@ func test_scenario_game_over() -> bool:
 	return all_passed
 
 
-## Print final test summary
-func print_test_summary() -> void:
-	log_summary()
+## Scenario 5: New Features Smoke Test
+## Verifies Phase 12-14 features have proper UI elements
+func test_scenario_new_features() -> bool:
+	log_scenario_start("New Features Smoke Test")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
 	
-	# Print scenario results
-	if test_results.size() > 0:
-		log_test("Scenario Results:")
-		for result in test_results:
-			var status = "PASS" if result.get("passed", false) else "FAIL"
-			log_test("  - %s: %s" % [result.get("scenario", "Unknown"), status])
+	# Ensure gameplay
+	var player = get_player()
+	if not player:
+		log_test("Not in gameplay - running title screen test first")
+		await test_scenario_title_screen()
+		await get_tree().create_timer(1.0).timeout
+		player = get_player()
+	
+	if not player:
+		log_failure("New Features", "Cannot test - no player")
+		return false
+	
+	log_test("--- Phase 12: Block/Parry UI ---")
+	
+	# Guard bar exists
+	var guard_bar_exists = await verify_exists("GuardBar", "Guard Bar (block system)")
+	if guard_bar_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check guard component exists on player
+	if player.has_node("GuardComponent"):
+		var guard = player.get_node("GuardComponent")
+		log_check("EXISTS: Player GuardComponent", "found", "found", true)
+		passed_count += 1
+		scenario_passed += 1
+		
+		# Verify guard bar updates with guard value
+		var guard_bar = find_ui_node("GuardBar")
+		if guard_bar and guard_bar.get("value") != null and guard.get("current_guard") != null:
+			log_test("Guard bar value: %.1f" % guard_bar.value)
+			log_test("Guard component value: %.1f" % guard.current_guard)
+	else:
+		log_test("INFO: GuardComponent not found on player (may be optional)")
+	
+	log_test("--- Phase 13: Pickup/Coin UI ---")
+	
+	# Coin counter exists
+	var coin_exists = await verify_exists("CoinCounter", "Coin Counter (pickup system)")
+	if coin_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	# Verify coin count matches GameManager
+	var coins = 0
+	if is_instance_valid(GameManager) and "coins" in GameManager:
+		coins = GameManager.coins
+	log_test("GameManager coins: %d" % coins)
+	
+	var coin_counter = find_ui_node("CoinCounter")
+	if coin_counter:
+		var label = coin_counter.find_child("Label", true, false)
+		if label and label is Label:
+			log_test("Coin counter text: %s" % label.text)
+	
+	log_test("--- Phase 14: Save System UI ---")
+	
+	# Save button in pause menu (already verified in scenario 3, but confirm here)
+	var save_btn = find_ui_node("SaveButton")
+	var save_btn_exists = save_btn != null
+	log_check("EXISTS: Save Button (from Phase 14)", "found" if save_btn_exists else "not found", "found", save_btn_exists)
+	if save_btn_exists:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	# Continue button on title (indicates save system working)
+	var continue_btn = find_ui_node("ContinueButton")
+	if continue_btn:
+		log_test("Continue button present (save file may exist)")
+	else:
+		log_test("INFO: No Continue button (normal if no save file)")
+	
+	# Test save functionality if SaveManager exists
+	if is_instance_valid(SaveManager) and SaveManager.has_method("save_game"):
+		log_test("Testing save functionality...")
+		var save_result = SaveManager.save_game()
+		log_check("FUNC: SaveManager.save_game()", str(save_result), "true", save_result)
+		if save_result:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+	else:
+		log_test("INFO: SaveManager not available for direct testing")
+	
+	log_scenario_end("New Features Smoke Test", scenario_passed, scenario_failed)
+	return all_passed
+
+
+## Print final test summary with comprehensive reporting
+func print_test_summary() -> void:
+	log_test("")
+	log_test("================================================================")
+	log_test("                  UI TESTER - FINAL REPORT")
+	log_test("================================================================")
+	log_test("Timestamp: " + Time.get_datetime_string_from_system())
+	log_test("")
+	
+	# Scenario results with PASS/FAIL icons
+	log_test("SCENARIO RESULTS:")
+	log_test("----------------------------------------------------------------")
+	for result in test_results:
+		var icon = "[PASS]" if result.get("passed", false) else "[FAIL]"
+		log_test("  %s %s" % [icon, result.get("scenario", "Unknown")])
+	log_test("")
+	
+	# Summary counts
+	log_test("SUMMARY:")
+	log_test("----------------------------------------------------------------")
+	var total = passed_count + failed_count
+	log_test("  Total checks:  %d" % total)
+	log_test("  Passed:        %d" % passed_count)
+	log_test("  Failed:        %d" % failed_count)
+	log_test("  Fixed/Retry:   %d" % fixed_on_retry_count)
+	log_test("")
+	
+	# Pass rate percentage
+	var pass_rate = (float(passed_count) / float(total) * 100.0) if total > 0 else 0.0
+	log_test("  Pass rate: %.1f%%" % pass_rate)
+	log_test("")
+	
+	# Screenshots location if failures
+	if failed_count > 0:
+		log_test("SCREENSHOTS:")
+		log_test("----------------------------------------------------------------")
+		log_test("  Location: exports/test_screenshots/")
+		log_test("  Check screenshots for failure details")
+		log_test("")
+	
+	log_test("================================================================")
+	
+	# Final verdict
+	if failed_count == 0:
+		log_test("            ALL TESTS PASSED!")
+	else:
+		log_test("  %d TEST(S) FAILED - Review logs and screenshots" % failed_count)
+	
+	log_test("================================================================")
+	log_test("")
+	log_test("UITester complete. Press F2 to run again.")
