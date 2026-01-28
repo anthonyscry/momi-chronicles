@@ -176,7 +176,17 @@ func run_all_tests() -> void:
 	test_results.append({"scenario": "Gameplay HUD", "passed": s2_passed})
 	log_test("SCENARIO RESULT: Gameplay HUD - " + ("PASS" if s2_passed else "FAIL"))
 	
-	# Scenarios 3-5 will be added in Plan 03
+	# Scenario 3: Pause Menu Flow
+	var s3_passed = await test_scenario_pause_menu()
+	test_results.append({"scenario": "Pause Menu Flow", "passed": s3_passed})
+	log_test("SCENARIO RESULT: Pause Menu Flow - " + ("PASS" if s3_passed else "FAIL"))
+	
+	# Scenario 4: Game Over Flow
+	var s4_passed = await test_scenario_game_over()
+	test_results.append({"scenario": "Game Over Flow", "passed": s4_passed})
+	log_test("SCENARIO RESULT: Game Over Flow - " + ("PASS" if s4_passed else "FAIL"))
+	
+	# Scenario 5 will be added next in Task 2
 	
 	# Print final summary
 	print_test_summary()
@@ -734,6 +744,278 @@ func verify_hud_elements() -> Dictionary:
 		log_test("Failed elements: " + str(failed_elements))
 	
 	return results
+
+
+## Scenario 3: Pause Menu Flow
+## Tests ESC toggle, pause state, buttons, audio sliders, and Resume
+func test_scenario_pause_menu() -> bool:
+	log_scenario_start("Pause Menu Flow")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+	
+	# Must be in gameplay
+	var player = get_player()
+	if not player:
+		log_failure("Pause Menu", "Cannot test - not in gameplay")
+		return false
+	
+	# Check 1: Pause menu initially hidden
+	var pause_menu = find_ui_node("PauseMenu")
+	if pause_menu:
+		var initially_hidden = not pause_menu.visible
+		log_check("INITIAL: Pause menu hidden", str(initially_hidden), "true", initially_hidden)
+		if initially_hidden:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+	else:
+		log_test("INFO: PauseMenu node not found - may be nested differently")
+	
+	# Check 2: Simulate ESC to open pause
+	log_test("Simulating ESC key press to open pause menu...")
+	var esc_event = InputEventKey.new()
+	esc_event.keycode = KEY_ESCAPE
+	esc_event.pressed = true
+	Input.parse_input_event(esc_event)
+	await get_tree().create_timer(0.5).timeout
+	
+	# Release ESC
+	esc_event.pressed = false
+	Input.parse_input_event(esc_event)
+	
+	# Check 3: Pause menu now visible
+	pause_menu = find_ui_node("PauseMenu")
+	if pause_menu:
+		var now_visible = pause_menu.visible
+		log_check("VISIBLE: Pause menu visible after ESC", str(now_visible), "true", now_visible)
+		if now_visible:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+			await capture_screenshot("pause_not_visible")
+	
+	# Check 4: Game is paused
+	var is_paused = get_tree().paused
+	log_check("STATE: Game paused", str(is_paused), "true", is_paused)
+	if is_paused:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check 5: Required buttons exist
+	var resume_exists = await verify_exists("ResumeButton", "Resume Button")
+	if resume_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	var save_exists = await verify_exists("SaveButton", "Save Button")
+	if save_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	var quit_exists = await verify_exists("QuitButton", "Quit Button")
+	if quit_exists:
+		scenario_passed += 1
+	else:
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check 6: Audio sliders exist and respond
+	var music_slider = find_ui_node("MusicSlider")
+	if music_slider:
+		log_check("EXISTS: Music Slider", "found", "found", true)
+		passed_count += 1
+		scenario_passed += 1
+		# Test slider responds
+		if music_slider is HSlider:
+			var original = music_slider.value
+			music_slider.value = clampf(original + 0.1, 0.0, 1.0)
+			await get_tree().create_timer(0.1).timeout
+			log_test("Music slider interaction: OK (changed to %.2f)" % music_slider.value)
+			music_slider.value = original
+	else:
+		log_check("EXISTS: Music Slider", "not found", "found", false)
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	var sfx_slider = find_ui_node("SFXSlider")
+	if sfx_slider:
+		log_check("EXISTS: SFX Slider", "found", "found", true)
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		log_check("EXISTS: SFX Slider", "not found", "found", false)
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	# Check 7: Test Resume button
+	log_test("Testing Resume button...")
+	var resume_btn = find_ui_node("ResumeButton")
+	if resume_btn and resume_btn is Button:
+		resume_btn.emit_signal("pressed")
+		await get_tree().create_timer(0.5).timeout
+		
+		# Game should be unpaused
+		var is_unpaused = not get_tree().paused
+		log_check("STATE: Game unpaused after Resume", str(is_unpaused), "true", is_unpaused)
+		if is_unpaused:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+		
+		# Pause menu should be hidden
+		pause_menu = find_ui_node("PauseMenu")
+		if pause_menu:
+			var hidden_after = not pause_menu.visible
+			log_check("VISIBLE: Pause menu hidden after Resume", str(hidden_after), "true", hidden_after)
+			if hidden_after:
+				passed_count += 1
+				scenario_passed += 1
+			else:
+				failed_count += 1
+				scenario_failed += 1
+				all_passed = false
+	else:
+		log_failure("Resume Button", "Could not interact")
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	log_scenario_end("Pause Menu Flow", scenario_passed, scenario_failed)
+	return all_passed
+
+
+## Scenario 4: Game Over Flow
+## Tests player death triggers game over screen and retry works
+func test_scenario_game_over() -> bool:
+	log_scenario_start("Game Over Flow")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+	
+	var player = get_player()
+	if not player:
+		log_failure("Game Over", "Cannot test - player not found")
+		return false
+	
+	# Store current state to detect changes
+	log_test("Triggering player death for game over test...")
+	
+	# Kill the player - try multiple methods
+	var death_triggered = false
+	
+	# Method 1: Direct health component damage
+	if player.has_node("HealthComponent"):
+		var health = player.get_node("HealthComponent")
+		if health.has_method("take_damage"):
+			log_test("Using HealthComponent.take_damage(9999)...")
+			health.take_damage(9999)
+			death_triggered = true
+		elif "current_health" in health:
+			log_test("Setting HealthComponent.current_health = 0...")
+			health.current_health = 0
+			if health.has_signal("died"):
+				health.died.emit()
+			death_triggered = true
+	
+	# Method 2: Emit death signal directly
+	if not death_triggered:
+		log_test("Emitting Events.player_died signal...")
+		Events.player_died.emit()
+		death_triggered = true
+	
+	await get_tree().create_timer(1.5).timeout  # Wait for death/transition
+	
+	# Check 1: Game over screen exists and is visible
+	var game_over = find_ui_node("GameOver")
+	if not game_over:
+		game_over = find_ui_node("GameOverScreen")
+	
+	if game_over:
+		var go_visible = game_over.visible
+		log_check("VISIBLE: Game Over screen visible", str(go_visible), "true", go_visible)
+		if go_visible:
+			passed_count += 1
+			scenario_passed += 1
+		else:
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+			await capture_screenshot("game_over_not_visible")
+		
+		# Check 2: Retry button exists
+		var retry_exists = await verify_exists("RetryButton", "Retry Button")
+		if retry_exists:
+			scenario_passed += 1
+		else:
+			scenario_failed += 1
+			all_passed = false
+		
+		# Check 3: Test Retry button
+		log_test("Testing Retry button...")
+		var retry_btn = find_ui_node("RetryButton")
+		if retry_btn and retry_btn is Button:
+			retry_btn.emit_signal("pressed")
+			await get_tree().create_timer(2.0).timeout
+			
+			# Should be back in gameplay with player alive
+			player = get_player()
+			var back_in_game = player != null
+			log_check("STATE: Returned to gameplay after Retry", str(back_in_game), "true", back_in_game)
+			if back_in_game:
+				passed_count += 1
+				scenario_passed += 1
+			else:
+				failed_count += 1
+				scenario_failed += 1
+				all_passed = false
+				await capture_screenshot("retry_failed")
+			
+			# Check player is alive (HP > 0)
+			if back_in_game:
+				var hp = get_player_health()
+				var is_alive = hp > 0
+				log_check("STATE: Player is alive after Retry (HP > 0)", str(hp), "> 0", is_alive)
+				if is_alive:
+					passed_count += 1
+					scenario_passed += 1
+				else:
+					failed_count += 1
+					scenario_failed += 1
+					all_passed = false
+		else:
+			log_failure("Retry Button", "Could not interact")
+			failed_count += 1
+			scenario_failed += 1
+			all_passed = false
+	else:
+		log_failure("Game Over", "Game over screen not found after death")
+		await capture_screenshot("missing_game_over")
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+	
+	log_scenario_end("Game Over Flow", scenario_passed, scenario_failed)
+	return all_passed
 
 
 ## Print final test summary
