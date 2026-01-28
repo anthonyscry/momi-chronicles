@@ -142,6 +142,27 @@ func set_combo_count(count: int) -> void:
 ## Called when player levels up
 func _on_level_changed(new_level: int) -> void:
 	_apply_level_stats()
+	_push_away_from_enemies()  # Prevent getting stuck on dying enemies
+
+## Push player away from nearby enemies on level up
+func _push_away_from_enemies() -> void:
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	var push_dir = Vector2.ZERO
+	var close_count = 0
+	
+	for enemy in enemies:
+		if not is_instance_valid(enemy):
+			continue
+		var dist = global_position.distance_to(enemy.global_position)
+		if dist < 40.0:  # Very close - might be overlapping
+			var away = (global_position - enemy.global_position).normalized()
+			push_dir += away
+			close_count += 1
+	
+	# Apply push if enemies were close
+	if close_count > 0:
+		push_dir = push_dir.normalized() * 60.0  # Push velocity
+		velocity = push_dir
 
 ## Apply stats based on current level
 func _apply_level_stats() -> void:
@@ -152,10 +173,10 @@ func _apply_level_stats() -> void:
 	var health_bonus = progression.get_stat_bonus("max_health")
 	if health:
 		var new_max = BASE_MAX_HEALTH + health_bonus
-		var heal_amount = new_max - health.max_health  # Heal the difference
 		health.max_health = new_max
-		if heal_amount > 0:
-			health.heal(heal_amount)  # Full heal on level up
+		# FULL HEAL on level up! (reward for leveling)
+		health.current_health = health.max_health
+		Events.player_healed.emit(health.max_health)
 	
 	# Update attack damage
 	var damage_bonus = progression.get_stat_bonus("attack_damage")

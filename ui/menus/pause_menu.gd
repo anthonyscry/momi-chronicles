@@ -29,6 +29,10 @@ func _ready() -> void:
 
 
 func _on_game_paused() -> void:
+	# Don't show pause menu if ring menu is open (it has its own pause)
+	if RingMenu and RingMenu.is_open:
+		return
+	
 	# Update sliders to current values
 	music_slider.value = AudioManager.get_music_volume()
 	sfx_slider.value = AudioManager.get_sfx_volume()
