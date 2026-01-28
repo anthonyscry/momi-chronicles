@@ -13,6 +13,9 @@ var vignette_tween: Tween
 var is_low_hp: bool = false
 const LOW_HP_THRESHOLD: float = 0.25
 
+## Buff status icons
+var buff_icons: BuffIcons
+
 ## Whether debug panel is visible
 var debug_visible: bool = true
 
@@ -22,6 +25,9 @@ func _ready() -> void:
 	
 	# Create low HP vignette overlay
 	_setup_low_hp_vignette()
+	
+	# Create buff icons display
+	_setup_buff_icons()
 	
 	# Connect to health changes
 	Events.player_health_changed.connect(_on_health_changed)
@@ -34,6 +40,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			debug_visible = not debug_visible
 			debug_panel.visible = debug_visible
 			print("[HUD] Debug panel: %s (F3 to toggle)" % ("ON" if debug_visible else "OFF"))
+
+
+func _setup_buff_icons() -> void:
+	buff_icons = BuffIcons.new()
+	buff_icons.name = "BuffIcons"
+	# Position bottom-left below health bar
+	buff_icons.position = Vector2(8, 60)
+	add_child(buff_icons)
 
 
 func _setup_low_hp_vignette() -> void:

@@ -83,6 +83,9 @@ func _on_combo_completed(total_damage: int) -> void:
 	for label in [hit1, hit2, hit3]:
 		label.modulate = Color(1, 0.9, 0.3)
 	
+	# Fire burst particles on full combo!
+	_spawn_combo_fire()
+	
 	# Fade out after celebration
 	await get_tree().create_timer(0.8).timeout
 	_start_fade_out()
@@ -90,25 +93,6 @@ func _on_combo_completed(total_damage: int) -> void:
 # =============================================================================
 # DISPLAY UPDATES
 # =============================================================================
-
-func _update_display(count: int) -> void:
-	_reset_display()
-	
-	var labels = [hit1, hit2, hit3]
-	
-	# Light up completed hits with consistent size
-	for i in range(count):
-		if i < labels.size():
-			var label = labels[i]
-			label.modulate = COLORS[i]
-	
-	# Pulse the current hit indicator (subtle)
-	if count > 0 and count <= 3:
-		var current_label = labels[count - 1]
-		_pulse_label(current_label, 1.4)
-	
-	# Show COMBO text on hit 3
-	combo_text.visible = (count >= 3)
 
 func _reset_display() -> void:
 	# Dim all indicators with consistent styling
@@ -134,3 +118,70 @@ func _start_fade_out() -> void:
 		visible = false
 		_reset_display()
 	)
+
+# =============================================================================
+# COMBO FIRE EFFECT (Phase P7)
+# =============================================================================
+
+## Spawn fire particles around the combo dots on full combo
+func _spawn_combo_fire() -> void:
+	var labels = [hit1, hit2, hit3]
+	for label in labels:
+		for i in range(4):
+			var spark = ColorRect.new()
+			spark.size = Vector2(2, 3)
+			spark.color = [Color(1, 0.6, 0.1), Color(1, 0.3, 0.05), Color(1, 0.9, 0.3)][randi() % 3]
+			spark.position = label.position + Vector2(randf_range(-3, 3), 0)
+			spark.z_index = 10
+			add_child(spark)
+			
+			var tween = create_tween()
+			tween.set_parallel(true)
+			tween.tween_property(spark, "position:y", spark.position.y - randf_range(8, 18), 0.4)\
+				.set_ease(Tween.EASE_OUT)
+			tween.tween_property(spark, "position:x", spark.position.x + randf_range(-5, 5), 0.4)
+			tween.tween_property(spark, "modulate:a", 0.0, 0.3).set_delay(0.1)
+			tween.chain().tween_callback(spark.queue_free)
+
+
+## On hit 2+, show escalating glow behind the current dot
+func _update_display(count: int) -> void:
+	_reset_display()
+	
+	var labels = [hit1, hit2, hit3]
+	
+	# Light up completed hits with consistent size
+	for i in range(count):
+		if i < labels.size():
+			var label = labels[i]
+			label.modulate = COLORS[i]
+	
+	# Pulse the current hit indicator (subtle)
+	if count > 0 and count <= 3:
+		var current_label = labels[count - 1]
+		_pulse_label(current_label, 1.4)
+	
+	# On hit 2+, emit small spark from the dot
+	if count >= 2:
+		var dot = labels[count - 1]
+		_emit_hit_spark(dot, COLORS[count - 1])
+	
+	# Show COMBO text on hit 3
+	combo_text.visible = (count >= 3)
+
+
+## Small spark from a dot on escalating hits
+func _emit_hit_spark(label: Label, color: Color) -> void:
+	for i in range(2):
+		var spark = ColorRect.new()
+		spark.size = Vector2(2, 2)
+		spark.color = color
+		spark.position = label.position + Vector2(randf_range(-2, 2), 0)
+		spark.z_index = 10
+		add_child(spark)
+		
+		var tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(spark, "position:y", spark.position.y - randf_range(5, 12), 0.25)
+		tween.tween_property(spark, "modulate:a", 0.0, 0.2).set_delay(0.05)
+		tween.chain().tween_callback(spark.queue_free)
