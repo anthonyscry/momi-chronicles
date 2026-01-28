@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dkp7q2m8x5w1r"]
+[gd_scene load_steps=9 format=3 uid="uid://dkp7q2m8x5w1r"]
 
 [ext_resource type="Script" path="res://ui/hud/game_hud.gd" id="1_hud"]
 [ext_resource type="PackedScene" uid="uid://c8r5kvm2t1hq3" path="res://ui/hud/health_bar.tscn" id="2_health_bar"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://ability_bar_001" path="res://ui/hud/ability_bar.tscn" id="5_ability_bar"]
 [ext_resource type="PackedScene" uid="uid://boss_health_bar_001" path="res://ui/hud/boss_health_bar.tscn" id="6_boss_health_bar"]
 [ext_resource type="PackedScene" uid="uid://guard_bar_001" path="res://ui/hud/guard_bar.tscn" id="7_guard_bar"]
+[ext_resource type="PackedScene" uid="uid://coin_counter_001" path="res://ui/hud/coin_counter.tscn" id="8_coin_counter"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug"]
 bg_color = Color(0, 0, 0, 0.7)
@@ -74,3 +75,13 @@ offset_bottom = 85.0
 [node name="AbilityBar" parent="." instance=ExtResource("5_ability_bar")]
 
 [node name="BossHealthBar" parent="." instance=ExtResource("6_boss_health_bar")]
+
+[node name="CoinCounter" parent="." instance=ExtResource("8_coin_counter")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 20.0
+grow_horizontal = 0
