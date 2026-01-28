@@ -3,29 +3,39 @@
 ## Current Position
 
 Phase: 14 of 16 (Save System)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-28 - Completed 14-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-27 - Completed 14-02-PLAN.md
 
 Progress: ██████████████████░░ 87%
 
 ## Current Status
 - **Version**: v1.2 New Mechanics IN PROGRESS
-- **Last Updated**: 2026-01-28
+- **Last Updated**: 2026-01-27
 - **Godot Files**: 91+
-- **Status**: Phase 14 IN PROGRESS (1/2 plans complete)
+- **Status**: Phase 14 COMPLETE (2/2 plans complete)
 
 ## v1.2 Progress
 - [x] Phase 12: Block & Parry System (COMPLETE)
 - [x] Phase 13: Items & Pickups (COMPLETE - HUD counter, effects, drop tables)
-- [ ] Phase 14: Save System (IN PROGRESS - 1/2 plans complete)
+- [x] Phase 14: Save System (COMPLETE - SaveManager, auto-save, title/pause menus)
 - [ ] Phase 15: UI Testing Automation
 - [ ] Phase 16: Ring Menu System
 
 ## Session Continuity
-Last session: 2026-01-28T05:13:26Z
-Stopped at: Completed 14-01-PLAN.md
+Last session: 2026-01-27
+Stopped at: Completed 14-02-PLAN.md
 Resume file: None
+
+## Phase 14 Decisions
+| Decision | Rationale |
+|----------|-----------|
+| JSON format for saves | Human-readable, debuggable |
+| Atomic write pattern | Crash safety with temp file + rename |
+| Backup system (.bak) | Corruption recovery |
+| Auto-save skip initial load | Check player.progression.current_level > 0 |
+| 3s delay after boss defeat | Allow celebration and rewards |
+| ConfirmationDialog for New Game | Prevent accidental overwrite |
 
 ## v1.1 Progress (COMPLETE)
 - [x] Phase 8: Combo Attack System
