@@ -130,6 +130,9 @@ func _connect_signals() -> void:
 	Events.player_charge_started.connect(_on_charge_started)
 	Events.player_charge_released.connect(_on_charge_released)
 	Events.player_parried.connect(_on_parry_success)
+	# Boss events
+	Events.boss_spawned.connect(_on_boss_intro)
+	Events.boss_defeated.connect(_on_boss_victory)
 
 # =============================================================================
 # SPAWN EFFECTS
@@ -1253,3 +1256,173 @@ func _spawn_directional_flash(angle: float) -> void:
 	tween.tween_property(flash, "color:a", 0.0, 0.25)\
 		.set_ease(Tween.EASE_OUT)
 	tween.tween_callback(canvas.queue_free)
+
+# =============================================================================
+# BOSS INTRO & VICTORY (Phase P6)
+# =============================================================================
+
+## Dramatic boss intro sequence
+func _on_boss_intro(boss: Node) -> void:
+	if not is_instance_valid(boss):
+		return
+	
+	# Slowmo entrance
+	Engine.time_scale = 0.3
+	
+	# Dark overlay flash
+	_flash_screen(Color(0, 0, 0, 0.6), 0.8)
+	
+	# Camera zoom in on boss
+	camera_punch(1.2, 0.5)
+	
+	# Screen shake for weight
+	screen_shake(6.0, 0.5)
+	
+	# "BOSS!" title text
+	_create_boss_title(boss)
+	
+	# Restore time after dramatic pause
+	var time_tween = create_tween()
+	time_tween.set_ignore_time_scale(true)
+	time_tween.tween_interval(0.4)
+	time_tween.tween_property(Engine, "time_scale", 1.0, 0.3)
+
+
+func _create_boss_title(boss: Node) -> void:
+	var viewport_size = Vector2(384, 216)
+	
+	var canvas = CanvasLayer.new()
+	canvas.layer = 90
+	get_tree().current_scene.add_child(canvas)
+	
+	# Boss name banner
+	var label = Label.new()
+	label.text = "RACCOON KING"
+	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
+	label.add_theme_color_override("font_outline_color", Color(0.3, 0.1, 0))
+	label.add_theme_constant_override("outline_size", 3)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(viewport_size.x / 2 - 80, viewport_size.y / 2 - 20)
+	label.pivot_offset = Vector2(80, 15)
+	label.scale = Vector2(0.1, 0.1)
+	label.modulate.a = 0.0
+	canvas.add_child(label)
+	
+	# Subtitle
+	var subtitle = Label.new()
+	subtitle.text = "Ruler of the Backyard"
+	subtitle.add_theme_font_size_override("font_size", 9)
+	subtitle.add_theme_color_override("font_color", Color(0.9, 0.7, 0.4))
+	subtitle.add_theme_color_override("font_outline_color", Color(0.2, 0.1, 0))
+	subtitle.add_theme_constant_override("outline_size", 1)
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.position = Vector2(viewport_size.x / 2 - 60, viewport_size.y / 2 + 10)
+	subtitle.modulate.a = 0.0
+	canvas.add_child(subtitle)
+	
+	# Animate: slam in, hold, fade out
+	var tween = create_tween()
+	tween.set_ignore_time_scale(true)
+	# Name slams in
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.2)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.parallel().tween_property(label, "modulate:a", 1.0, 0.15)
+	# Subtitle fades in
+	tween.tween_property(subtitle, "modulate:a", 1.0, 0.2)
+	# Hold
+	tween.tween_interval(1.5)
+	# Fade out
+	tween.tween_property(canvas, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(canvas.queue_free)
+
+
+## Boss victory celebration
+func _on_boss_victory(boss: Node) -> void:
+	# Dramatic slowmo
+	Engine.time_scale = 0.2
+	
+	# Big screen shake
+	screen_shake(12.0, 0.5)
+	
+	# White flash
+	_flash_screen(Color(1, 1, 0.8, 0.6), 0.5)
+	
+	# "VICTORY!" text
+	_create_victory_text()
+	
+	# Firework particles
+	_create_victory_fireworks()
+	
+	# Slowly restore time
+	var time_tween = create_tween()
+	time_tween.set_ignore_time_scale(true)
+	time_tween.tween_interval(0.5)
+	time_tween.tween_property(Engine, "time_scale", 1.0, 0.5)
+
+
+func _create_victory_text() -> void:
+	var viewport_size = Vector2(384, 216)
+	
+	var canvas = CanvasLayer.new()
+	canvas.layer = 95
+	get_tree().current_scene.add_child(canvas)
+	
+	var label = Label.new()
+	label.text = "VICTORY!"
+	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_color_override("font_color", Color(1, 0.95, 0.3))
+	label.add_theme_color_override("font_outline_color", Color(0.4, 0.2, 0))
+	label.add_theme_constant_override("outline_size", 4)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(viewport_size.x / 2 - 60, viewport_size.y / 2 - 25)
+	label.pivot_offset = Vector2(60, 18)
+	label.scale = Vector2(3.0, 3.0)
+	canvas.add_child(label)
+	
+	# Slam in and hold
+	var tween = create_tween()
+	tween.set_ignore_time_scale(true)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.3)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.tween_interval(2.5)
+	tween.tween_property(label, "global_position:y", label.global_position.y - 30, 0.8)
+	tween.parallel().tween_property(canvas, "modulate:a", 0.0, 0.8)
+	tween.tween_callback(canvas.queue_free)
+
+
+func _create_victory_fireworks() -> void:
+	# Burst of gold particles from boss position
+	var player = get_tree().get_first_node_in_group("player")
+	var center = player.global_position if player else Vector2(192, 108)
+	
+	# 3 waves of firework bursts
+	for wave in range(3):
+		await get_tree().create_timer(0.3 * wave).timeout
+		
+		var burst_pos = center + Vector2(randf_range(-60, 60), randf_range(-40, 20))
+		for i in range(15):
+			var particle = ColorRect.new()
+			particle.size = Vector2(3, 3)
+			# Gold / red / white mix
+			var colors = [Color(1, 0.9, 0.2), Color(1, 0.4, 0.2), Color(1, 1, 1)]
+			particle.color = colors[randi() % colors.size()]
+			particle.global_position = burst_pos
+			particle.z_index = 100
+			get_tree().current_scene.add_child(particle)
+			
+			var angle = randf() * TAU
+			var dist = randf_range(20, 50)
+			var end_pos = burst_pos + Vector2(cos(angle), sin(angle)) * dist
+			
+			var tween = create_tween()
+			tween.set_parallel(true)
+			tween.tween_property(particle, "global_position", end_pos, 0.5)\
+				.set_ease(Tween.EASE_OUT)
+			# Arc: go up then fall
+			tween.tween_property(particle, "global_position:y", end_pos.y - 15, 0.25)\
+				.set_ease(Tween.EASE_OUT)
+			tween.chain().tween_property(particle, "global_position:y", end_pos.y + 10, 0.25)\
+				.set_ease(Tween.EASE_IN)
+			tween.tween_property(particle, "modulate:a", 0.0, 0.4).set_delay(0.1)
+			tween.chain().tween_callback(particle.queue_free)

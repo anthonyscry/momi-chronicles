@@ -125,9 +125,17 @@ func _show_damage_flash(old_hp: int, new_hp: int) -> void:
 	damage_fill.size.x = BAR_WIDTH * (old_percent - new_percent)
 	damage_fill.modulate.a = 1.0
 	
-	# Fade out
+	# Fade out the damage indicator slowly (lingers to show recent damage)
 	var tween = create_tween()
-	tween.tween_property(damage_fill, "modulate:a", 0.0, 0.4).set_delay(0.1)
+	tween.tween_property(damage_fill, "modulate:a", 0.0, 0.6).set_delay(0.3)
+	
+	# Shake the entire bar on hit for impact feel
+	_shake_bar()
+	
+	# Flash the bar white briefly
+	var flash_tween = create_tween()
+	flash_tween.tween_property(fill, "color", Color(1, 1, 1), 0.05)
+	flash_tween.tween_property(fill, "color", FILL_COLOR_ENRAGED if is_enraged else FILL_COLOR, 0.1)
 
 func _animate_fill() -> void:
 	if fill_tween and fill_tween.is_valid():
@@ -137,6 +145,18 @@ func _animate_fill() -> void:
 	
 	fill_tween = create_tween()
 	fill_tween.tween_property(fill, "size:x", target_width, 0.2)
+
+## Shake the boss health bar for hit impact
+func _shake_bar() -> void:
+	if not bar_container:
+		return
+	var original_pos = bar_container.position
+	var shake_tween = create_tween()
+	shake_tween.tween_property(bar_container, "position", original_pos + Vector2(3, 0), 0.03)
+	shake_tween.tween_property(bar_container, "position", original_pos + Vector2(-2, 1), 0.03)
+	shake_tween.tween_property(bar_container, "position", original_pos + Vector2(1, -1), 0.03)
+	shake_tween.tween_property(bar_container, "position", original_pos, 0.04)
+
 
 func _show_bar() -> void:
 	visible = true
