@@ -135,18 +135,80 @@ func quit_game() -> void:
 # ZONE TRANSITIONS
 # =============================================================================
 
-## Handle zone transition request
+## Transition fade overlay
+var _fade_overlay: CanvasLayer = null
+var _fade_rect: ColorRect = null
+var _is_transitioning: bool = false
+
+## Handle zone transition request with fade effect
 func _on_zone_transition_requested(target_zone: String, spawn_point: String) -> void:
 	if not zone_scenes.has(target_zone):
 		push_error("Unknown zone: " + target_zone)
 		return
 	
+	if _is_transitioning:
+		return
+	_is_transitioning = true
+	
 	pending_spawn_point = spawn_point
 	Events.zone_exited.emit(current_zone)
+	
+	# Fade out, load zone, fade in
+	_ensure_fade_overlay()
+	await _fade_to_black(0.3)
 	
 	# Load the new zone
 	var zone_path = zone_scenes[target_zone]
 	get_tree().change_scene_to_file(zone_path)
+	
+	# Wait a frame for scene to load
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	# Fade back in
+	await _fade_from_black(0.4)
+	_is_transitioning = false
+
+
+## Ensure the fade overlay exists (persistent across scenes)
+func _ensure_fade_overlay() -> void:
+	if _fade_overlay and is_instance_valid(_fade_overlay):
+		return
+	
+	_fade_overlay = CanvasLayer.new()
+	_fade_overlay.name = "FadeOverlay"
+	_fade_overlay.layer = 128  # Above everything
+	_fade_overlay.process_mode = Node.PROCESS_MODE_ALWAYS  # Works during pause
+	add_child(_fade_overlay)
+	
+	_fade_rect = ColorRect.new()
+	_fade_rect.name = "FadeRect"
+	_fade_rect.color = Color(0, 0, 0, 0)
+	_fade_rect.anchors_preset = Control.PRESET_FULL_RECT
+	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_overlay.add_child(_fade_rect)
+
+
+## Fade screen to black
+func _fade_to_black(duration: float) -> void:
+	_ensure_fade_overlay()
+	_fade_rect.color.a = 0.0
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(_fade_rect, "color:a", 1.0, duration)\
+		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	await tween.finished
+
+
+## Fade screen from black
+func _fade_from_black(duration: float) -> void:
+	_ensure_fade_overlay()
+	_fade_rect.color.a = 1.0
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(_fade_rect, "color:a", 0.0, duration)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	await tween.finished
 
 
 ## Load a specific zone

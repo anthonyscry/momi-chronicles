@@ -424,6 +424,8 @@ func _on_player_damaged(amount: int) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		spawn_damage_number(player.global_position + Vector2(0, -10), amount)
+		# Damage direction indicator - flash from nearest enemy direction
+		_create_damage_direction_indicator(player)
 	
 	# Screen shake when player takes damage
 	shake_medium()
@@ -1152,3 +1154,79 @@ func camera_punch(zoom_amount: float = 1.1, duration: float = 0.15) -> void:
 	tween.tween_property(camera, "zoom", original_zoom, duration * 0.7)\
 		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_callback(func(): camera_punch_active = false)
+
+# =============================================================================
+# DAMAGE DIRECTION INDICATOR
+# =============================================================================
+
+## Show a brief red flash from the direction damage came from
+func _create_damage_direction_indicator(player_node: Node2D) -> void:
+	# Find nearest enemy to determine damage direction
+	var nearest_enemy: Node2D = null
+	var nearest_dist: float = INF
+	
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		var dist = player_node.global_position.distance_to(enemy.global_position)
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest_enemy = enemy
+	
+	if nearest_enemy == null:
+		# No enemy found, flash from random direction
+		_spawn_directional_flash(randf() * TAU)
+		return
+	
+	# Calculate angle from player to enemy (damage source direction)
+	var direction = (nearest_enemy.global_position - player_node.global_position).normalized()
+	var angle = direction.angle()
+	_spawn_directional_flash(angle)
+
+
+## Spawn a red flash bar on the screen edge from the given angle
+func _spawn_directional_flash(angle: float) -> void:
+	# viewport is 384x216
+	var viewport_size = Vector2(384, 216)
+	var center = viewport_size / 2.0
+	
+	var canvas = CanvasLayer.new()
+	canvas.layer = 95
+	get_tree().current_scene.add_child(canvas)
+	
+	# Create a thin red bar positioned on the screen edge toward the angle
+	var flash = ColorRect.new()
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	
+	# Determine which edge of the screen the flash should appear on
+	var dir = Vector2(cos(angle), sin(angle))
+	
+	# Bar dimensions
+	var bar_length: float = 80.0
+	var bar_thickness: float = 6.0
+	
+	if absf(dir.x) > absf(dir.y):
+		# Left or right edge
+		flash.size = Vector2(bar_thickness, bar_length)
+		flash.position.y = center.y - bar_length / 2.0
+		if dir.x > 0:
+			flash.position.x = viewport_size.x - bar_thickness  # Right edge
+		else:
+			flash.position.x = 0  # Left edge
+	else:
+		# Top or bottom edge
+		flash.size = Vector2(bar_length, bar_thickness)
+		flash.position.x = center.x - bar_length / 2.0
+		if dir.y > 0:
+			flash.position.y = viewport_size.y - bar_thickness  # Bottom edge
+		else:
+			flash.position.y = 0  # Top edge
+	
+	flash.color = Color(1, 0.1, 0.05, 0.7)
+	canvas.add_child(flash)
+	
+	# Quick flash and fade
+	var tween = create_tween()
+	tween.tween_property(flash, "color:a", 0.0, 0.25)\
+		.set_ease(Tween.EASE_OUT)
+	tween.tween_callback(canvas.queue_free)
