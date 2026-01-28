@@ -306,23 +306,14 @@ func _update_selection() -> void:
 # =============================================================================
 
 func _get_inventory_items() -> Array:
-	# Will be implemented in 16-02 with GameManager.inventory
-	if GameManager.has_method("get") and GameManager.get("inventory"):
+	if GameManager.inventory:
 		return GameManager.inventory.get_all_items()
-	# Return placeholder for testing
-	return [
-		{"id": "health_potion", "name": "Health Potion", "type": "item", "desc": "Restores 50 HP", "quantity": 3, "color": Color(1.0, 0.3, 0.3)},
-		{"id": "acorn", "name": "Acorn", "type": "item", "desc": "A crunchy snack", "quantity": 5, "color": Color(0.6, 0.4, 0.2)},
-	]
+	return []
 
 func _get_equipment_items() -> Array:
-	# Will be implemented in 16-03 with GameManager.equipment_manager
-	if GameManager.has_method("get") and GameManager.get("equipment_manager"):
+	if GameManager.equipment_manager:
 		return GameManager.equipment_manager.get_equipment_for_ring()
-	# Return placeholder for testing
-	return [
-		{"id": "basic_collar", "name": "Basic Collar", "type": "equipment", "desc": "+5 Max HP", "equipped": true, "color": Color(0.8, 0.4, 0.2)},
-	]
+	return []
 
 func _get_companions() -> Array:
 	# Will be implemented in 16-04 with GameManager.party_manager
@@ -340,40 +331,30 @@ func _get_companions() -> Array:
 # =============================================================================
 
 func _use_item(item: Dictionary) -> void:
-	# Will be implemented in 16-02
 	var item_id = item.get("id", "")
 	if item_id.is_empty():
 		return
 	
-	# Check if inventory system exists
-	if GameManager.has_method("get") and GameManager.get("inventory"):
+	if GameManager.inventory:
 		if GameManager.inventory.use_item(item_id):
 			_refresh_ring()
 			var items = rings[RingType.ITEMS]
 			if selected_index >= items.size():
 				selected_index = max(0, items.size() - 1)
 			_update_selection()
-		return
-	
-	print("[RingMenu] Use item: %s" % item.get("name", "unknown"))
 
 func _equip_item(item: Dictionary) -> void:
-	# Will be implemented in 16-03
 	var equip_id = item.get("id", "")
 	if equip_id.is_empty():
 		return
 	
-	# Check if equipment system exists
-	if GameManager.has_method("get") and GameManager.get("equipment_manager"):
+	if GameManager.equipment_manager:
 		if item.get("equipped", false):
 			GameManager.equipment_manager.unequip(item.get("slot", 0))
 		else:
 			GameManager.equipment_manager.equip(equip_id)
 		_refresh_ring()
 		_update_selection()
-		return
-	
-	print("[RingMenu] Equip: %s" % item.get("name", "unknown"))
 
 func _switch_companion(item: Dictionary) -> void:
 	# Will be implemented in 16-04

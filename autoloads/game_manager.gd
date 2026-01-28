@@ -17,6 +17,12 @@ var is_player_alive: bool = true
 ## Currency system
 var coins: int = 0
 
+## Inventory system (Phase 16)
+var inventory: Inventory = null
+
+## Equipment system (Phase 16)
+var equipment_manager: EquipmentManager = null
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -46,6 +52,16 @@ func _ready() -> void:
 	Events.zone_entered.connect(_on_zone_entered_autosave)
 	# Auto-save after boss defeat (delayed for celebration)
 	Events.boss_defeated.connect(_on_boss_defeated_autosave)
+	
+	# Initialize inventory system (Phase 16)
+	inventory = Inventory.new()
+	inventory.name = "Inventory"
+	add_child(inventory)
+	
+	# Initialize equipment system (Phase 16)
+	equipment_manager = EquipmentManager.new()
+	equipment_manager.name = "EquipmentManager"
+	add_child(equipment_manager)
 
 func _on_boss_defeated(_boss: Node) -> void:
 	boss_defeated = true
