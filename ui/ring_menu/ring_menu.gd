@@ -2,14 +2,22 @@ extends CanvasLayer
 ## Ring Menu - Secret of Mana style radial menu
 ## NOTE: This is an autoload, so don't use class_name (would conflict)
 
-## Ring configuration
-const RING_RADIUS: float = 70.0          # Distance from center to items
-const ROTATION_SPEED: float = 8.0        # Animation speed
-const MAX_VISIBLE_ITEMS: int = 8         # Items visible at once
+## Ring configuration - Compact design
+const RING_RADIUS: float = 38.0          # Distance from center to items (was 70)
+const ROTATION_SPEED: float = 10.0       # Animation speed (slightly faster)
+const MAX_VISIBLE_ITEMS: int = 6         # Items visible at once (was 8)
 
-## Animation constants
-const OPEN_DURATION: float = 0.2
-const CLOSE_DURATION: float = 0.15
+## Animation constants - Snappier feel
+const OPEN_DURATION: float = 0.12
+const CLOSE_DURATION: float = 0.08
+
+## Ring glow colors per type
+const RING_GLOW_COLORS: Dictionary = {
+	0: Color(0.9, 0.75, 0.3, 0.2),   # ITEMS - Gold
+	1: Color(0.4, 0.6, 1.0, 0.2),    # EQUIPMENT - Blue
+	2: Color(1.0, 0.6, 0.3, 0.2),    # COMPANIONS - Orange
+	3: Color(0.6, 0.6, 0.6, 0.2),    # OPTIONS - Silver
+}
 
 ## Ring types
 enum RingType { ITEMS, EQUIPMENT, COMPANIONS, OPTIONS }
@@ -40,6 +48,7 @@ var ring_names: Dictionary = {
 ## Node references
 @onready var container: Control = $Container
 @onready var background: ColorRect = $Container/Background
+@onready var ring_glow: ColorRect = $Container/RingGlow
 @onready var ring_label: Label = $Container/RingLabel
 @onready var item_name_label: Label = $Container/ItemNameLabel
 @onready var item_desc_label: Label = $Container/ItemDescLabel
@@ -112,6 +121,12 @@ func _process(delta: float) -> void:
 	# Smooth rotation animation
 	current_rotation = lerp_angle(current_rotation, target_rotation, ROTATION_SPEED * delta)
 	_update_item_positions()
+	
+	# Subtle breathing pulse on the ring glow
+	if ring_glow:
+		var pulse = 0.15 + sin(Time.get_ticks_msec() * 0.003) * 0.08
+		var base_color = RING_GLOW_COLORS.get(current_ring as int, Color(0.5, 0.5, 0.5, 0.2))
+		ring_glow.color.a = base_color.a + pulse
 
 # =============================================================================
 # MENU CONTROL
@@ -238,7 +253,12 @@ func activate_selected() -> void:
 # =============================================================================
 
 func _refresh_ring() -> void:
-	# Populate rings from game systems (will be implemented in later plans)
+	# Update ring glow color based on current ring type
+	if ring_glow:
+		var glow_color = RING_GLOW_COLORS.get(current_ring as int, Color(0.5, 0.5, 0.5, 0.2))
+		ring_glow.color = glow_color
+	
+	# Populate rings from game systems
 	match current_ring:
 		RingType.ITEMS:
 			rings[RingType.ITEMS] = _get_inventory_items()

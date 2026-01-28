@@ -18,11 +18,11 @@ var target_alpha: float = 1.0
 @onready var glow: ColorRect = $Glow
 @onready var quantity_label: Label = $QuantityLabel
 
-const SELECTED_SCALE: float = 1.4
-const UNSELECTED_SCALE: float = 0.9
+const SELECTED_SCALE: float = 1.25      # Slightly less dramatic for compact ring
+const UNSELECTED_SCALE: float = 0.85
 const SELECTED_ALPHA: float = 1.0
-const UNSELECTED_ALPHA: float = 0.6
-const LERP_SPEED: float = 12.0
+const UNSELECTED_ALPHA: float = 0.5     # More contrast between selected/unselected
+const LERP_SPEED: float = 15.0          # Snappier transitions
 
 func _ready() -> void:
 	# Start with glow hidden

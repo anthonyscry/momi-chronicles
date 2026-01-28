@@ -12,57 +12,64 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -100.0
-offset_right = 100.0
-offset_bottom = 100.0
+offset_left = -60.0
+offset_top = -60.0
+offset_right = 60.0
+offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
-pivot_offset = Vector2(100, 100)
+pivot_offset = Vector2(60, 60)
 
 [node name="Background" type="ColorRect" parent="Container"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.1, 0.1, 0.15, 0.8)
+color = Color(0.02, 0.02, 0.05, 0.35)
+
+[node name="RingGlow" type="ColorRect" parent="Container"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.9, 0.75, 0.3, 0.15)
 
 [node name="CenterCircle" type="ColorRect" parent="Container"]
 layout_mode = 0
-offset_left = 70.0
-offset_top = 70.0
-offset_right = 130.0
-offset_bottom = 130.0
-color = Color(0.15, 0.15, 0.2, 1)
+offset_left = 42.0
+offset_top = 42.0
+offset_right = 78.0
+offset_bottom = 78.0
+color = Color(0.08, 0.08, 0.12, 0.6)
 
 [node name="RingLabel" type="Label" parent="Container"]
 layout_mode = 0
 offset_left = 0.0
-offset_top = 8.0
-offset_right = 200.0
-offset_bottom = 24.0
-theme_override_font_sizes/font_size = 10
+offset_top = 4.0
+offset_right = 120.0
+offset_bottom = 16.0
+theme_override_font_sizes/font_size = 8
 text = "Items"
 horizontal_alignment = 1
 
 [node name="ItemNameLabel" type="Label" parent="Container"]
 layout_mode = 0
-offset_left = 40.0
-offset_top = 85.0
-offset_right = 160.0
-offset_bottom = 100.0
-theme_override_font_sizes/font_size = 8
+offset_left = 20.0
+offset_top = 52.0
+offset_right = 100.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 6
 text = "Item Name"
 horizontal_alignment = 1
 
 [node name="ItemDescLabel" type="Label" parent="Container"]
 layout_mode = 0
-offset_left = 20.0
-offset_top = 100.0
-offset_right = 180.0
-offset_bottom = 120.0
-theme_override_font_sizes/font_size = 6
+offset_left = 10.0
+offset_top = 64.0
+offset_right = 110.0
+offset_bottom = 76.0
+theme_override_font_sizes/font_size = 5
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Item description here"
+text = "Item description"
 horizontal_alignment = 1
 autowrap_mode = 2
