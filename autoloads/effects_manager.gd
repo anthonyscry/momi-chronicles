@@ -118,6 +118,11 @@ func _connect_signals() -> void:
 	Events.combo_completed.connect(_on_combo_completed)
 	Events.player_leveled_up.connect(_on_player_level_up)
 	Events.exp_gained.connect(_on_exp_gained)
+	# Combat juice - special abilities
+	Events.player_ground_pound_impact.connect(_on_ground_pound_impact)
+	Events.player_charge_started.connect(_on_charge_started)
+	Events.player_charge_released.connect(_on_charge_released)
+	Events.player_parried.connect(_on_parry_success)
 
 # =============================================================================
 # SPAWN EFFECTS
@@ -592,3 +597,291 @@ func flash_pickup(pos: Vector2, color: Color) -> void:
 	tween.tween_property(flash, "scale", Vector2(1.5, 1.5), 0.12)
 	tween.tween_property(flash, "modulate:a", 0.0, 0.12)
 	tween.chain().tween_callback(flash.queue_free)
+
+# =============================================================================
+# COMBAT JUICE - SPECIAL ABILITIES
+# =============================================================================
+
+## Ground pound impact - massive shockwave effect
+func _on_ground_pound_impact(damage: int, radius: float) -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	
+	var pos = player.global_position
+	
+	# Heavy screen shake
+	screen_shake(10.0, 0.35)
+	
+	# Heavy hitstop
+	hitstop_heavy()
+	
+	# Camera punch (zoom effect)
+	camera_punch(1.15, 0.2)
+	
+	# Shockwave ring effect
+	_create_shockwave(pos, radius)
+	
+	# Dust burst in all directions
+	for i in range(12):
+		var angle = i * TAU / 12
+		var dust_pos = pos + Vector2(cos(angle), sin(angle)) * 8
+		spawn_dust(dust_pos, Vector2(cos(angle), sin(angle)))
+	
+	# Ground crack particles
+	_create_ground_crack_particles(pos)
+	
+	# Screen flash
+	_flash_screen(Color(1, 0.8, 0.3, 0.3), 0.15)
+
+
+## Create expanding shockwave ring
+func _create_shockwave(pos: Vector2, radius: float) -> void:
+	# Create multiple expanding rings
+	for ring_idx in range(3):
+		var ring = _create_ring_sprite(pos)
+		var delay = ring_idx * 0.05
+		var target_scale = (radius / 10.0) * (1.0 + ring_idx * 0.3)
+		
+		var tween = create_tween()
+		tween.tween_property(ring, "scale", Vector2(target_scale, target_scale), 0.4)\
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD).set_delay(delay)
+		tween.parallel().tween_property(ring, "modulate:a", 0.0, 0.4).set_delay(delay)
+		tween.tween_callback(ring.queue_free)
+
+
+## Create a ring sprite for shockwave
+func _create_ring_sprite(pos: Vector2) -> Node2D:
+	# Use ColorRect as placeholder ring (circle approximation)
+	var container = Node2D.new()
+	container.global_position = pos
+	container.z_index = 50
+	get_tree().current_scene.add_child(container)
+	
+	# Create ring from multiple small rects
+	for i in range(16):
+		var angle = i * TAU / 16
+		var rect = ColorRect.new()
+		rect.size = Vector2(4, 4)
+		rect.position = Vector2(cos(angle), sin(angle)) * 10 - Vector2(2, 2)
+		rect.color = Color(1, 0.9, 0.5, 0.8)
+		container.add_child(rect)
+	
+	return container
+
+
+## Create ground crack particle burst
+func _create_ground_crack_particles(pos: Vector2) -> void:
+	for i in range(8):
+		var particle = ColorRect.new()
+		particle.size = Vector2(3, 3)
+		particle.color = Color(0.6, 0.5, 0.3, 1)
+		particle.global_position = pos
+		particle.z_index = 5
+		get_tree().current_scene.add_child(particle)
+		
+		var angle = randf() * TAU
+		var distance = randf_range(15, 35)
+		var end_pos = pos + Vector2(cos(angle), sin(angle)) * distance
+		
+		var tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(particle, "global_position", end_pos, 0.3)\
+			.set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "modulate:a", 0.0, 0.4)
+		tween.tween_callback(particle.queue_free)
+
+
+## Charge attack started - show charging glow
+var charge_glow_node: Node2D = null
+
+func _on_charge_started() -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	
+	# Create charging glow effect
+	charge_glow_node = _create_charge_glow(player)
+
+
+func _create_charge_glow(target: Node2D) -> Node2D:
+	var glow = Node2D.new()
+	glow.name = "ChargeGlow"
+	glow.z_index = -1
+	target.add_child(glow)
+	
+	# Pulsing glow circle
+	var circle = ColorRect.new()
+	circle.size = Vector2(24, 24)
+	circle.position = Vector2(-12, -12)
+	circle.color = Color(1, 0.6, 0.2, 0.4)
+	glow.add_child(circle)
+	
+	# Animate pulsing
+	var tween = create_tween().set_loops()
+	tween.tween_property(circle, "scale", Vector2(1.3, 1.3), 0.3)
+	tween.tween_property(circle, "scale", Vector2(1.0, 1.0), 0.3)
+	
+	# Color shift as charge builds
+	var color_tween = create_tween().set_loops()
+	color_tween.tween_property(circle, "color", Color(1, 0.3, 0.1, 0.6), 0.8)
+	color_tween.tween_property(circle, "color", Color(1, 0.6, 0.2, 0.4), 0.8)
+	
+	return glow
+
+
+## Charge attack released - flash and effects
+func _on_charge_released(damage: int, charge_percent: float) -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	
+	# Remove charge glow
+	if charge_glow_node and is_instance_valid(charge_glow_node):
+		charge_glow_node.queue_free()
+		charge_glow_node = null
+	
+	# Scale effects based on charge percent
+	var intensity = 0.5 + charge_percent * 0.5  # 50% to 100%
+	
+	# Screen shake scaled to charge
+	screen_shake(5.0 * intensity, 0.2)
+	
+	# Hitstop for powerful charged hits
+	if charge_percent > 0.7:
+		hitstop_heavy()
+	else:
+		hitstop_light()
+	
+	# Camera punch for fully charged
+	if charge_percent > 0.9:
+		camera_punch(1.1, 0.15)
+	
+	# Release flash
+	var flash_color = Color(1, 0.8, 0.4, 0.4 * intensity)
+	_flash_screen(flash_color, 0.1)
+	
+	# Burst particles
+	_create_charge_release_burst(player.global_position, charge_percent)
+
+
+func _create_charge_release_burst(pos: Vector2, charge_percent: float) -> void:
+	var particle_count = int(6 + charge_percent * 8)  # 6-14 particles
+	
+	for i in range(particle_count):
+		var particle = ColorRect.new()
+		particle.size = Vector2(3 + charge_percent * 2, 3 + charge_percent * 2)
+		particle.color = Color(1, 0.7, 0.3, 1)
+		particle.global_position = pos
+		particle.z_index = 60
+		get_tree().current_scene.add_child(particle)
+		
+		var angle = randf() * TAU
+		var speed = randf_range(40, 80) * (0.5 + charge_percent * 0.5)
+		var end_pos = pos + Vector2(cos(angle), sin(angle)) * speed * 0.3
+		
+		var tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(particle, "global_position", end_pos, 0.25)\
+			.set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "modulate:a", 0.0, 0.3)
+		tween.tween_callback(particle.queue_free)
+
+
+## Parry success - satisfying feedback
+func _on_parry_success(attacker: Node, reflected_damage: int) -> void:
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	
+	var pos = player.global_position
+	
+	# Medium screen shake
+	screen_shake(6.0, 0.2)
+	
+	# Hitstop for impact
+	hitstop_heavy()
+	
+	# Blue parry flash
+	_flash_screen(Color(0.3, 0.6, 1.0, 0.4), 0.15)
+	
+	# Parry spark effect
+	_create_parry_sparks(pos)
+	
+	# "PARRY!" text popup
+	_create_parry_text(pos)
+	
+	# Camera punch
+	camera_punch(1.08, 0.12)
+
+
+func _create_parry_sparks(pos: Vector2) -> void:
+	# Blue/white sparks radiating outward
+	for i in range(10):
+		var spark = ColorRect.new()
+		spark.size = Vector2(4, 2)
+		spark.color = Color(0.5, 0.8, 1.0, 1)
+		spark.global_position = pos
+		spark.z_index = 70
+		spark.rotation = randf() * TAU
+		get_tree().current_scene.add_child(spark)
+		
+		var angle = i * TAU / 10 + randf_range(-0.2, 0.2)
+		var end_pos = pos + Vector2(cos(angle), sin(angle)) * randf_range(20, 35)
+		
+		var tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(spark, "global_position", end_pos, 0.2)\
+			.set_ease(Tween.EASE_OUT)
+		tween.tween_property(spark, "modulate:a", 0.0, 0.25)
+		tween.tween_callback(spark.queue_free)
+
+
+func _create_parry_text(pos: Vector2) -> void:
+	var label = Label.new()
+	label.text = "PARRY!"
+	label.add_theme_font_size_override("font_size", 14)
+	label.add_theme_color_override("font_color", Color(0.5, 0.8, 1.0))
+	label.add_theme_color_override("font_outline_color", Color(0.1, 0.2, 0.4))
+	label.add_theme_constant_override("outline_size", 2)
+	label.global_position = pos + Vector2(-25, -40)
+	label.z_index = 100
+	get_tree().current_scene.add_child(label)
+	
+	# Pop and float animation
+	label.scale = Vector2(0.5, 0.5)
+	var tween = create_tween()
+	tween.tween_property(label, "scale", Vector2(1.2, 1.2), 0.1).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.1)
+	tween.parallel().tween_property(label, "global_position:y", pos.y - 55, 0.6)
+	tween.tween_property(label, "modulate:a", 0.0, 0.3)
+	tween.tween_callback(label.queue_free)
+
+
+# =============================================================================
+# CAMERA PUNCH (ZOOM EFFECT)
+# =============================================================================
+
+var camera_punch_active: bool = false
+
+## Quick zoom in/out for impact feel
+func camera_punch(zoom_amount: float = 1.1, duration: float = 0.15) -> void:
+	if camera_punch_active:
+		return
+	
+	var player = get_tree().get_first_node_in_group("player")
+	if not player or not player.has_node("Camera2D"):
+		return
+	
+	var camera: Camera2D = player.get_node("Camera2D")
+	var original_zoom = camera.zoom
+	var punch_zoom = original_zoom * zoom_amount
+	
+	camera_punch_active = true
+	
+	var tween = create_tween()
+	tween.tween_property(camera, "zoom", punch_zoom, duration * 0.3)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(camera, "zoom", original_zoom, duration * 0.7)\
+		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_QUAD)
+	tween.tween_callback(func(): camera_punch_active = false)
