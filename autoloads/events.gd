@@ -169,3 +169,49 @@ signal game_loaded
 
 ## Emitted if save file is corrupt
 signal save_corrupted
+
+# =============================================================================
+# RING MENU SIGNALS
+# =============================================================================
+
+## Emitted when ring menu opens
+signal ring_menu_opened
+
+## Emitted when ring menu closes
+signal ring_menu_closed
+
+## Emitted when an item is selected from ring menu
+signal ring_item_selected(ring_type: int, item: Dictionary)
+
+# =============================================================================
+# BUFF SYSTEM SIGNALS
+# =============================================================================
+
+## Emitted when a buff is applied
+signal buff_applied(effect_type: int, value: float, duration: float)
+
+## Emitted when a buff expires
+signal buff_expired(effect_type: int)
+
+# =============================================================================
+# EQUIPMENT SIGNALS
+# =============================================================================
+
+## Emitted when equipment changes
+signal equipment_changed(slot: int, equipment_id: String)
+
+# =============================================================================
+# COMPANION/PARTY SIGNALS
+# =============================================================================
+
+## Emitted when active companion changes
+signal active_companion_changed(companion_id: String)
+
+## Emitted when a companion is knocked out
+signal companion_knocked_out(companion_id: String)
+
+## Emitted when a companion is revived
+signal companion_revived(companion_id: String)
+
+## Emitted when a companion's meter changes
+signal companion_meter_changed(companion_id: String, current: float, max_val: float)
