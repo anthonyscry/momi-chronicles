@@ -15,31 +15,36 @@ offset_left = -3.0
 offset_top = -3.0
 offset_right = 31.0
 offset_bottom = 31.0
-color = Color(1, 1, 0.5, 0.4)
+color = Color(1, 1, 0.5, 0.5)
 
 [node name="Icon" type="ColorRect" parent="."]
 layout_mode = 0
 offset_left = 2.0
 offset_top = 2.0
 offset_right = 26.0
-offset_bottom = 20.0
+offset_bottom = 18.0
 color = Color(0.4, 0.8, 0.4, 1)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_top = 20.0
+offset_top = 18.0
 offset_right = 28.0
 offset_bottom = 28.0
-theme_override_font_sizes/font_size = 5
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 6
 text = "Item"
 horizontal_alignment = 1
 
 [node name="QuantityLabel" type="Label" parent="."]
 visible = false
 layout_mode = 0
-offset_left = 18.0
+offset_left = 16.0
 offset_right = 28.0
-offset_bottom = 8.0
-theme_override_font_sizes/font_size = 5
+offset_bottom = 10.0
+theme_override_colors/font_color = Color(1, 1, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 6
 text = "x1"
 horizontal_alignment = 2

@@ -25,7 +25,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.02, 0.02, 0.05, 0.35)
+color = Color(0.02, 0.02, 0.05, 0.5)
 
 [node name="RingGlow" type="ColorRect" parent="Container"]
 layout_mode = 1
@@ -40,36 +40,42 @@ offset_left = 42.0
 offset_top = 42.0
 offset_right = 78.0
 offset_bottom = 78.0
-color = Color(0.08, 0.08, 0.12, 0.6)
+color = Color(0.08, 0.08, 0.12, 0.7)
 
 [node name="RingLabel" type="Label" parent="Container"]
 layout_mode = 0
 offset_left = 0.0
-offset_top = 4.0
+offset_top = 2.0
 offset_right = 120.0
-offset_bottom = 16.0
-theme_override_font_sizes/font_size = 8
+offset_bottom = 14.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 10
 text = "Items"
 horizontal_alignment = 1
 
 [node name="ItemNameLabel" type="Label" parent="Container"]
 layout_mode = 0
-offset_left = 20.0
-offset_top = 52.0
-offset_right = 100.0
-offset_bottom = 64.0
-theme_override_font_sizes/font_size = 6
+offset_left = 10.0
+offset_top = 50.0
+offset_right = 110.0
+offset_bottom = 62.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 8
 text = "Item Name"
 horizontal_alignment = 1
 
 [node name="ItemDescLabel" type="Label" parent="Container"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 64.0
-offset_right = 110.0
-offset_bottom = 76.0
-theme_override_font_sizes/font_size = 5
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Item description"
+offset_left = 5.0
+offset_top = 62.0
+offset_right = 115.0
+offset_bottom = 74.0
+theme_override_font_sizes/font_size = 6
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 1
+text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 2
