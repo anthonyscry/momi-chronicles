@@ -250,6 +250,8 @@ Plans:
 ## Phase 15: UI Testing Automation
 **Goal**: Automated testing for all UI flows and HUD elements
 
+**Status**: PLANNED - Ready for execution
+
 **Deliverables**:
 - UITester mode in AutoBot (F2 to toggle)
 - Test scenarios: title → gameplay → pause → game over → retry
@@ -258,9 +260,12 @@ Plans:
 - New feature smoke tests (block/parry feedback, pickup collection)
 - Test report output to console
 
-**Plans:**
-- [ ] 15-01-PLAN.md — UITester core & helper functions
-- [ ] 15-02-PLAN.md — Test scenarios & verification
+**Plans:** 3 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — UITester foundation, F2 toggle, screenshot capture
+- [ ] 15-02-PLAN.md — HUD verification, title screen & gameplay scenarios
+- [ ] 15-03-PLAN.md — Pause/game over scenarios, new features smoke test, final reporting
 
 ---
 
