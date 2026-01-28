@@ -28,6 +28,22 @@ var facing_left: bool = false
 var current_combo_count: int = 0
 
 # =============================================================================
+# CAMERA FEEL
+# =============================================================================
+
+## Look-ahead: camera leads in player movement direction
+const LOOK_AHEAD_DISTANCE: float = 20.0
+const LOOK_AHEAD_SMOOTH: float = 3.0
+var _look_ahead_target: Vector2 = Vector2.ZERO
+
+## Combat zoom: subtle zoom-in when enemies nearby
+const BASE_ZOOM: Vector2 = Vector2(1.0, 1.0)
+const COMBAT_ZOOM: Vector2 = Vector2(1.12, 1.12)
+const COMBAT_ZOOM_RANGE: float = 60.0  # Enemies within this range trigger zoom
+const ZOOM_SMOOTH: float = 2.5
+var _target_zoom: Vector2 = BASE_ZOOM
+
+# =============================================================================
 # BOT CONTROL - For AutoBot to control player directly
 # =============================================================================
 
@@ -61,6 +77,43 @@ func _ready() -> void:
 	
 	# Apply initial stats
 	_apply_level_stats()
+
+
+func _physics_process(delta: float) -> void:
+	_update_camera_feel(delta)
+
+
+func _update_camera_feel(delta: float) -> void:
+	if not camera:
+		return
+	
+	# --- Look-ahead: offset camera in movement direction ---
+	var input_dir = get_input_direction()
+	if input_dir.length() > 0.1:
+		_look_ahead_target = input_dir.normalized() * LOOK_AHEAD_DISTANCE
+	else:
+		_look_ahead_target = Vector2.ZERO
+	
+	# Smoothly interpolate camera offset toward look-ahead target
+	# (EffectsManager uses camera.offset for shake, so we track separately)
+	var current_offset = camera.offset
+	# Only adjust if not being shaken (shake_timer check via EffectsManager)
+	if EffectsManager.shake_timer <= 0.0:
+		camera.offset = current_offset.lerp(_look_ahead_target, LOOK_AHEAD_SMOOTH * delta)
+	
+	# --- Combat zoom: zoom in when enemies are close ---
+	var enemies_nearby = false
+	for enemy in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy) and enemy is Node2D:
+			if global_position.distance_to(enemy.global_position) < COMBAT_ZOOM_RANGE:
+				enemies_nearby = true
+				break
+	
+	_target_zoom = COMBAT_ZOOM if enemies_nearby else BASE_ZOOM
+	
+	# Don't fight camera_punch (which also tweens zoom)
+	if not EffectsManager.camera_punch_active:
+		camera.zoom = camera.zoom.lerp(_target_zoom, ZOOM_SMOOTH * delta)
 
 func _on_hurt(attacking_hitbox: Hitbox) -> void:
 	var damage = attacking_hitbox.damage

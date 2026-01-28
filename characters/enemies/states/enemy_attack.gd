@@ -6,8 +6,12 @@ const ATTACK_DURATION: float = 0.4
 const HITBOX_START: float = 0.15
 const HITBOX_END: float = 0.35
 
+## Telegraph: brief red flash before attack connects
+const TELEGRAPH_DURATION: float = 0.12
+
 var attack_timer: float = 0.0
 var hitbox_active: bool = false
+var telegraph_indicator: ColorRect = null
 
 func enter() -> void:
 	player.velocity = Vector2.ZERO
@@ -26,6 +30,9 @@ func enter() -> void:
 	
 	# Start cooldown
 	player.start_attack_cooldown()
+	
+	# Telegraph: visual warning before attack
+	_show_telegraph()
 
 func exit() -> void:
 	if player.hitbox:
@@ -67,3 +74,35 @@ func _position_hitbox(direction: Vector2) -> void:
 	
 	# Position based on direction
 	hitbox_shape.position = direction.normalized() * 12
+
+
+## Show a brief red "!" indicator above enemy before attacking
+func _show_telegraph() -> void:
+	# Red exclamation mark above head
+	var label = Label.new()
+	label.text = "!"
+	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_color_override("font_color", Color(1, 0.2, 0.1))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	label.add_theme_constant_override("outline_size", 2)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(-4, -26)
+	label.z_index = 90
+	label.scale = Vector2(0.5, 0.5)
+	label.pivot_offset = Vector2(4, 10)
+	player.add_child(label)
+	
+	# Pop-in animation
+	var tween = player.create_tween()
+	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.06)\
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.04)
+	tween.tween_interval(TELEGRAPH_DURATION)
+	tween.tween_property(label, "modulate:a", 0.0, 0.1)
+	tween.tween_callback(label.queue_free)
+	
+	# Also flash the enemy sprite red briefly
+	if player.sprite:
+		var flash_tween = player.create_tween()
+		flash_tween.tween_property(player.sprite, "modulate", Color(1.5, 0.6, 0.6), 0.06)
+		flash_tween.tween_property(player.sprite, "modulate", Color.WHITE, 0.1)

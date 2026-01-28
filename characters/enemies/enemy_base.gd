@@ -126,7 +126,17 @@ func _on_hurt(attacking_hitbox: Hitbox) -> void:
 	Events.enemy_damaged.emit(self, damage_amount)
 	
 	var knockback_dir = (global_position - attacking_hitbox.global_position).normalized()
-	velocity = knockback_dir * knockback_force
+	# Improved knockback: burst initial velocity then fast deceleration
+	# Multiplier gives a snappy "pop" that decays quickly
+	velocity = knockback_dir * knockback_force * 1.6
+	
+	# Visual: slight sprite pop in knockback direction for weight feel
+	if sprite:
+		var pop_tween = create_tween()
+		pop_tween.tween_property(sprite, "position", knockback_dir * 3.0, 0.05)\
+			.set_ease(Tween.EASE_OUT)
+		pop_tween.tween_property(sprite, "position", Vector2.ZERO, 0.12)\
+			.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_BACK)
 	
 	if health and not health.is_dead():
 		state_machine.transition_to("Hurt")

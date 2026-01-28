@@ -49,8 +49,15 @@ func _apply_hit_stagger() -> void:
 func physics_update(delta: float) -> void:
 	hurt_timer += delta
 	
-	# Apply knockback velocity decay
-	player.velocity = player.velocity.move_toward(Vector2.ZERO, 200 * delta)
+	# Curved knockback decay: fast at start, smooth stop
+	# Using exponential decay for snappy feel (higher = faster decay)
+	var decay_rate = 8.0
+	player.velocity *= exp(-decay_rate * delta)
+	
+	# Snap to zero when very slow (avoid endless drift)
+	if player.velocity.length() < 5.0:
+		player.velocity = Vector2.ZERO
+	
 	player.move_and_slide()
 	
 	if hurt_timer >= HURT_DURATION:
