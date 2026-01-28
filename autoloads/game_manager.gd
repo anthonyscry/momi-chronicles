@@ -23,6 +23,9 @@ var inventory: Inventory = null
 ## Equipment system (Phase 16)
 var equipment_manager: EquipmentManager = null
 
+## Party system (Phase 16)
+var party_manager: PartyManager = null
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -62,6 +65,11 @@ func _ready() -> void:
 	equipment_manager = EquipmentManager.new()
 	equipment_manager.name = "EquipmentManager"
 	add_child(equipment_manager)
+	
+	# Initialize party system (Phase 16)
+	party_manager = PartyManager.new()
+	party_manager.name = "PartyManager"
+	add_child(party_manager)
 
 func _on_boss_defeated(_boss: Node) -> void:
 	boss_defeated = true

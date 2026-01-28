@@ -316,15 +316,9 @@ func _get_equipment_items() -> Array:
 	return []
 
 func _get_companions() -> Array:
-	# Will be implemented in 16-04 with GameManager.party_manager
-	if GameManager.has_method("get") and GameManager.get("party_manager"):
+	if GameManager.party_manager:
 		return GameManager.party_manager.get_companions_for_ring()
-	# Return placeholder for testing
-	return [
-		{"id": "momi", "name": "Momi", "type": "companion", "desc": "French Bulldog - DPS", "is_active": true, "color": Color(0.9, 0.7, 0.5)},
-		{"id": "cinnamon", "name": "Cinnamon", "type": "companion", "desc": "English Bulldog - Tank", "is_active": false, "color": Color(0.8, 0.5, 0.3)},
-		{"id": "philo", "name": "Philo", "type": "companion", "desc": "Boston Terrier - Support", "is_active": false, "color": Color(0.2, 0.2, 0.25)},
-	]
+	return []
 
 # =============================================================================
 # ITEM ACTIONS (Stubs - implemented in later plans)
@@ -357,7 +351,6 @@ func _equip_item(item: Dictionary) -> void:
 		_update_selection()
 
 func _switch_companion(item: Dictionary) -> void:
-	# Will be implemented in 16-04
 	var companion_id = item.get("id", "")
 	if companion_id.is_empty():
 		return
@@ -367,14 +360,10 @@ func _switch_companion(item: Dictionary) -> void:
 		AudioManager.play_sfx("menu_navigate")  # Error sound
 		return
 	
-	# Check if party system exists
-	if GameManager.has_method("get") and GameManager.get("party_manager"):
+	if GameManager.party_manager:
 		if not item.get("is_active", false):
 			GameManager.party_manager._switch_to_companion(companion_id)
 		close_menu()
-		return
-	
-	print("[RingMenu] Switch to: %s" % item.get("name", "unknown"))
 
 func _handle_option(item: Dictionary) -> void:
 	match item.get("id"):

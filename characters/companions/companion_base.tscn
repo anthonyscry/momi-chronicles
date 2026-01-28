@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://ccompbase001"]
+
+[ext_resource type="Script" path="res://characters/companions/companion_base.gd" id="1_comp"]
+[ext_resource type="Script" path="res://systems/party/companion_ai.gd" id="2_ai"]
+
+[node name="CompanionBase" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_comp")
+
+[node name="Sprite2D" type="Polygon2D" parent="."]
+color = Color(0.9, 0.7, 0.5, 1)
+polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_companion")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 6
+collision_mask = 5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(12, 0)
+disabled = true
+shape = SubResource("CircleShape2D_hitbox")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="CompanionAI" type="Node" parent="."]
+script = ExtResource("2_ai")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
+radius = 6.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 7.0
