@@ -215,3 +215,13 @@ signal companion_revived(companion_id: String)
 
 ## Emitted when a companion's meter changes
 signal companion_meter_changed(companion_id: String, current: float, max_val: float)
+
+# =============================================================================
+# SHOP SIGNALS
+# =============================================================================
+
+## Emitted when player presses E near shop NPC
+signal shop_interact_requested
+
+## Emitted when shop UI closes
+signal shop_closed
