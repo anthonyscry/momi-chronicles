@@ -25,6 +25,10 @@ var ai_presets: Dictionary = {
 	"philo": CompanionData.AIPreset.BALANCED,
 }
 
+## Pending health/meters from save data (applied when companions register)
+var _pending_health: Dictionary = {}  # {companion_id: health_value}
+var _pending_meters: Dictionary = {}  # {companion_id: meter_value}
+
 func _ready() -> void:
 	# Connect to player damage for Philo's mechanic
 	Events.player_damaged.connect(_on_player_damaged)
@@ -76,6 +80,16 @@ func register_companion(companion_id: String, companion_node: Node) -> void:
 	
 	# Set initial control mode
 	companion_node.set_player_controlled(companion_id == active_companion_id)
+	
+	# Apply pending health/meter from save data (deferred restoration)
+	if _pending_health.has(companion_id):
+		companion_node.current_health = _pending_health[companion_id]
+		companion_node.health_changed.emit(companion_node.current_health, companion_node.max_health)
+		_pending_health.erase(companion_id)
+	if _pending_meters.has(companion_id):
+		companion_node.meter_value = _pending_meters[companion_id]
+		companion_node.meter_changed.emit(companion_node.meter_value, companion_node.meter_max)
+		_pending_meters.erase(companion_id)
 
 ## Knock out a companion
 func _on_companion_knocked_out(companion_id: String) -> void:
@@ -188,3 +202,8 @@ func load_save_data(data: Dictionary) -> void:
 		"cinnamon": CompanionData.AIPreset.DEFENSIVE,
 		"philo": CompanionData.AIPreset.BALANCED,
 	}).duplicate()
+	
+	# Store pending health/meters for deferred application
+	# (companion nodes don't exist yet — applied in register_companion)
+	_pending_health = data.get("health", {})
+	_pending_meters = data.get("meters", {})
