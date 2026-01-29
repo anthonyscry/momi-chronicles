@@ -480,10 +480,11 @@ Close the companion health/meter restoration gap discovered during v1.3.1 audit.
 - Awareness of darkness zones (Sewers PointLight2D range)
 - Bot respects zone-specific terrain (water channels, walls in sewers corridors)
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD — Dynamic zone bounds + hazard avoidance
+- [ ] 24-01-PLAN.md — Dynamic zone bounds + proportional patrol points
+- [ ] 24-02-PLAN.md — Hazard avoidance steering + sewers corridor-aware navigation
 
 ---
 
