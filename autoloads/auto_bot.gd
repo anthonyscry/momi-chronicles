@@ -91,6 +91,15 @@ const REVIVAL_CHECK_INTERVAL: float = 5.0  # Check for knocked-out companions ev
 ## Equipment optimization
 const EQUIP_CHECK_INTERVAL: float = 30.0  # Check equipment every 30s
 
+## Zone traversal settings
+const ZONE_EXIT_INTERACT_RANGE: float = 30.0  # Range to interact with exits
+const SHOP_NPC_INTERACT_RANGE: float = 25.0   # Range to interact with NPC
+
+## Shop visit settings
+const SHOP_HEALTH_ITEM_MIN: int = 3     # Shop when health items below this count
+const SHOP_COINS_MIN: int = 200          # Only shop when coins above this
+const SHOP_CHECK_INTERVAL: float = 20.0  # Check if should shop every 20s
+
 ## Hazard avoidance settings
 const HAZARD_DETECTION_RANGE: float = 120.0   # How far to detect hazards
 const HAZARD_AVOIDANCE_STRENGTH: float = 0.8  # How strongly to steer away (0-1)
@@ -187,6 +196,18 @@ var last_guard_snack_time: float = 0.0  # Prevent guard snack spam
 var last_buff_use_time: float = 0.0      # Prevent buff spam
 var revival_check_timer: float = 3.0     # First check after 3 seconds
 var equip_check_timer: float = 10.0      # First equipment check after 10 seconds
+
+# Zone traversal state
+var target_zone_exit: Node = null        # Current ZoneExit we're navigating to
+var zone_exit_interact_cooldown: float = 0.0  # Prevent spam E pressing
+var wants_zone_transition: bool = false  # Set by game loop AI (Phase 27)
+var target_exit_zone_id: String = ""     # Which zone to exit to
+
+# Shop navigation state
+var shop_check_timer: float = 15.0       # First shop check after 15s
+var wants_to_shop: bool = false          # Bot wants to visit shop
+var navigating_to_shop: bool = false     # Currently walking to NPC
+var shop_npc_ref: Node = null            # Cached ShopNPC reference
 
 # Debug info
 var debug_state: String = "INIT"
@@ -513,7 +534,19 @@ func _make_decision() -> void:
 				should_run = randf() < (RUN_CHANCE * 0.5)
 			player_ref.bot_running = should_run
 	else:
-		# No enemy nearby - explore/wander
+		# No enemy nearby - check for navigation objectives first
+		
+		# Priority 1: Zone transition
+		if wants_zone_transition:
+			_navigate_to_zone_exit(1.0 / 60.0)
+			return
+		
+		# Priority 2: Shop visit
+		if wants_to_shop:
+			if _navigate_to_shop_npc():
+				return
+		
+		# Default: explore/wander
 		debug_state = "WANDERING"
 		player_ref.bot_running = false
 		
@@ -1301,6 +1334,7 @@ func _update_phase16_systems(delta: float) -> void:
 	ring_menu_test_timer -= delta
 	revival_check_timer -= delta
 	equip_check_timer -= delta
+	zone_exit_interact_cooldown = max(0, zone_exit_interact_cooldown - delta)
 	
 	# Allow critical healing even in combat
 	if is_critical_health:
@@ -1331,6 +1365,12 @@ func _update_phase16_systems(delta: float) -> void:
 	if equip_check_timer <= 0 and nearby_enemy_count == 0:
 		equip_check_timer = EQUIP_CHECK_INTERVAL
 		_optimize_equipment()
+	
+	# Check if should visit shop
+	shop_check_timer -= delta
+	if shop_check_timer <= 0 and nearby_enemy_count == 0:
+		shop_check_timer = SHOP_CHECK_INTERVAL
+		wants_to_shop = _should_visit_shop()
 	
 	# Cycle companions periodically
 	if companion_cycle_timer <= 0:
@@ -1546,6 +1586,152 @@ func _get_equipment_score(equip_id: String) -> float:
 				score += value * 0.5    # EXP is nice but not survival
 	
 	return score
+
+
+# =============================================================================
+# ZONE TRAVERSAL & NPC INTERACTION
+# =============================================================================
+
+## Find a ZoneExit that leads to the specified target zone
+func _find_zone_exit(target_zone_id: String) -> Node:
+	if not is_instance_valid(current_zone_ref):
+		return null
+	
+	# Search ZoneExits container first
+	if current_zone_ref.has_node("ZoneExits"):
+		var exits_container = current_zone_ref.get_node("ZoneExits")
+		for exit_node in exits_container.get_children():
+			if exit_node is ZoneExit and exit_node.target_zone == target_zone_id:
+				return exit_node
+	
+	# Also search direct children (some zones place exits directly)
+	for child in current_zone_ref.get_children():
+		if child is ZoneExit and child.target_zone == target_zone_id:
+			return child
+	
+	return null
+
+
+## Navigate toward a zone exit. Returns true if actively navigating.
+func _navigate_to_zone_exit(delta: float) -> bool:
+	if not wants_zone_transition or target_exit_zone_id.is_empty():
+		return false
+	
+	# Find exit if we don't have one
+	if target_zone_exit == null or not is_instance_valid(target_zone_exit):
+		target_zone_exit = _find_zone_exit(target_exit_zone_id)
+		if target_zone_exit == null:
+			print("[AutoBot] No exit found for zone: %s" % target_exit_zone_id)
+			wants_zone_transition = false
+			return false
+	
+	# Navigate toward the exit
+	var exit_pos = target_zone_exit.global_position
+	var player_pos = player_ref.global_position
+	var dist = player_pos.distance_to(exit_pos)
+	
+	if dist > ZONE_EXIT_INTERACT_RANGE:
+		# Walk toward exit
+		desired_direction = (exit_pos - player_pos).normalized()
+		player_ref.bot_running = true
+		debug_state = "NAVIGATING_EXIT"
+		return true
+	else:
+		# We're close enough — interact if needed
+		zone_exit_interact_cooldown -= delta
+		if zone_exit_interact_cooldown <= 0:
+			zone_exit_interact_cooldown = 1.0  # 1s cooldown between presses
+			if target_zone_exit.require_interaction:
+				# Simulate E press for interactive exits (manhole, boss door)
+				var event = InputEventAction.new()
+				event.action = "interact"
+				event.pressed = true
+				Input.parse_input_event(event)
+				print("[AutoBot] Pressing interact at zone exit: %s" % target_zone_exit.exit_id)
+			# Non-interactive exits trigger automatically when player walks in
+		
+		desired_direction = (exit_pos - player_pos).normalized() * 0.3
+		debug_state = "AT_EXIT"
+		return true
+
+
+## Check if bot should visit the shop
+func _should_visit_shop() -> bool:
+	# Must be in neighborhood (where Nutkin is)
+	if not is_instance_valid(current_zone_ref):
+		return false
+	if current_zone_ref.zone_id != "neighborhood":
+		return false
+	
+	# Must have enough coins
+	if GameManager.coins < SHOP_COINS_MIN:
+		return false
+	
+	# Count healing items
+	if not GameManager.inventory:
+		return false
+	
+	var health_item_count: int = 0
+	var items_to_check = ["acorn", "bird_seed", "health_potion", "mega_potion", "full_heal"]
+	for item_id in items_to_check:
+		health_item_count += GameManager.inventory.get_item_count(item_id) if GameManager.inventory.has_method("get_item_count") else (1 if GameManager.inventory.has_item(item_id) else 0)
+	
+	# Shop if low on health items
+	return health_item_count < SHOP_HEALTH_ITEM_MIN
+
+
+## Navigate to shop NPC. Returns true if actively navigating.
+func _navigate_to_shop_npc() -> bool:
+	if not wants_to_shop or player_ref == null:
+		return false
+	
+	# Find Nutkin if we don't have a reference
+	if shop_npc_ref == null or not is_instance_valid(shop_npc_ref):
+		if is_instance_valid(current_zone_ref):
+			# Search for ShopNPC in zone
+			for child in current_zone_ref.get_children():
+				if child is ShopNPC:
+					shop_npc_ref = child
+					break
+	
+	if shop_npc_ref == null:
+		wants_to_shop = false
+		return false
+	
+	var npc_pos = shop_npc_ref.global_position
+	var player_pos = player_ref.global_position
+	var dist = player_pos.distance_to(npc_pos)
+	
+	if dist > SHOP_NPC_INTERACT_RANGE:
+		# Walk toward NPC
+		desired_direction = (npc_pos - player_pos).normalized()
+		player_ref.bot_running = dist > 80  # Run if far, walk if close
+		debug_state = "GOING_TO_SHOP"
+		navigating_to_shop = true
+		return true
+	else:
+		# We're close — interact with shop
+		navigating_to_shop = false
+		wants_to_shop = false
+		Events.shop_interact_requested.emit()
+		print("[AutoBot] Interacting with shop NPC")
+		
+		# Schedule shop close after brief browse
+		_schedule_shop_close()
+		return false
+
+
+## Schedule closing the shop after a brief browse period
+func _schedule_shop_close() -> void:
+	# Close shop after 2 seconds (auto-browse)
+	await get_tree().create_timer(2.0).timeout
+	
+	# Close shop via ESC/E
+	var close_event = InputEventAction.new()
+	close_event.action = "interact"
+	close_event.pressed = true
+	Input.parse_input_event(close_event)
+	print("[AutoBot] Closing shop")
 
 
 ## Cycle to next companion using Q key
