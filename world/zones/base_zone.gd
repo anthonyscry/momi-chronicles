@@ -213,6 +213,7 @@ func _capture_enemy_spawn_data() -> void:
 		if enemy is CharacterBody2D:
 			var config = {
 				"scene_path": enemy.scene_file_path,
+				"scene_resource": load(enemy.scene_file_path),  # Cache at zone init (not hot path)
 				"position": enemy.global_position,
 				"name": enemy.name
 			}
@@ -242,6 +243,7 @@ func _on_enemy_died(enemy: Node) -> void:
 			# Record death for this spawn point
 			var spawn_entry = {
 				"scene_path": config.scene_path,
+				"scene_resource": config.get("scene_resource"),
 				"position": config.position,
 				"death_time": Time.get_ticks_msec() / 1000.0,
 				"name": config.name
@@ -304,9 +306,17 @@ func _respawn_enemy(spawn_entry: Dictionary) -> void:
 	if scene_path.is_empty():
 		return
 	
-	var enemy_scene = load(scene_path)
+	# Use cached PackedScene (no runtime load stutter)
+	var enemy_scene = spawn_entry.get("scene_resource")
 	if not enemy_scene:
-		push_warning("Failed to load enemy scene: %s" % scene_path)
+		# Fallback: find in original configs
+		for config in original_enemy_configs:
+			if config.scene_path == scene_path:
+				enemy_scene = config.get("scene_resource")
+				break
+	
+	if not enemy_scene:
+		push_warning("No cached scene for: %s" % scene_path)
 		return
 	
 	var new_enemy = enemy_scene.instantiate()
@@ -331,6 +341,7 @@ func _on_respawned_enemy_died(enemy: Node, original_spawn: Dictionary) -> void:
 	# Re-record for another respawn cycle
 	var spawn_entry = {
 		"scene_path": original_spawn.scene_path,
+		"scene_resource": original_spawn.get("scene_resource"),
 		"position": original_spawn.position,
 		"death_time": Time.get_ticks_msec() / 1000.0,
 		"name": original_spawn.name

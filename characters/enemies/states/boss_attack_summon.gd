@@ -5,6 +5,8 @@ class_name BossAttackSummon
 const SUMMON_TIME: float = 1.0
 const RECOVERY: float = 0.5
 
+const RACCOON_SCENE: PackedScene = preload("res://characters/enemies/raccoon.tscn")
+
 var timer: float = 0.0
 var summoned: bool = false
 
@@ -37,8 +39,8 @@ func _do_summon() -> void:
 	var is_enraged = enemy.get("is_enraged") if enemy.get("is_enraged") != null else false
 	var count = 2 if is_enraged else 1
 	
-	# Load raccoon scene
-	var raccoon_scene = load("res://characters/enemies/raccoon.tscn")
+	# Use preloaded raccoon scene (no frame stutter)
+	var raccoon_scene = RACCOON_SCENE
 	if not raccoon_scene:
 		return
 	
