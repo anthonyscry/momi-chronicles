@@ -100,6 +100,12 @@ const SHOP_HEALTH_ITEM_MIN: int = 3     # Shop when health items below this coun
 const SHOP_COINS_MIN: int = 200          # Only shop when coins above this
 const SHOP_CHECK_INTERVAL: float = 20.0  # Check if should shop every 20s
 
+## Game loop AI settings
+const ZONE_CLEAR_CHECK_INTERVAL: float = 10.0  # Check zone clear status every 10s
+const FARM_KILL_TARGET: int = 10               # Kill N enemies before moving on
+const MIN_LEVEL_FOR_SEWERS: int = 3            # Don't enter sewers below level 3
+const MIN_LEVEL_FOR_BOSS: int = 5              # Don't fight boss below level 5
+
 ## Hazard avoidance settings
 const HAZARD_DETECTION_RANGE: float = 120.0   # How far to detect hazards
 const HAZARD_AVOIDANCE_STRENGTH: float = 0.8  # How strongly to steer away (0-1)
@@ -209,6 +215,14 @@ var wants_to_shop: bool = false          # Bot wants to visit shop
 var navigating_to_shop: bool = false     # Currently walking to NPC
 var shop_npc_ref: Node = null            # Cached ShopNPC reference
 
+# Game loop AI state
+enum GameLoopState { FARM, SHOP, TRAVERSE, CLEAR, BOSS, VICTORY }
+var game_loop_state: int = GameLoopState.FARM
+var game_loop_timer: float = 5.0         # First game loop check after 5s
+var zone_kills: int = 0                  # Kills in current zone
+var game_loop_enabled: bool = true       # Enable/disable game loop AI
+var _last_enemy_count: int = 0           # For kill tracking
+
 # Debug info
 var debug_state: String = "INIT"
 var enemies_found: int = 0
@@ -285,6 +299,9 @@ func _physics_process(delta: float) -> void:
 	# Update hazard awareness
 	_update_hazard_awareness()
 	
+	# Update game loop AI
+	_update_game_loop(delta)
+	
 	# Update kiting
 	if is_kiting:
 		kite_timer -= delta
@@ -354,6 +371,9 @@ func _ensure_player_reference() -> void:
 			print("[AutoBot] Found player")
 			auto_start_attempted = false  # Reset for next title screen visit
 			_zone_size_detected = false  # Re-detect zone on new player
+			zone_kills = 0  # Reset kill counter on zone transition
+			target_zone_exit = null  # Clear exit reference
+			wants_zone_transition = false
 			_update_player_control()
 
 
@@ -1084,6 +1104,12 @@ func _update_crowd_awareness() -> void:
 	
 	# Check if surrounded (enemies on multiple sides)
 	is_surrounded = _check_if_surrounded(threat_vectors)
+	
+	# Track kills by detecting enemy count drops
+	var current_living = _count_living_enemies()
+	if current_living < _last_enemy_count and _last_enemy_count > 0:
+		zone_kills += _last_enemy_count - current_living
+	_last_enemy_count = current_living
 
 
 func _update_hazard_awareness() -> void:
@@ -1244,8 +1270,10 @@ func _log_debug_status() -> void:
 	if is_blocking:
 		block_str = " | BLOCKING" if not attempting_parry else " | PARRYING"
 	
-	print("[AutoBot] State: %s | Pos: %s | HP: %s | Guard: %s | Enemies: %d | Nearest: %.0fpx%s" % [
-		debug_state, pos_str, hp_str, guard_str, living_enemies, nearest_enemy_dist, block_str
+	var loop_state_names = ["FARM", "SHOP", "TRAVERSE", "CLEAR", "BOSS", "VICTORY"]
+	var loop_str = loop_state_names[game_loop_state] if game_loop_state < loop_state_names.size() else "?"
+	print("[AutoBot] State: %s | Loop: %s | Pos: %s | HP: %s | Guard: %s | Enemies: %d | Nearest: %.0fpx | Kills: %d%s" % [
+		debug_state, loop_str, pos_str, hp_str, guard_str, living_enemies, nearest_enemy_dist, zone_kills, block_str
 	])
 
 
@@ -1586,6 +1614,179 @@ func _get_equipment_score(equip_id: String) -> float:
 				score += value * 0.5    # EXP is nice but not survival
 	
 	return score
+
+
+# =============================================================================
+# GAME LOOP AI (Phase 27)
+# =============================================================================
+
+## Main game loop AI — decides high-level objectives
+func _update_game_loop(delta: float) -> void:
+	if not game_loop_enabled or player_ref == null:
+		return
+	
+	game_loop_timer -= delta
+	if game_loop_timer > 0:
+		return
+	game_loop_timer = ZONE_CLEAR_CHECK_INTERVAL
+	
+	var current_zone_id = ""
+	if is_instance_valid(current_zone_ref):
+		current_zone_id = current_zone_ref.zone_id
+	
+	var player_level = player_ref.get_current_level() if player_ref.has_method("get_current_level") else 1
+	
+	match game_loop_state:
+		GameLoopState.FARM:
+			_game_loop_farm(current_zone_id, player_level)
+		GameLoopState.SHOP:
+			_game_loop_shop(current_zone_id)
+		GameLoopState.TRAVERSE:
+			_game_loop_traverse(current_zone_id, player_level)
+		GameLoopState.CLEAR:
+			_game_loop_clear(current_zone_id, player_level)
+		GameLoopState.BOSS:
+			_game_loop_boss(current_zone_id)
+		GameLoopState.VICTORY:
+			debug_state = "VICTORY"
+
+
+## FARM state: Kill enemies in neighborhood to level up and earn coins
+func _game_loop_farm(zone_id: String, level: int) -> void:
+	# If we're not in neighborhood, navigate there
+	if zone_id != "neighborhood" and zone_id != "":
+		wants_zone_transition = true
+		target_exit_zone_id = "neighborhood"
+		return
+	
+	# Check if we've farmed enough or leveled enough
+	if level >= MIN_LEVEL_FOR_SEWERS or zone_kills >= FARM_KILL_TARGET:
+		# Transition to SHOP before moving on
+		game_loop_state = GameLoopState.SHOP
+		print("[AutoBot GameLoop] FARM → SHOP (level: %d, kills: %d)" % [level, zone_kills])
+		return
+	
+	# Otherwise, just fight (default wander + combat behavior handles this)
+	debug_state = "FARMING"
+
+
+## SHOP state: Visit Nutkin to buy supplies
+func _game_loop_shop(zone_id: String) -> void:
+	# Must be in neighborhood for shop
+	if zone_id != "neighborhood":
+		wants_zone_transition = true
+		target_exit_zone_id = "neighborhood"
+		return
+	
+	# Trigger shop visit
+	if not wants_to_shop and not navigating_to_shop:
+		if GameManager.coins >= 50:  # Lower threshold for game loop shop
+			wants_to_shop = true
+			debug_state = "SHOPPING"
+		else:
+			# Not enough coins, skip shopping
+			game_loop_state = GameLoopState.TRAVERSE
+			print("[AutoBot GameLoop] SHOP → TRAVERSE (low coins)")
+			return
+	
+	# If shop visit completed (wants_to_shop reset by navigation)
+	if not wants_to_shop and not navigating_to_shop:
+		game_loop_state = GameLoopState.TRAVERSE
+		print("[AutoBot GameLoop] SHOP → TRAVERSE")
+
+
+## TRAVERSE state: Move to next zone
+func _game_loop_traverse(zone_id: String, level: int) -> void:
+	# Determine destination based on progression
+	var destination = _get_next_zone(zone_id, level)
+	
+	if destination == zone_id or destination.is_empty():
+		# Already in target zone, move to CLEAR
+		game_loop_state = GameLoopState.CLEAR
+		zone_kills = 0
+		print("[AutoBot GameLoop] TRAVERSE → CLEAR (zone: %s)" % zone_id)
+		return
+	
+	# Navigate to destination
+	wants_zone_transition = true
+	target_exit_zone_id = destination
+	debug_state = "TRAVERSING"
+
+
+## CLEAR state: Clear all enemies in current zone
+func _game_loop_clear(zone_id: String, level: int) -> void:
+	# Check if zone is clear
+	var living_enemies = _count_living_enemies()
+	
+	if living_enemies == 0:
+		# Zone is clear — decide next step
+		if zone_id == "sewers" and level >= MIN_LEVEL_FOR_BOSS:
+			# Ready for boss
+			game_loop_state = GameLoopState.BOSS
+			print("[AutoBot GameLoop] CLEAR → BOSS (sewers cleared)")
+		elif zone_id == "neighborhood":
+			# Move to backyard
+			game_loop_state = GameLoopState.TRAVERSE
+			print("[AutoBot GameLoop] CLEAR → TRAVERSE (neighborhood cleared)")
+		elif zone_id == "backyard":
+			# Move to sewers
+			game_loop_state = GameLoopState.TRAVERSE
+			print("[AutoBot GameLoop] CLEAR → TRAVERSE (backyard cleared)")
+		else:
+			# Default: go back to farming
+			game_loop_state = GameLoopState.FARM
+			zone_kills = 0
+		return
+	
+	# Still enemies — fight them (default behavior handles combat)
+	debug_state = "CLEARING"
+
+
+## BOSS state: Navigate to and fight the boss
+func _game_loop_boss(zone_id: String) -> void:
+	if zone_id != "sewers" and zone_id != "boss_arena":
+		# Need to get to sewers first
+		wants_zone_transition = true
+		target_exit_zone_id = "sewers"
+		return
+	
+	if zone_id == "sewers":
+		# Navigate to boss door
+		wants_zone_transition = true
+		target_exit_zone_id = "boss_arena"
+		debug_state = "GOING_TO_BOSS"
+		return
+	
+	if zone_id == "boss_arena":
+		# We're in the boss room — fight! (combat AI handles the rest)
+		debug_state = "BOSS_FIGHT"
+		
+		# Check if boss is defeated
+		var boss_defeated = GameManager.boss_defeated if "boss_defeated" in GameManager else false
+		if boss_defeated:
+			game_loop_state = GameLoopState.VICTORY
+			print("[AutoBot GameLoop] BOSS → VICTORY! Boss defeated!")
+
+
+## Determine next zone in progression
+func _get_next_zone(current_zone: String, level: int) -> String:
+	match current_zone:
+		"neighborhood":
+			return "backyard"
+		"backyard":
+			if level >= MIN_LEVEL_FOR_SEWERS:
+				return "sewers"
+			else:
+				return "neighborhood"  # Go back to farm more
+		"sewers":
+			if level >= MIN_LEVEL_FOR_BOSS:
+				return "boss_arena"
+			else:
+				return "neighborhood"  # Go back to level up
+		"boss_arena":
+			return ""  # Stay in boss arena
+		_:
+			return "neighborhood"  # Default start zone
 
 
 # =============================================================================
