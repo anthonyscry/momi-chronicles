@@ -99,11 +99,14 @@ Level, total EXP, coins, current zone, boss/mini-boss defeated flags, equipment 
 
 ### Art Assets
 
-Existing AI-generated sprites in `gemini_images/` folder covering characters, enemies, environment tiles, and UI elements.
+- **Current visuals**: All characters/enemies/effects are colored Polygon2D shapes and ColorRect particles
+- **Art pipeline**: `art/prompts.json` (96 structured prompts), `art/rip_sprites.py` (background removal + downscale), `art/generated/` directory structure ready
+- **Tile atlas**: `assets/tiles/tile_atlas.png` (only real pixel art asset in use)
+- **Audio**: 88 .wav files -- fully implemented dynamic music system + 16 SFX (complete)
 
 ### Current Milestone
 
-**v1.5 Integration & Quality Audit** -- Fixing bugs and wiring missing signals from full codebase audit (2026-01-29).
+**v1.6 Visual Polish** -- Replace all placeholder colored shapes with AI-generated pixel art sprites. Gemini automation for art generation, sprite integration, particle/effect upgrade.
 
 ---
-*Last updated: 2026-01-29 after v1.4 completion*
+*Last updated: 2026-01-29 after v1.5 completion*

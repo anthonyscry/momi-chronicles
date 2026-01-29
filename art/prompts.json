@@ -1,0 +1,533 @@
+{
+  "global_suffix": "pixel art, 16-bit SNES style, top-down RPG perspective, isolated character on plain white background, no ground no shadows no gradients, clean pixel edges, vibrant colors, game sprite",
+  "categories": [
+    {
+      "name": "characters",
+      "folder": "characters",
+      "prompts": [
+        {
+          "id": "momi_idle",
+          "filename": "momi_idle.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A cute brindle black French Bulldog puppy with white chest patch, big bat ears pointing up, short stocky body, stubby tail, wearing a small brown leather collar. Animation: Idle breathing cycle. Frame 1: Standing alert. Frame 2: Slight ear twitch. Frame 3: Chest rises (inhale). Frame 4: Ears perk. Frame 5: Chest falls (exhale). Frame 6: Tail wag. Frame 7: Head tilt. Frame 8: Return to start."
+        },
+        {
+          "id": "momi_walk",
+          "filename": "momi_walk.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, big bat ears, brown leather collar. Animation: Walk cycle facing down. Frame 1: Right front paw forward. Frame 2: Mid-stride right. Frame 3: Left back paw push. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Mid-stride left. Frame 7: Right back paw push. Frame 8: Return to start."
+        },
+        {
+          "id": "momi_run",
+          "filename": "momi_run.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, ears pinned back from speed, brown leather collar. Animation: Run cycle facing down. Frame 1: Leap start. Frame 2: Airborne legs tucked. Frame 3: Front paws land. Frame 4: Body stretches. Frame 5: Back paws push off. Frame 6: Full extension. Frame 7: Airborne again. Frame 8: Landing."
+        },
+        {
+          "id": "momi_attack",
+          "filename": "momi_attack.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: 3-hit combo attack chain. Frame 1: Wind up. Frame 2: Quick bite lunge. Frame 3: Recovery. Frame 4: Second hit wind up. Frame 5: Headbutt forward. Frame 6: Recovery. Frame 7: Heavy slam wind up. Frame 8: Final powerful headbutt with swoosh arc."
+        },
+        {
+          "id": "momi_charge",
+          "filename": "momi_charge.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: Charge attack buildup and release. Frame 1: Bracing stance. Frame 2: Golden glow starts. Frame 3: Aura building. Frame 4: Full golden charge aura. Frame 5: Charge release lunge. Frame 6: Impact burst. Frame 7: Golden energy explosion. Frame 8: Follow through."
+        },
+        {
+          "id": "momi_ground_pound",
+          "filename": "momi_ground_pound.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: Ground pound AoE attack. Frame 1: Crouch. Frame 2: Leap up. Frame 3: Apex of jump. Frame 4: Tuck and aim down. Frame 5: Slam down. Frame 6: Impact shockwave ring. Frame 7: Expanding shockwave. Frame 8: Landing recovery."
+        },
+        {
+          "id": "momi_dodge",
+          "filename": "momi_dodge.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: Dodge roll. Frame 1: Start lean. Frame 2: Tuck into ball. Frame 3: Rolling mid-air. Frame 4: Full rotation. Frame 5: Dust cloud. Frame 6: Coming out of roll. Frame 7: Landing. Frame 8: Recovery stance."
+        },
+        {
+          "id": "momi_block",
+          "filename": "momi_block.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: Block and parry stance. Frame 1: Raise guard. Frame 2: Shield energy appears. Frame 3: Full block stance blue barrier. Frame 4: Hold block. Frame 5: Impact absorbed. Frame 6: Perfect parry flash blue burst. Frame 7: Counter-push energy. Frame 8: Return to guard."
+        },
+        {
+          "id": "momi_hurt",
+          "filename": "momi_hurt.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: Hurt and knockback. Frame 1: Impact flash. Frame 2: Recoil eyes shut. Frame 3: Knocked backward. Frame 4: Tumbling. Frame 5: Hitting ground. Frame 6: Bounce. Frame 7: Getting up. Frame 8: Recovery stance slightly dazed."
+        },
+        {
+          "id": "momi_death",
+          "filename": "momi_death.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A brindle black French Bulldog puppy with white chest patch, brown collar. Animation: KO and collapse. Frame 1: Final hit stagger. Frame 2: Wobble left. Frame 3: Wobble right. Frame 4: Eyes go X-shaped. Frame 5: Falling over. Frame 6: Collapsed on side. Frame 7: Stars circling head. Frame 8: Tongue out fully KO'd."
+        },
+        {
+          "id": "cinnamon_idle",
+          "filename": "cinnamon_idle.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A stocky black and tan English Bulldog with tan points on legs, face, chest, and eyebrows over a black base coat, wide barrel chest, pronounced underbite showing bottom teeth, wrinkly face, short bowed legs, wearing a red tactical harness with buckles. Larger than average dog, bulky tank build. Animation: Idle breathing cycle. Frame 1: Standing guard. Frame 2: Slight jaw shift. Frame 3: Chest rises (inhale). Frame 4: Drool drip. Frame 5: Chest falls (exhale). Frame 6: Ear twitch. Frame 7: Weight shift. Frame 8: Return to start."
+        },
+        {
+          "id": "cinnamon_walk",
+          "filename": "cinnamon_walk.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A stocky black and tan English Bulldog with tan points on legs, face, chest, and eyebrows over black base coat, wide chest, underbite, wrinkly face, red tactical harness. Animation: Walk cycle facing down, heavy lumbering gait. Frame 1: Right front paw forward. Frame 2: Body sways right. Frame 3: Left back paw pushes. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Body sways left. Frame 7: Right back paw pushes. Frame 8: Return to start."
+        },
+        {
+          "id": "cinnamon_attack",
+          "filename": "cinnamon_attack.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A stocky black and tan English Bulldog with tan points over black base coat, wide chest, underbite, red tactical harness. Animation: Headbutt tank attack. Frame 1: Lower head. Frame 2: Brace legs. Frame 3: Charge forward. Frame 4: Headbutt impact. Frame 5: Impact flash. Frame 6: Shove push. Frame 7: Recovery. Frame 8: Return to stance."
+        },
+        {
+          "id": "cinnamon_overheat",
+          "filename": "cinnamon_overheat.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A black and tan English Bulldog with tan points over black base coat, panting heavily, tongue out long, drooling, face flushed red-orange, steam wisps rising from body, red tactical harness. Animation: Overheat panting cycle. Frame 1: Tongue out panting. Frame 2: Steam puff left. Frame 3: Heavy pant. Frame 4: Steam puff right. Frame 5: Drool drip. Frame 6: Body sags. Frame 7: Deep breath. Frame 8: Resume panting."
+        },
+        {
+          "id": "philo_idle",
+          "filename": "philo_idle.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A small dark grey-and-white Boston Terrier with classic tuxedo markings (dark grey body, white chest, white blaze on face), big round expressive eyes, small pointed ears, wearing a blue bandana around neck. Slim and compact build. Animation: Idle alert cycle. Frame 1: Standing alert. Frame 2: Ears perk up. Frame 3: Head tilt right. Frame 4: Eyes blink. Frame 5: Head tilt left. Frame 6: Tail wag. Frame 7: Sniff air. Frame 8: Return to start."
+        },
+        {
+          "id": "philo_walk",
+          "filename": "philo_walk.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A small dark grey-and-white Boston Terrier with tuxedo markings, blue bandana. Animation: Walk cycle facing down, quick light steps. Frame 1: Right front paw. Frame 2: Quick step. Frame 3: Left back push. Frame 4: Passing. Frame 5: Left front paw. Frame 6: Quick step. Frame 7: Right back push. Frame 8: Return to start."
+        },
+        {
+          "id": "philo_attack",
+          "filename": "philo_attack.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A small dark grey-and-white Boston Terrier with tuxedo markings, blue bandana. Animation: Support bark attack with healing sparkle. Frame 1: Crouch. Frame 2: Inhale. Frame 3: Bark burst with sound waves. Frame 4: Green sparkles emanate. Frame 5: Healing aura pulse. Frame 6: Second bark. Frame 7: Sparkle fade. Frame 8: Recovery."
+        },
+        {
+          "id": "philo_motivated",
+          "filename": "philo_motivated.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A dark grey-and-white Boston Terrier with tuxedo markings, blue bandana, eyes glowing golden with determination, golden sparkle aura surrounding body. Animation: Motivated buff state. Frame 1: Stand tall. Frame 2: Eyes flash gold. Frame 3: Sparkles appear. Frame 4: Full golden aura. Frame 5: Power pose. Frame 6: Aura pulse. Frame 7: Sparkles orbit. Frame 8: Sustained glow."
+        },
+        {
+          "id": "philo_lazy",
+          "filename": "philo_lazy.png",
+          "prompt": "32x32 pixel sprite sheet, 8 frames, horizontal strip, plain white background, no shadows, no gradients, no ground. 3/4 top-down view, 16-bit SNES RPG style. Character: A dark grey-and-white Boston Terrier with tuxedo markings, blue bandana, droopy half-closed eyes, low energy. Animation: Lazy idle. Frame 1: Slumped standing. Frame 2: Eyes drooping. Frame 3: Yawn opening. Frame 4: Full yawn. Frame 5: Yawn closing. Frame 6: Sleepy blink. Frame 7: Head droops. Frame 8: Jolts slightly awake."
+        }
+      ]
+    },
+    {
+      "name": "enemies",
+      "folder": "enemies",
+      "prompts": [
+        {
+          "id": "raccoon_idle",
+          "filename": "raccoon_idle.png",
+          "prompt": "A mischievous raccoon with black mask markings around eyes, grey-brown fur, bushy striped tail, standing on hind legs in fighting pose, top-down 3/4 view, enemy sprite"
+        },
+        {
+          "id": "raccoon_attack",
+          "filename": "raccoon_attack.png",
+          "prompt": "An aggressive raccoon swiping with sharp claws, lunging forward, top-down 3/4 view, melee attack animation"
+        },
+        {
+          "id": "crow_idle",
+          "filename": "crow_idle.png",
+          "prompt": "A black crow with glossy purple-black feathers, beady red eyes, sharp beak, wings spread in flight, seen from above top-down, flying enemy sprite"
+        },
+        {
+          "id": "crow_dive",
+          "filename": "crow_dive.png",
+          "prompt": "A crow swooping down beak-first in a dive bomb attack, motion lines, top-down view, aerial attack animation"
+        },
+        {
+          "id": "stray_cat_idle",
+          "filename": "stray_cat_idle.png",
+          "prompt": "A scrappy orange tabby cat with torn ear and scar, crouching low in ambush position, green glowing eyes, top-down 3/4 view, stealth enemy"
+        },
+        {
+          "id": "stray_cat_stealth",
+          "filename": "stray_cat_stealth.png",
+          "prompt": "An orange tabby cat fading into shadows, partially invisible translucent, only eyes glowing green, stealth mode"
+        },
+        {
+          "id": "stray_cat_pounce",
+          "filename": "stray_cat_pounce.png",
+          "prompt": "An orange tabby cat mid-leap pouncing forward with claws extended, top-down action pose, attack animation"
+        },
+        {
+          "id": "sewer_rat_idle",
+          "filename": "sewer_rat_idle.png",
+          "prompt": "A small dirty sewer rat with beady eyes and long pink tail, matted grey-brown fur, hunched posture, top-down 3/4 view, small swarm enemy"
+        },
+        {
+          "id": "sewer_rat_pack",
+          "filename": "sewer_rat_pack.png",
+          "prompt": "Three sewer rats running in a V formation, swarming toward viewer, pack behavior, small rats together"
+        },
+        {
+          "id": "shadow_creature_idle",
+          "filename": "shadow_creature_idle.png",
+          "prompt": "A mysterious shadowy creature, amorphous dark purple blob with glowing white eyes, wispy ethereal edges dissolving into darkness, floating slightly above ground, top-down view, dark magic enemy"
+        },
+        {
+          "id": "shadow_creature_bolt",
+          "filename": "shadow_creature_bolt.png",
+          "prompt": "A dark purple energy bolt projectile with trailing dark particles, magic projectile sprite"
+        }
+      ]
+    },
+    {
+      "name": "bosses",
+      "folder": "bosses",
+      "prompts": [
+        {
+          "id": "alpha_raccoon",
+          "filename": "alpha_raccoon.png",
+          "prompt": "A massive raccoon standing upright like a gorilla, dark slate fur, golden crown on head, battle scar across face, muscular arms raised menacingly, top-down 3/4 view, mini-boss sprite, larger than normal enemies"
+        },
+        {
+          "id": "alpha_raccoon_slam",
+          "filename": "alpha_raccoon_slam.png",
+          "prompt": "A huge raccoon slamming both fists into the ground, circular shockwave spreading outward, dust and debris flying, AoE attack, boss attack"
+        },
+        {
+          "id": "crow_matriarch",
+          "filename": "crow_matriarch.png",
+          "prompt": "A large mother crow with magnificent purple-black plumage, ornate purple feather crest on head, piercing red eyes glowing, wings spread wide, seen from above, mini-boss sprite"
+        },
+        {
+          "id": "crow_matriarch_dive",
+          "filename": "crow_matriarch_dive.png",
+          "prompt": "A large crow diving down at incredible speed, beak glowing red, impact crater forming, dive attack boss ability"
+        },
+        {
+          "id": "rat_king",
+          "filename": "rat_king.png",
+          "prompt": "A grotesque giant sewer rat king with three rat heads fused together, intertwined tails forming a crown, dirty mud-brown fur, red eyes, sitting on a pile of garbage, top-down 3/4 view, mini-boss"
+        },
+        {
+          "id": "rat_king_poison",
+          "filename": "rat_king_poison.png",
+          "prompt": "A rat king spewing a cloud of green toxic gas, expanding poison AoE circle, poison attack boss ability"
+        },
+        {
+          "id": "raccoon_king_normal",
+          "filename": "raccoon_king_normal.png",
+          "prompt": "An enormous raccoon king wearing a large golden crown with jewels, royal purple cape draped over shoulders, massive body with powerful arms, scarred and battle-hardened face, top-down 3/4 view, final boss, imposing and regal"
+        },
+        {
+          "id": "raccoon_king_enrage",
+          "filename": "raccoon_king_enrage.png",
+          "prompt": "An enraged raccoon king, eyes glowing red, fur standing on end, crown cracked, purple energy aura erupting around body, faster more aggressive pose, boss enrage phase"
+        },
+        {
+          "id": "raccoon_king_death",
+          "filename": "raccoon_king_death.png",
+          "prompt": "A raccoon king collapsing dramatically, crown falling off, cape deflating, flashing white, exploding into golden particles, boss defeat animation"
+        }
+      ]
+    },
+    {
+      "name": "npcs",
+      "folder": "npcs",
+      "prompts": [
+        {
+          "id": "nutkin_idle",
+          "filename": "nutkin_idle.png",
+          "prompt": "A friendly cartoon squirrel shopkeeper, warm brown fur with cream belly, big bushy curled tail, wearing a tiny green apron and merchant hat, sitting behind a small wooden stall with items displayed, top-down 3/4 view, NPC sprite"
+        },
+        {
+          "id": "nutkin_wave",
+          "filename": "nutkin_wave.png",
+          "prompt": "A squirrel shopkeeper waving cheerfully, tail swishing, friendly NPC animation"
+        }
+      ]
+    },
+    {
+      "name": "items",
+      "folder": "items",
+      "prompts": [
+        {
+          "id": "health_potion",
+          "filename": "health_potion.png",
+          "prompt": "A small red glass bottle with cork stopper, glowing red liquid inside, white cross symbol, healing item icon, tiny 16x16"
+        },
+        {
+          "id": "mega_potion",
+          "filename": "mega_potion.png",
+          "prompt": "A large magenta glass flask with swirling liquid, ornate stopper, rare healing item, 16x16"
+        },
+        {
+          "id": "full_heal",
+          "filename": "full_heal.png",
+          "prompt": "A sparkling pink crystal vial with golden cap, radiating light, legendary healing item, 16x16"
+        },
+        {
+          "id": "acorn",
+          "filename": "acorn.png",
+          "prompt": "A small brown acorn with cap, simple food item, tiny collectible, 16x16"
+        },
+        {
+          "id": "bird_seed",
+          "filename": "bird_seed.png",
+          "prompt": "A small pouch of golden seeds spilling out, food item, 16x16"
+        },
+        {
+          "id": "power_treat",
+          "filename": "power_treat.png",
+          "prompt": "An orange dog bone treat with flame icon, glowing with attack power, buff item, 16x16"
+        },
+        {
+          "id": "speed_treat",
+          "filename": "speed_treat.png",
+          "prompt": "A cyan dog bone treat with lightning bolt icon, crackling with speed energy, buff item, 16x16"
+        },
+        {
+          "id": "tough_treat",
+          "filename": "tough_treat.png",
+          "prompt": "A purple-blue dog bone treat with shield icon, shimmering with defense, buff item, 16x16"
+        },
+        {
+          "id": "guard_snack",
+          "filename": "guard_snack.png",
+          "prompt": "A blue cookie with star shape, guard meter restore item, 16x16"
+        },
+        {
+          "id": "revival_bone",
+          "filename": "revival_bone.png",
+          "prompt": "A golden glowing dog bone with sparkles and halo, revival item, 16x16"
+        },
+        {
+          "id": "antidote",
+          "filename": "antidote.png",
+          "prompt": "A small green bottle with leaf symbol, bright green liquid, cure poison medicine, 16x16"
+        },
+        {
+          "id": "smoke_bomb",
+          "filename": "smoke_bomb.png",
+          "prompt": "A round grey bomb with fuse, trailing wisps of smoke, tactical item, 16x16"
+        },
+        {
+          "id": "energy_treat",
+          "filename": "energy_treat.png",
+          "prompt": "A golden glowing dog bone with rainbow sparkles, all-buff super item, legendary consumable, 16x16"
+        },
+        {
+          "id": "health_pickup",
+          "filename": "health_pickup.png",
+          "prompt": "A bright green pulsing heart shape floating and bobbing, green sparkle particles, health pickup collectible, 12x12"
+        },
+        {
+          "id": "coin_pickup",
+          "filename": "coin_pickup.png",
+          "prompt": "A shiny gold coin with star sparkle effect, spinning coin collectible, 12x12"
+        }
+      ]
+    },
+    {
+      "name": "equipment",
+      "folder": "equipment",
+      "prompts": [
+        {
+          "id": "basic_collar",
+          "filename": "basic_collar.png",
+          "prompt": "A simple brown leather dog collar with buckle, equipment icon, 16x16"
+        },
+        {
+          "id": "spiked_collar",
+          "filename": "spiked_collar.png",
+          "prompt": "A black spiked dog collar with metal studs, equipment icon, 16x16"
+        },
+        {
+          "id": "lucky_collar",
+          "filename": "lucky_collar.png",
+          "prompt": "A shiny golden dog collar with gem, rare equipment icon, 16x16"
+        },
+        {
+          "id": "rat_king_collar",
+          "filename": "rat_king_collar.png",
+          "prompt": "A glowing dark brown collar with rat skull motif, boss loot, 16x16"
+        },
+        {
+          "id": "training_harness",
+          "filename": "training_harness.png",
+          "prompt": "A blue training harness with buckles, dog equipment, 16x16"
+        },
+        {
+          "id": "tactical_harness",
+          "filename": "tactical_harness.png",
+          "prompt": "An olive military tactical harness with pouches, equipment, 16x16"
+        },
+        {
+          "id": "padded_harness",
+          "filename": "padded_harness.png",
+          "prompt": "A purple padded harness with soft lining, equipment, 16x16"
+        },
+        {
+          "id": "retractable_leash",
+          "filename": "retractable_leash.png",
+          "prompt": "A red retractable leash with spring mechanism, equipment, 16x16"
+        },
+        {
+          "id": "chain_leash",
+          "filename": "chain_leash.png",
+          "prompt": "A silver chain leash with heavy links, equipment, 16x16"
+        },
+        {
+          "id": "bungee_leash",
+          "filename": "bungee_leash.png",
+          "prompt": "A green bungee leash with elastic cord, equipment, 16x16"
+        },
+        {
+          "id": "raincoat",
+          "filename": "raincoat.png",
+          "prompt": "A cute yellow raincoat for a dog, protective equipment, 16x16"
+        },
+        {
+          "id": "sweater",
+          "filename": "sweater.png",
+          "prompt": "A pink cozy knitted sweater for a dog, equipment, 16x16"
+        },
+        {
+          "id": "leather_jacket",
+          "filename": "leather_jacket.png",
+          "prompt": "A black leather biker jacket for a dog, cool and tough, equipment, 16x16"
+        },
+        {
+          "id": "crow_feather_coat",
+          "filename": "crow_feather_coat.png",
+          "prompt": "A dark purple coat made of crow feathers, mystical and flowing, rare boss equipment, 16x16"
+        },
+        {
+          "id": "kings_mantle",
+          "filename": "kings_mantle.png",
+          "prompt": "A royal purple cape with gold trim and jewels, legendary boss drop, 16x16"
+        },
+        {
+          "id": "baseball_cap",
+          "filename": "baseball_cap.png",
+          "prompt": "A red baseball cap worn sideways, sporty hat equipment, 16x16"
+        },
+        {
+          "id": "bandana",
+          "filename": "bandana.png",
+          "prompt": "A navy blue bandana tied around head, headwear equipment, 16x16"
+        },
+        {
+          "id": "guard_helmet",
+          "filename": "guard_helmet.png",
+          "prompt": "A steel grey guard helmet with visor, protective headgear, 16x16"
+        },
+        {
+          "id": "raccoon_crown",
+          "filename": "raccoon_crown.png",
+          "prompt": "A golden crown with jewels, trophy from alpha raccoon mini-boss, rare hat, 16x16"
+        }
+      ]
+    },
+    {
+      "name": "effects",
+      "folder": "effects",
+      "prompts": [
+        {
+          "id": "hit_spark",
+          "filename": "hit_spark.png",
+          "prompt": "Yellow-white starburst explosion of sparks on impact, radiating lines, hit effect, combat"
+        },
+        {
+          "id": "death_poof",
+          "filename": "death_poof.png",
+          "prompt": "A large white flash expanding into grey smoke cloud with particles, enemy death effect"
+        },
+        {
+          "id": "dust_puff",
+          "filename": "dust_puff.png",
+          "prompt": "Small tan-brown dust cloud rising from ground, movement effect"
+        },
+        {
+          "id": "heal_effect",
+          "filename": "heal_effect.png",
+          "prompt": "Green sparkles and plus signs rising upward, healing effect"
+        },
+        {
+          "id": "poison_effect",
+          "filename": "poison_effect.png",
+          "prompt": "Green toxic bubbles popping on character, sickly green tint, poison status effect"
+        },
+        {
+          "id": "level_up",
+          "filename": "level_up.png",
+          "prompt": "Golden light pillar with sparkles erupting around character, LEVEL UP celebration effect"
+        },
+        {
+          "id": "parry_flash",
+          "filename": "parry_flash.png",
+          "prompt": "Blue energy shield flash with radiating ring, perfect block parry effect"
+        }
+      ]
+    },
+    {
+      "name": "zones",
+      "folder": "zones",
+      "prompts": [
+        {
+          "id": "neighborhood_tile",
+          "filename": "neighborhood_tile.png",
+          "prompt": "Green grass ground tile for a suburban neighborhood, few blades of grass detail, top-down RPG tileset tile, seamless, 16x16"
+        },
+        {
+          "id": "neighborhood_path",
+          "filename": "neighborhood_path.png",
+          "prompt": "Light brown dirt and stone pathway tile, top-down RPG tileset, seamless, 16x16"
+        },
+        {
+          "id": "neighborhood_house_yellow",
+          "filename": "house_yellow.png",
+          "prompt": "A cute yellow house with blue door and red roof, seen from top-down 3/4 view, suburban neighborhood building"
+        },
+        {
+          "id": "neighborhood_fence",
+          "filename": "fence_white.png",
+          "prompt": "A white picket fence section, top-down view, environmental tile"
+        },
+        {
+          "id": "backyard_grass",
+          "filename": "backyard_grass.png",
+          "prompt": "Dark green grass tile, denser wilder vegetation, backyard tileset, seamless, 16x16"
+        },
+        {
+          "id": "backyard_tree",
+          "filename": "tree.png",
+          "prompt": "A leafy green tree with brown trunk, round canopy, seen from top-down showing crown, nature tile"
+        },
+        {
+          "id": "backyard_shed",
+          "filename": "shed.png",
+          "prompt": "A small wooden garden shed with tools visible, brown walls and grey roof, top-down 3/4 view, building"
+        },
+        {
+          "id": "sewer_floor",
+          "filename": "sewer_floor.png",
+          "prompt": "Dark grey stone sewer floor with cracks and water stains, dungeon tileset, seamless, 16x16"
+        },
+        {
+          "id": "sewer_wall",
+          "filename": "sewer_wall.png",
+          "prompt": "Dark brick sewer wall, mossy and damp, top-down 3/4 view, dungeon wall tile"
+        },
+        {
+          "id": "toxic_puddle",
+          "filename": "toxic_puddle.png",
+          "prompt": "A glowing green toxic puddle on sewer floor, bubbling and pulsing, environmental hazard"
+        },
+        {
+          "id": "boss_door",
+          "filename": "boss_door.png",
+          "prompt": "A large reinforced metal door with skull emblem, glowing red cracks, dungeon boss entrance"
+        },
+        {
+          "id": "boss_arena_floor",
+          "filename": "boss_arena_floor.png",
+          "prompt": "Dark grey-purple stone arena floor with ancient symbols, boss arena tileset, seamless, 16x16"
+        },
+        {
+          "id": "throne",
+          "filename": "throne.png",
+          "prompt": "A large throne made of garbage, bones, and scrap metal, where the Raccoon King sits, boss arena centerpiece"
+        },
+        {
+          "id": "manhole",
+          "filename": "manhole.png",
+          "prompt": "A round grey metal manhole cover with cross pattern, slightly ajar with green glow underneath, entrance to sewers"
+        }
+      ]
+    }
+  ]
+}
