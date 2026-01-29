@@ -236,7 +236,6 @@ func activate_selected() -> void:
 	var item = items[selected_index]
 	
 	AudioManager.play_sfx("menu_select")
-	Events.ring_item_selected.emit(current_ring, item)
 	
 	# Handle based on type
 	match current_ring:

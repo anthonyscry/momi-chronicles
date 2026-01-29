@@ -47,10 +47,12 @@ signal player_dodged
 ## Emitted when player starts blocking
 signal player_block_started
 
-## Emitted when player stops blocking
+## Future hook — emitted when block released. Could drive shield-lower SFX,
+## visual effects, or enemy AI reaction windows.
 signal player_block_ended
 
-## Emitted when guard meter breaks (depleted while blocking)
+## Future hook — guard meter depleted. Could drive guard-break SFX,
+## stagger animation, enemy aggro spike, or achievement.
 signal player_guard_broken
 
 ## Emitted when guard meter changes (for UI)
@@ -82,7 +84,8 @@ signal exp_gained(amount: int, current_level: int, current_exp: int, exp_to_next
 ## Emitted when player levels up
 signal player_leveled_up(new_level: int)
 
-## Emitted when stats change due to level up
+## Future hook — emitted on level-up stat changes. Could drive stat sheet UI,
+## achievement tracking, or companion scaling.
 signal stats_updated(stat_name: String, new_value: int)
 
 # =============================================================================
@@ -132,7 +135,8 @@ signal mini_boss_defeated(boss: Node, boss_key: String)
 # PICKUP SIGNALS
 # =============================================================================
 
-## Emitted when any pickup is collected
+## Future hook — emitted on any pickup collection. Could drive collection
+## stats, achievements, or tutorial triggers.
 signal pickup_collected(pickup_type: String, value: int)
 
 ## Emitted when coin count changes
@@ -145,7 +149,8 @@ signal coins_changed(total: int)
 ## Emitted when entering a new zone
 signal zone_entered(zone_name: String)
 
-## Emitted when exiting a zone
+## Future hook — emitted before zone transition. Could drive cleanup tasks,
+## play-time tracking, or zone-exit save triggers.
 signal zone_exited(zone_name: String)
 
 ## Emitted when a zone transition is triggered
@@ -164,7 +169,7 @@ signal game_resumed
 ## Emitted when game over state is triggered
 signal game_over
 
-## Emitted when game restarts
+## Emitted when game restarts — temporary state cleared in GameManager.restart_game()
 signal game_restarted
 
 # =============================================================================
@@ -174,10 +179,10 @@ signal game_restarted
 ## Emitted when game is saved
 signal game_saved
 
-## Emitted when game is loaded
+## Emitted when game is loaded — could drive HUD refresh on load
 signal game_loaded
 
-## Emitted if save file is corrupt
+## Emitted if save file is corrupt — handled by title screen warning UI
 signal save_corrupted
 
 # =============================================================================
@@ -187,11 +192,9 @@ signal save_corrupted
 ## Emitted when ring menu opens
 signal ring_menu_opened
 
-## Emitted when ring menu closes
+## Future hook — paired with ring_menu_opened. Could re-show hidden HUD
+## elements or resume gameplay effects on menu close.
 signal ring_menu_closed
-
-## Emitted when an item is selected from ring menu
-signal ring_item_selected(ring_type: int, item: Dictionary)
 
 # =============================================================================
 # BUFF SYSTEM SIGNALS
@@ -207,7 +210,8 @@ signal buff_expired(effect_type: int)
 # EQUIPMENT SIGNALS
 # =============================================================================
 
-## Emitted when equipment changes
+## Future hook — broadcast when equipment slot changes. Could drive inventory
+## UI refresh, paper-doll display, or stat comparisons.
 signal equipment_changed(slot: int, equipment_id: String)
 
 # =============================================================================
