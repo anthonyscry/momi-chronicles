@@ -293,5 +293,90 @@ Plans:
 
 ---
 
-## Milestone: v1.2 New Mechanics
+## Milestone: v1.2 New Mechanics ✅
 Defensive combat, item drops, persistent progression, ring menu, and automated UI testing.
+
+---
+
+# v1.3 CONTENT & VARIETY
+
+---
+
+## Phase 17: New Enemy Types
+**Goal**: Three new enemies with unique combat behaviors that force different tactics
+
+**Deliverables**:
+- Stray Cat enemy (stealthy ambusher - hides, pounces from stealth, fast retreat)
+- Sewer Rat enemy (swarm behavior - weak alone, spawns in packs of 3-4, poison bite)
+- Shadow Creature enemy (mysterious threat from the lore - phases in/out, ranged shadow bolt)
+- New enemy states: Stealth, Pounce, Swarm, Phase, RangedAttack
+- Poison DoT system on HealthComponent
+- Projectile system (shadow bolt, reusable)
+- Unique drop tables per enemy type
+
+**Plans:** 3 plans
+
+Plans:
+- [ ] 17-01-PLAN.md — Stray Cat enemy with stealth/pounce/retreat (Wave 1)
+- [ ] 17-02-PLAN.md — Sewer Rat enemy pack with poison DoT system (Wave 1)
+- [ ] 17-03-PLAN.md — Shadow Creature with projectile system (Wave 2)
+
+---
+
+## Phase 18: Shop System
+**Goal**: Spend coins on items and equipment from a friendly shopkeeper
+
+**Deliverables**:
+- Shop NPC (Nutkin the Squirrel, placed in Neighborhood zone)
+- Shop UI panel (browse, buy, sell interface via ring menu or dedicated screen)
+- Price catalog for all existing items and equipment
+- Sell-back system (50% of buy price)
+- Restock mechanic (shop refreshes on zone re-entry)
+- Integration with existing coin/inventory systems
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — planned by /gsd-plan-phase
+
+---
+
+## Phase 19: The Sewers Zone
+**Goal**: New dungeon zone with environmental hazards and tougher encounters
+
+**Deliverables**:
+- Sewers zone (darker atmosphere, tighter corridors, 3x larger than backyard)
+- Zone entrance from Neighborhood (manhole cover interaction)
+- Environmental hazards: toxic puddles (damage over time), dark areas (reduced visibility)
+- Sewer-specific enemy spawns (rats + shadow creatures)
+- Linear path leading to Rat King mini-boss room
+- Sewer ambient effects (dripping, gloom particles)
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — planned by /gsd-plan-phase
+
+---
+
+## Phase 20: Mini-Boss System
+**Goal**: Unique mini-boss encounters in each zone for replayability
+
+**Deliverables**:
+- Mini-boss base class (extended from EnemyBase, 2 attack patterns each)
+- Alpha Raccoon (Neighborhood) — 120 HP, calls raccoon reinforcements, ground slam AoE
+- Crow Matriarch (Backyard) — 80 HP, summons crow swarm, dive bomb attack
+- Rat King (Sewers) — 150 HP, splits into smaller rats at 50% HP, poison AoE cloud
+- Mini-boss health bar (mid-size, top of screen)
+- One-time defeat per save file, unique loot drops (rare equipment)
+- Mini-boss spawn triggers (area-based, optional fights)
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — planned by /gsd-plan-phase
+
+---
+
+## Milestone: v1.3 Content & Variety
+New enemies with unique mechanics, a shop to spend coins, a dungeon zone, and challenging mini-bosses.
