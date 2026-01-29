@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dne7k3m2p5x8q"]
+[gd_scene load_steps=12 format=3 uid="uid://dne7k3m2p5x8q"]
 
 [ext_resource type="Script" path="res://world/zones/neighborhood.gd" id="1_neighborhood"]
 [ext_resource type="TileSet" uid="uid://cwt7k3m2p5x8q" path="res://assets/tiles/world_tileset.tres" id="2_tileset"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://bze7k3m2p5x8q" path="res://components/zone_exit/zone_exit.tscn" id="9_zone_exit"]
 [ext_resource type="PackedScene" uid="uid://cat7s3m2p5x8q" path="res://characters/enemies/stray_cat.tscn" id="10_stray_cat"]
 [ext_resource type="PackedScene" uid="uid://dsc7x3m2k5p8q" path="res://characters/enemies/shadow_creature.tscn" id="11_shadow_creature"]
+[ext_resource type="PackedScene" path="res://characters/npcs/shop_npc.tscn" id="12_shop_npc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_h"]
 size = Vector2(800, 16)
@@ -1376,6 +1377,13 @@ position = Vector2(720, 580)
 exit_id = "to_backyard"
 target_zone = "backyard"
 target_spawn = "from_neighborhood"
+
+;; ============================================================================
+;; NPCs
+;; ============================================================================
+
+[node name="Nutkin" parent="." instance=ExtResource("12_shop_npc")]
+position = Vector2(400, 350)
 
 ;; ============================================================================
 ;; UI

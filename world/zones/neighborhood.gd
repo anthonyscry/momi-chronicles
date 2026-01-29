@@ -15,6 +15,7 @@ var spawn_points: Dictionary = {
 	"stores": Vector2(450, 380),            # Near the stores
 	"road_west": Vector2(50, 300),          # West end of main road
 	"road_east": Vector2(680, 300),         # East end of main road
+	"shop": Vector2(380, 350),              # Near Nutkin's shop
 }
 
 # =============================================================================
@@ -23,6 +24,9 @@ var spawn_points: Dictionary = {
 
 func _setup_zone() -> void:
 	zone_id = "neighborhood"
+	
+	# Debug: log shop NPC interaction until shop UI is implemented (Plan 02)
+	Events.shop_interact_requested.connect(func(): print("[Shop] NPC interaction triggered!"))
 	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
