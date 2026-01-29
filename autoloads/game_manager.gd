@@ -94,7 +94,7 @@ func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
 	# Wait 2 seconds for death animation + loot notification
 	await get_tree().create_timer(2.0).timeout
 	SaveManager.save_game()
-	print("[GameManager] Auto-saved after mini-boss defeat")
+	DebugLogger.log_save("Auto-saved after mini-boss defeat")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
@@ -145,8 +145,23 @@ func restart_game() -> void:
 	is_player_alive = true
 	is_paused = false
 	get_tree().paused = false
+	
+	# Clear temporary state before scene reload
+	_clear_temporary_state()
+	
 	get_tree().reload_current_scene()
 	Events.game_restarted.emit()
+
+
+## Clear temporary state that survives scene reload (autoload children).
+## Combo counter, poison visuals, and guard meter are scene-tree nodes
+## that reset naturally via reload_current_scene(). Only Inventory.active_buffs
+## persists incorrectly since Inventory is an autoload child.
+func _clear_temporary_state() -> void:
+	if inventory:
+		for effect_type in inventory.active_buffs.keys():
+			Events.buff_expired.emit(effect_type)
+		inventory.active_buffs.clear()
 
 ## Quit to desktop
 func quit_game() -> void:
@@ -279,7 +294,7 @@ func _on_zone_entered_autosave(zone_name: String) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.progression and player.progression.current_level > 0:
 		SaveManager.save_game()
-		print("[GameManager] Auto-saved on zone entry: ", zone_name)
+		DebugLogger.log_zone("Auto-saved on zone entry: %s" % zone_name)
 
 
 ## Auto-save after boss defeat (delayed for celebration/rewards)
@@ -287,4 +302,4 @@ func _on_boss_defeated_autosave(_boss: Node) -> void:
 	# Wait 3 seconds for victory celebration and rewards
 	await get_tree().create_timer(3.0).timeout
 	SaveManager.save_game()
-	print("[GameManager] Auto-saved after boss defeat")
+	DebugLogger.log_save("Auto-saved after boss defeat")
