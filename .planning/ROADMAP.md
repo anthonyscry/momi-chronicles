@@ -483,8 +483,8 @@ Close the companion health/meter restoration gap discovered during v1.3.1 audit.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 24-01-PLAN.md — Dynamic zone bounds + proportional patrol points
-- [ ] 24-02-PLAN.md — Hazard avoidance steering + sewers corridor-aware navigation
+- [ ] 24-01-PLAN.md — Dynamic zone bounds + proportional patrol points (Wave 1)
+- [ ] 24-02-PLAN.md — Hazard avoidance + sewers corridor navigation + dark zone behavior (Wave 2)
 
 ---
 
@@ -503,7 +503,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 25-01-PLAN.md — Smart healing + guard snack + buff treats (Wave 1)
+- [ ] 25-01-PLAN.md — Smart 3-tier healing + guard snack + buff treats (Wave 1)
 - [ ] 25-02-PLAN.md — Companion revival + equipment optimization (Wave 2)
 
 ---
