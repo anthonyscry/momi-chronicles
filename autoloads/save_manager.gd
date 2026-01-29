@@ -7,7 +7,7 @@ extends Node
 
 const SAVE_PATH: String = "user://save.dat"
 const BACKUP_PATH: String = "user://save.dat.bak"
-const SAVE_VERSION: int = 2
+const SAVE_VERSION: int = 3
 
 # =============================================================================
 # SAVE DATA STRUCTURE
@@ -27,6 +27,9 @@ func _get_default_data() -> Dictionary:
 			"crow_matriarch": false,
 			"rat_king": false,
 		},
+		"equipment": {},
+		"inventory": {},
+		"party": {},
 		"timestamp": Time.get_unix_time_from_system()
 	}
 
@@ -79,6 +82,12 @@ func _gather_save_data() -> Dictionary:
 	data.current_zone = GameManager.current_zone if GameManager.current_zone != "" else "neighborhood"
 	data.boss_defeated = GameManager.boss_defeated
 	data.mini_bosses_defeated = GameManager.mini_bosses_defeated.duplicate()
+	
+	# Get sub-system state (helpers already exist on each manager)
+	data.equipment = GameManager.equipment_manager.get_save_data()
+	data.inventory = GameManager.inventory.get_save_data()
+	data.party = GameManager.party_manager.get_save_data()
+	
 	data.timestamp = Time.get_unix_time_from_system()
 	
 	return data
@@ -103,6 +112,19 @@ func _apply_save_data(data: Dictionary) -> bool:
 		"crow_matriarch": false,
 		"rat_king": false,
 	})
+	
+	# Restore sub-system state (v3+, graceful fallback for v2 saves)
+	var equipment_data = data.get("equipment", {})
+	if not equipment_data.is_empty():
+		GameManager.equipment_manager.load_save_data(equipment_data)
+	
+	var inventory_data = data.get("inventory", {})
+	if not inventory_data.is_empty():
+		GameManager.inventory.load_save_data(inventory_data)
+	
+	var party_data = data.get("party", {})
+	if not party_data.is_empty():
+		GameManager.party_manager.load_save_data(party_data)
 	
 	# Store zone for transition (GameManager handles zone loading)
 	var target_zone = data.get("current_zone", "neighborhood")
