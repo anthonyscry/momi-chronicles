@@ -25,9 +25,6 @@ var spawn_points: Dictionary = {
 func _setup_zone() -> void:
 	zone_id = "neighborhood"
 	
-	# Debug: log shop NPC interaction until shop UI is implemented (Plan 02)
-	Events.shop_interact_requested.connect(func(): print("[Shop] NPC interaction triggered!"))
-	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
 	if not pending_spawn.is_empty() and spawn_points.has(pending_spawn):
