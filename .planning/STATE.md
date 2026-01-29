@@ -3,31 +3,33 @@
 ## Current Position
 
 Phase: 29 of 29 (Signal Integrity & Polish)
-Plan: 3 of 3 (29-03 complete)
-Status: v1.5 Integration & Quality Audit — IN PROGRESS
-Last activity: 2026-01-29 — Completed 29-03-PLAN.md
+Plan: 3 of 3 (all complete)
+Status: v1.5 Integration & Quality Audit — COMPLETE ✅
+Last activity: 2026-01-29 — Phase 29 verified, milestone closed
 
 Progress: ████████████████████████████████████████ 100% (v1.5)
 
 ## Current Status
-- **Version**: v1.5 Integration & Quality Audit (IN PROGRESS)
+- **Version**: v1.5 Integration & Quality Audit (COMPLETE ✅)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts (100 .gd files)
-- **Status**: Phase 29 complete (all 3 plans done)
+- **Status**: All milestones through v1.5 complete
 
-## v1.5 Audit Findings
+## v1.5 Audit Findings (ALL RESOLVED)
 - [x] Full codebase audit completed (2026-01-29)
 - [x] BUG: Revival Bone ring menu stub — FIXED (28-01)
 - [x] BUG: Antidote cure_poison/clear_poison method name mismatch — FIXED (28-01)
 - [x] BUG: Boss summon runtime load() — FIXED (28-01)
 - [x] MISS: save_corrupted signal has no UI handler — FIXED (29-01)
+- [x] MISS: game_loaded signal has no HUD refresh — FIXED (29-01)
+- [x] MISS: game_restarted doesn't clear active_buffs — FIXED (29-01)
 - [x] DEBT: 11 orphaned Events bus signals — CLEANED (29-02)
 - [x] DEBT: PROJECT.md character descriptions outdated — FIXED (29-03)
 - [x] DEBT: Enemy respawn uses runtime load() — FIXED (28-01)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 29-03-PLAN.md
+Stopped at: v1.5 milestone complete — ready for next milestone
 Resume file: None
 
 ## Accumulated Decisions (from v1.0-v1.5)
@@ -48,7 +50,7 @@ Resume file: None
 
 ---
 
-## PREVIOUS MILESTONES (ALL COMPLETE)
+## ALL MILESTONES COMPLETE
 
 | Milestone | Phases | Status |
 |-----------|--------|--------|
@@ -59,7 +61,9 @@ Resume file: None
 | v1.3.1 Tech Debt & Polish | 21-22 | ✅ COMPLETE |
 | v1.3.2 Companion Save Fix | 23 | ✅ COMPLETE |
 | v1.4 AutoBot Overhaul | 24-27 | ✅ COMPLETE |
+| v1.5 Integration & Quality Audit | 28-29 | ✅ COMPLETE |
 
 ---
 
-*v1.5 Integration & Quality Audit started: 2026-01-29*
+*v1.5 Integration & Quality Audit completed: 2026-01-29*
+*All 9 requirements resolved: 3 BUG, 3 SIG, 3 DEBT*

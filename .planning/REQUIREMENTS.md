@@ -15,15 +15,15 @@ Requirements for the Integration & Quality Audit milestone. All issues discovere
 
 ### Signal Integrity (SIG)
 
-- [ ] **SIG-01**: save_corrupted signal shows player-visible error feedback (toast, HUD message, or title screen warning)
-- [ ] **SIG-02**: game_loaded signal triggers UI refresh (health bar, coin counter, EXP bar update to loaded values)
-- [ ] **SIG-03**: game_restarted signal clears stale state (active buffs, poison visuals, combo counter)
+- [x] **SIG-01**: save_corrupted signal shows player-visible error feedback (toast, HUD message, or title screen warning)
+- [x] **SIG-02**: game_loaded signal triggers UI refresh (health bar, coin counter, EXP bar update to loaded values)
+- [x] **SIG-03**: game_restarted signal clears stale state (active buffs, poison visuals, combo counter)
 
 ### Tech Debt (DEBT)
 
 - [x] **DEBT-01**: All scene instantiation uses preload() — no runtime load() in hot paths (boss_attack_summon.gd, base_zone.gd respawn)
-- [ ] **DEBT-02**: Orphaned Events bus signals either connected to handlers or removed with comment explaining why
-- [ ] **DEBT-03**: PROJECT.md reflects actual game state (characters, features, scope updated through v1.4)
+- [x] **DEBT-02**: Orphaned Events bus signals either connected to handlers or removed with comment explaining why
+- [x] **DEBT-03**: PROJECT.md reflects actual game state (characters, features, scope updated through v1.4)
 
 ## Out of Scope
 
@@ -41,12 +41,12 @@ Requirements for the Integration & Quality Audit milestone. All issues discovere
 | BUG-01 | Phase 28 | Complete |
 | BUG-02 | Phase 28 | Complete |
 | BUG-03 | Phase 28 | Complete |
-| SIG-01 | Phase 29 | Pending |
-| SIG-02 | Phase 29 | Pending |
-| SIG-03 | Phase 29 | Pending |
+| SIG-01 | Phase 29 | Complete |
+| SIG-02 | Phase 29 | Complete |
+| SIG-03 | Phase 29 | Complete |
 | DEBT-01 | Phase 28 | Complete |
-| DEBT-02 | Phase 29 | Pending |
-| DEBT-03 | Phase 29 | Pending |
+| DEBT-02 | Phase 29 | Complete |
+| DEBT-03 | Phase 29 | Complete |
 
 **Coverage:**
 - v1.5 requirements: 9 total

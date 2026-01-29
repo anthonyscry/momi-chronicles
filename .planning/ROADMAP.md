@@ -578,10 +578,10 @@ Plans:
 
 ---
 
-## Phase 29: Signal Integrity & Polish
+## Phase 29: Signal Integrity & Polish ✅
 **Goal**: Wire missing signal handlers, clean up orphaned signals, update project documentation
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Requirements Covered**: SIG-01, SIG-02, SIG-03, DEBT-02, DEBT-03
 
@@ -595,11 +595,11 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 29-01-PLAN.md — Wire save_corrupted, game_loaded, game_restarted signal handlers
-- [ ] 29-02-PLAN.md — Orphaned signal audit: doc comments + dead signal removal
-- [ ] 29-03-PLAN.md — PROJECT.md full rewrite through v1.4
+- [x] 29-01-PLAN.md — Wire save_corrupted, game_loaded, game_restarted signal handlers
+- [x] 29-02-PLAN.md — Orphaned signal audit: doc comments + dead signal removal
+- [x] 29-03-PLAN.md — PROJECT.md full rewrite through v1.4
 
 ---
 
-## Milestone: v1.5 Integration & Quality Audit
+## Milestone: v1.5 Integration & Quality Audit ✅
 Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and update documentation. All issues from full codebase audit on 2026-01-29.
