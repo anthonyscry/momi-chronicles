@@ -330,16 +330,19 @@ Plans:
 
 **Deliverables**:
 - Shop NPC (Nutkin the Squirrel, placed in Neighborhood zone)
-- Shop UI panel (browse, buy, sell interface via ring menu or dedicated screen)
+- Shop UI panel (browse, buy, sell interface with keyboard navigation)
 - Price catalog for all existing items and equipment
 - Sell-back system (50% of buy price)
 - Restock mechanic (shop refreshes on zone re-entry)
+- Stock tracking (limited quantities per restock cycle)
 - Integration with existing coin/inventory systems
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD — planned by /gsd-plan-phase
+- [ ] 18-01-PLAN.md — Shop NPC (Nutkin) + price catalog + interaction system (Wave 1)
+- [ ] 18-02-PLAN.md — Shop UI panel with buy functionality (Wave 2)
+- [ ] 18-03-PLAN.md — Sell tab + restock mechanic + stock tracking (Wave 3)
 
 ---
 
