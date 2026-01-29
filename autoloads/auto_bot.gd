@@ -232,6 +232,7 @@ const DEBUG_LOG_INTERVAL: int = 300  # Log every 5 seconds at 60fps
 
 # Auto-start flag to prevent spam clicking
 var auto_start_attempted: bool = false
+var auto_start_delay: float = 1.5  # Wait for title screen animation to finish
 
 # =============================================================================
 # LIFECYCLE
@@ -254,27 +255,20 @@ func _physics_process(delta: float) -> void:
 	# Toggle with F1
 	_handle_toggle_input()
 	
-	# Auto-start: If on title screen and no player, click appropriate button (once)
+	# Auto-start: If on title screen and no player, auto-click start/continue
 	if enabled and player_ref == null and not auto_start_attempted:
-		# First check for confirmation dialog (overwrite save prompt)
-		var confirm_dialog = get_tree().root.find_child("ConfirmationDialog", true, false)
-		if confirm_dialog and confirm_dialog is ConfirmationDialog and confirm_dialog.visible:
-			auto_start_attempted = true
-			print("[AutoBot] Confirming new game!")
-			confirm_dialog.confirmed.emit()
+		if auto_start_delay > 0:
+			auto_start_delay -= delta
 		else:
-			# Prefer Continue if it exists (has save), otherwise Start
-			var continue_btn = get_tree().root.find_child("ContinueButton", true, false)
-			if continue_btn and continue_btn is Button and continue_btn.visible:
+			var scene = get_tree().current_scene
+			if scene is TitleScreen:
 				auto_start_attempted = true
-				print("[AutoBot] Continuing saved game!")
-				continue_btn.pressed.emit()
-			else:
-				var start_btn = get_tree().root.find_child("StartButton", true, false)
-				if start_btn and start_btn is Button and start_btn.visible:
-					auto_start_attempted = true
+				if SaveManager.has_save():
+					print("[AutoBot] Continuing saved game!")
+					scene._on_continue_pressed()
+				else:
 					print("[AutoBot] Starting new game!")
-					start_btn.pressed.emit()
+					scene._on_start_pressed()
 	
 	# Get player reference
 	_ensure_player_reference()
@@ -370,6 +364,7 @@ func _ensure_player_reference() -> void:
 		if player_ref != null:
 			print("[AutoBot] Found player")
 			auto_start_attempted = false  # Reset for next title screen visit
+			auto_start_delay = 1.5  # Reset delay for next title screen
 			_zone_size_detected = false  # Re-detect zone on new player
 			zone_kills = 0  # Reset kill counter on zone transition
 			target_zone_exit = null  # Clear exit reference
@@ -393,6 +388,17 @@ func _update_player_control() -> void:
 			is_charging = false
 			is_blocking = false
 			attempting_parry = false
+			# Release ALL virtual key presses — including directional inputs
+			# used by ring menu navigation (move_left/right/down) which share
+			# the same actions as player movement
+			for action in ["interact", "ring_menu", "attack", "dodge", "block",
+					"special_attack", "run", "cycle_companion",
+					"move_left", "move_right", "move_up", "move_down"]:
+				Input.action_release(action)
+			# Release UI focus so keyboard input goes back to the game
+			var viewport = get_viewport()
+			if viewport and viewport.gui_get_focus_owner():
+				viewport.gui_get_focus_owner().release_focus()
 
 
 # =============================================================================
@@ -1009,8 +1015,10 @@ func _pick_wander_direction() -> void:
 
 func _update_zone_awareness() -> void:
 	# Only re-detect when zone ref is lost (zone transition) or not yet detected
-	if _zone_size_detected and is_instance_valid(current_zone_ref):
-		return
+	if _zone_size_detected:
+		# If we have a zone ref, only re-detect if it becomes invalid (zone transition)
+		if current_zone_ref == null or is_instance_valid(current_zone_ref):
+			return
 	
 	if player_ref == null:
 		return
@@ -1031,7 +1039,8 @@ func _update_zone_awareness() -> void:
 		var cam = player_ref.get_node("Camera2D")
 		var w = cam.limit_right - cam.limit_left
 		var h = cam.limit_bottom - cam.limit_top
-		if w > 0 and h > 0:
+		# Ignore Godot default limits (20M) — they mean "no limits set"
+		if w > 0 and h > 0 and w < 100000 and h < 100000:
 			current_zone_size = Vector2(w, h)
 			_zone_size_detected = true
 			print("[AutoBot] Zone size from camera: %s" % current_zone_size)
@@ -1844,10 +1853,7 @@ func _navigate_to_zone_exit(delta: float) -> bool:
 			zone_exit_interact_cooldown = 1.0  # 1s cooldown between presses
 			if target_zone_exit.require_interaction:
 				# Simulate E press for interactive exits (manhole, boss door)
-				var event = InputEventAction.new()
-				event.action = "interact"
-				event.pressed = true
-				Input.parse_input_event(event)
+				_tap_action("interact")
 				print("[AutoBot] Pressing interact at zone exit: %s" % target_zone_exit.exit_id)
 			# Non-interactive exits trigger automatically when player walks in
 		
@@ -1891,7 +1897,7 @@ func _navigate_to_shop_npc() -> bool:
 		if is_instance_valid(current_zone_ref):
 			# Search for ShopNPC in zone
 			for child in current_zone_ref.get_children():
-				if child is ShopNPC:
+				if child.get_script() and child.get_script().get_global_name() == &"ShopNPC":
 					shop_npc_ref = child
 					break
 	
@@ -1922,16 +1928,22 @@ func _navigate_to_shop_npc() -> bool:
 		return false
 
 
+## Simulate a momentary action press — presses then releases next frame
+## Prevents synthetic inputs from getting stuck in the Input singleton
+func _tap_action(action_name: String) -> void:
+	Input.action_press(action_name)
+	# Release next frame so it registers as a single tap
+	await get_tree().process_frame
+	Input.action_release(action_name)
+
+
 ## Schedule closing the shop after a brief browse period
 func _schedule_shop_close() -> void:
 	# Close shop after 2 seconds (auto-browse)
 	await get_tree().create_timer(2.0).timeout
 	
 	# Close shop via ESC/E
-	var close_event = InputEventAction.new()
-	close_event.action = "interact"
-	close_event.pressed = true
-	Input.parse_input_event(close_event)
+	_tap_action("interact")
 	print("[AutoBot] Closing shop")
 
 
@@ -1945,10 +1957,7 @@ func _cycle_companion() -> void:
 		return
 	
 	# Simulate Q key press
-	var event = InputEventAction.new()
-	event.action = "cycle_companion"
-	event.pressed = true
-	Input.parse_input_event(event)
+	_tap_action("cycle_companion")
 	
 	print("[AutoBot] Cycled companion -> %s" % GameManager.party_manager.active_companion_id)
 
@@ -1956,10 +1965,7 @@ func _cycle_companion() -> void:
 ## Test the ring menu by opening, browsing, and closing it
 func _test_ring_menu() -> void:
 	# Open ring menu
-	var open_event = InputEventAction.new()
-	open_event.action = "ring_menu"
-	open_event.pressed = true
-	Input.parse_input_event(open_event)
+	_tap_action("ring_menu")
 	
 	print("[AutoBot] Testing ring menu...")
 	
@@ -1997,31 +2003,19 @@ func _schedule_ring_menu_navigation() -> void:
 	
 	# Navigate right a few times
 	for i in range(3):
-		var nav_event = InputEventAction.new()
-		nav_event.action = "move_right"
-		nav_event.pressed = true
-		Input.parse_input_event(nav_event)
+		_tap_action("move_right")
 		await get_tree().create_timer(0.3).timeout
 	
 	# Switch to next ring (down)
-	var switch_event = InputEventAction.new()
-	switch_event.action = "move_down"
-	switch_event.pressed = true
-	Input.parse_input_event(switch_event)
+	_tap_action("move_down")
 	await get_tree().create_timer(0.5).timeout
 	
 	# Navigate a bit more
 	for i in range(2):
-		var nav_event = InputEventAction.new()
-		nav_event.action = "move_left"
-		nav_event.pressed = true
-		Input.parse_input_event(nav_event)
+		_tap_action("move_left")
 		await get_tree().create_timer(0.3).timeout
 	
 	# Close ring menu
-	var close_event = InputEventAction.new()
-	close_event.action = "ring_menu"
-	close_event.pressed = true
-	Input.parse_input_event(close_event)
+	_tap_action("ring_menu")
 	
 	print("[AutoBot] Ring menu test complete")

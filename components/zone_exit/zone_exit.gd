@@ -27,6 +27,7 @@ extends Area2D
 # =============================================================================
 
 var player_in_area: bool = false
+var _entry_cooldown: float = 0.5  # Grace period after zone loads to prevent bounce-back
 
 # =============================================================================
 # NODE REFERENCES
@@ -53,8 +54,13 @@ func _ready() -> void:
 		indicator.color = indicator_color
 
 
+func _process(delta: float) -> void:
+	if _entry_cooldown > 0:
+		_entry_cooldown -= delta
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if require_interaction and player_in_area:
+	if require_interaction and player_in_area and _entry_cooldown <= 0:
 		if event.is_action_pressed("interact") or event.is_action_pressed("attack"):
 			_trigger_transition()
 
@@ -65,7 +71,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body is Player:
 		player_in_area = true
-		if not require_interaction:
+		if not require_interaction and _entry_cooldown <= 0:
 			_trigger_transition()
 
 

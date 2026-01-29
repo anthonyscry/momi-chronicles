@@ -8,13 +8,13 @@ class_name BossRaccoonKing
 # =============================================================================
 
 ## Boss stats (override base)
-const BOSS_MAX_HP: int = 200
-const BOSS_DAMAGE: int = 25
-const BOSS_SPEED: float = 40.0
-const BOSS_EXP: int = 200
+const BOSS_MAX_HP: int = 400
+const BOSS_DAMAGE: int = 35
+const BOSS_SPEED: float = 50.0
+const BOSS_EXP: int = 500
 
 ## Attack pattern timings
-const ATTACK_COOLDOWN_BASE: float = 2.0
+const ATTACK_COOLDOWN_BASE: float = 1.5
 const ENRAGE_THRESHOLD: float = 0.5  # 50% HP
 
 ## Attack patterns
@@ -112,9 +112,10 @@ func _enter_enrage() -> void:
 	is_enraged = true
 	phase = 2
 	
-	# Speed up attacks
-	attack_cooldown = ATTACK_COOLDOWN_BASE * 0.6
-	chase_speed = BOSS_SPEED * 2.0
+	# Speed up attacks and hit harder
+	attack_cooldown = ATTACK_COOLDOWN_BASE * 0.4
+	chase_speed = BOSS_SPEED * 2.5
+	attack_damage = BOSS_DAMAGE + 15  # 50 damage in enrage
 	
 	# Visual feedback
 	if sprite:

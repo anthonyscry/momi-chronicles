@@ -35,13 +35,16 @@ var is_attacking: bool = false
 var attack_timer: float = 0.0
 const ATTACK_DURATION: float = 0.15
 
+## Preload to avoid autoload parse-time dependency
+const _CompanionData = preload("res://systems/party/companion_data.gd")
+
 ## Components
 @onready var sprite: Polygon2D = $Sprite2D
 @onready var collision: CollisionShape2D = $CollisionShape2D
 @onready var hitbox_area: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/CollisionShape2D
 @onready var hurtbox_area: Area2D = $Hurtbox
-@onready var ai: CompanionAI = $CompanionAI
+@onready var ai = $CompanionAI  # Removed type to avoid parse-order dependency
 
 func _ready() -> void:
 	add_to_group("companions")
@@ -60,7 +63,7 @@ func _ready() -> void:
 	
 	# Setup AI
 	if ai:
-		var preset = CompanionData.AIPreset.BALANCED
+		var preset = _CompanionData.AIPreset.BALANCED
 		if GameManager.party_manager:
 			preset = GameManager.party_manager.ai_presets.get(companion_id, preset)
 		ai.setup(self, preset)
@@ -70,7 +73,7 @@ func _ready() -> void:
 		hitbox_shape.disabled = true
 
 func _load_companion_data() -> void:
-	var data = CompanionData.get_companion(companion_id)
+	var data = _CompanionData.get_companion(companion_id)
 	if data.is_empty():
 		return
 	

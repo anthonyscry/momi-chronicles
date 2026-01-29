@@ -4,6 +4,7 @@ class_name BossArena
 
 const BOSS_SCENE = preload("res://characters/enemies/boss_raccoon_king.tscn")
 const HEALTH_PICKUP_SCENE = preload("res://components/health/health_pickup.tscn")
+const ZONE_EXIT_SCENE = preload("res://components/zone_exit/zone_exit.tscn")
 
 # =============================================================================
 # ARENA STATE
@@ -27,10 +28,12 @@ func _ready() -> void:
 	# Connect to boss events
 	Events.boss_defeated.connect(_on_boss_defeated)
 	
-	# Position player
+	# Position player and set camera limits for this small arena
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player_spawn_point:
 		player.global_position = player_spawn_point.global_position
+	if player and player.has_method("set_camera_limits"):
+		player.set_camera_limits(Rect2(Vector2.ZERO, Vector2(384, 216)))
 	
 	# Spawn boss
 	_spawn_boss()
@@ -91,6 +94,9 @@ func _on_boss_defeated(_boss: Node) -> void:
 	
 	# Spawn rewards
 	_spawn_victory_rewards()
+	
+	# Spawn exit back to sewers
+	_spawn_victory_exit()
 
 func _spawn_victory_rewards() -> void:
 	# Spawn multiple health pickups
@@ -99,6 +105,18 @@ func _spawn_victory_rewards() -> void:
 		var spawn_pos = boss_spawn_point.global_position if boss_spawn_point else Vector2(192, 80)
 		pickup.global_position = spawn_pos + Vector2(randf_range(-30, 30), randf_range(-30, 30))
 		add_child(pickup)
+
+func _spawn_victory_exit() -> void:
+	# Create exit at the entrance door position (bottom of arena)
+	var exit = ZONE_EXIT_SCENE.instantiate()
+	exit.exit_id = "victory_exit"
+	exit.target_zone = "neighborhood"
+	exit.target_spawn = "default"
+	exit.require_interaction = false
+	exit.position = Vector2(192, 200)  # Entrance door position
+	add_child(exit)
+	print("[BossArena] Victory exit spawned — walk south to leave!")
+
 
 # =============================================================================
 # DOOR ANIMATIONS

@@ -64,6 +64,11 @@ func _setup_health_bar() -> void:
 	health_bar.position = Vector2(-12, -18)
 
 
+## Override to use a different attack state (e.g. CatPounce instead of Attack)
+func get_attack_state_name() -> String:
+	return "Attack"
+
+
 func is_alive() -> bool:
 	if health:
 		return not health.is_dead()

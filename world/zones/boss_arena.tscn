@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://boss_arena_001"]
+[gd_scene load_steps=4 format=3 uid="uid://boss_arena_001"]
 
 [ext_resource type="Script" path="res://world/zones/boss_arena.gd" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://c1kpwx5v8mh5r" path="res://characters/player/player.tscn" id="2_player"]
 
 [sub_resource type="RectangleShape2D" id="wall_shape"]
 size = Vector2(384, 20)
@@ -91,6 +92,9 @@ collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Doors/ExitBlocker"]
 shape = SubResource("door_shape")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(192, 170)
 
 [node name="BossSpawnPoint" type="Marker2D" parent="."]
 position = Vector2(192, 80)

@@ -33,6 +33,11 @@ func _ready() -> void:
 		])
 
 
+## Cat attacks via pounce, not generic Attack state
+func get_attack_state_name() -> String:
+	return "CatPounce"
+
+
 ## Cat drops: 70% chance for 1-2 coins, 20% chance for health
 func _init_default_drops() -> void:
 	drop_table = [

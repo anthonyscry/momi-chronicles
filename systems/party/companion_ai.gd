@@ -1,14 +1,17 @@
 extends Node
 class_name CompanionAI
 
+## Preload companion data to avoid autoload parse-time dependency
+const _CompanionData = preload("res://systems/party/companion_data.gd")
+
 ## AI behavior presets
-var preset: int = CompanionData.AIPreset.BALANCED
+var preset: int = _CompanionData.AIPreset.BALANCED
 
 ## Distance settings per preset
 const PRESET_DISTANCES: Dictionary = {
-	CompanionData.AIPreset.AGGRESSIVE: {"follow": 60, "attack": 120},
-	CompanionData.AIPreset.BALANCED: {"follow": 80, "attack": 100},
-	CompanionData.AIPreset.DEFENSIVE: {"follow": 40, "attack": 80},
+	_CompanionData.AIPreset.AGGRESSIVE: {"follow": 60, "attack": 120},
+	_CompanionData.AIPreset.BALANCED: {"follow": 80, "attack": 100},
+	_CompanionData.AIPreset.DEFENSIVE: {"follow": 40, "attack": 80},
 }
 
 ## Reference to owner
@@ -82,7 +85,7 @@ func should_attack() -> bool:
 
 func should_block() -> bool:
 	# Tank preset blocks more
-	if preset != CompanionData.AIPreset.DEFENSIVE:
+	if preset != _CompanionData.AIPreset.DEFENSIVE:
 		return false
 	
 	# Check if enemy is attacking nearby

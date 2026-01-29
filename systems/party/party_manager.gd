@@ -1,6 +1,9 @@
 extends Node
 class_name PartyManager
 
+## Preload companion data to avoid autoload parse-time dependency
+const _CompanionData = preload("res://systems/party/companion_data.gd")
+
 signal active_companion_changed(companion_id: String)
 signal companion_knocked_out(companion_id: String)
 signal companion_revived(companion_id: String)
@@ -20,9 +23,9 @@ var knocked_out: Dictionary = {}  # {id: true}
 
 ## AI preset per companion
 var ai_presets: Dictionary = {
-	"momi": CompanionData.AIPreset.AGGRESSIVE,
-	"cinnamon": CompanionData.AIPreset.DEFENSIVE,
-	"philo": CompanionData.AIPreset.BALANCED,
+	"momi": _CompanionData.AIPreset.AGGRESSIVE,
+	"cinnamon": _CompanionData.AIPreset.DEFENSIVE,
+	"philo": _CompanionData.AIPreset.BALANCED,
 }
 
 ## Pending health/meters from save data (applied when companions register)
@@ -130,7 +133,7 @@ func get_companions_for_ring() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	
 	for companion_id in PARTY_ORDER:
-		var data = CompanionData.get_companion(companion_id)
+		var data = _CompanionData.get_companion(companion_id)
 		data["is_active"] = (companion_id == active_companion_id)
 		data["is_knocked_out"] = knocked_out.has(companion_id)
 		
@@ -198,9 +201,9 @@ func load_save_data(data: Dictionary) -> void:
 		knocked_out[ko_id] = true
 	
 	ai_presets = data.get("presets", {
-		"momi": CompanionData.AIPreset.AGGRESSIVE,
-		"cinnamon": CompanionData.AIPreset.DEFENSIVE,
-		"philo": CompanionData.AIPreset.BALANCED,
+		"momi": _CompanionData.AIPreset.AGGRESSIVE,
+		"cinnamon": _CompanionData.AIPreset.DEFENSIVE,
+		"philo": _CompanionData.AIPreset.BALANCED,
 	}).duplicate()
 	
 	# Store pending health/meters for deferred application

@@ -30,7 +30,7 @@ func physics_update(delta: float) -> void:
 	
 	# In attack range and can attack
 	if player.is_target_in_attack_range() and player.can_attack:
-		state_machine.transition_to("Attack")
+		state_machine.transition_to(player.get_attack_state_name())
 		return
 	
 	var distance = player.get_distance_to_target()

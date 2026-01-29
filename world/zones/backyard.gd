@@ -10,8 +10,8 @@ const CROW_MATRIARCH_SCENE = preload("res://characters/enemies/crow_matriarch.ts
 
 ## Named spawn points in this zone
 var spawn_points: Dictionary = {
-	"default": Vector2(30, 108),
-	"from_neighborhood": Vector2(30, 108),
+	"default": Vector2(60, 140),
+	"from_neighborhood": Vector2(60, 140),
 	"center": Vector2(192, 108)
 }
 

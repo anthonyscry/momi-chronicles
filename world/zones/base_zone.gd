@@ -26,6 +26,12 @@ extends Node2D
 @export var respawn_min_distance: float = 200.0
 
 # =============================================================================
+# PRELOADS (avoid global class_name resolution issues)
+# =============================================================================
+
+const _InteractiveGrass = preload("res://components/effects/interactive_grass.gd")
+
+# =============================================================================
 # NODE REFERENCES
 # =============================================================================
 
@@ -138,7 +144,7 @@ func _spawn_grass() -> void:
 	var margin = 30  # Keep away from zone edges
 	
 	for i in range(grass_count):
-		var grass = InteractiveGrass.new()
+		var grass = _InteractiveGrass.new()
 		
 		# Random position within zone bounds (avoiding edges)
 		var x = randf_range(margin, zone_size.x - margin)
