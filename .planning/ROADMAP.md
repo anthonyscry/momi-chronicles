@@ -363,7 +363,7 @@ Plans:
 
 Plans:
 - [x] 19-01-PLAN.md — Toxic puddle component & sewer infrastructure (Wave 1)
-- [ ] 19-02-PLAN.md — Sewers zone scene: layout, darkness & atmosphere (Wave 2)
+- [x] 19-02-PLAN.md — Sewers zone scene: layout, darkness & atmosphere (Wave 2)
 - [ ] 19-03-PLAN.md — Neighborhood manhole & integration testing (Wave 3)
 
 ---

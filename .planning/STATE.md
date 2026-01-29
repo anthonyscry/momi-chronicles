@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 19 of 20 (The Sewers Zone)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-29 - Completed 19-01-PLAN.md (Toxic Puddle & Sewer Infrastructure)
+Last activity: 2026-01-29 - Completed 19-02-PLAN.md (Sewers Zone Scene Layout & Darkness)
 
-Progress: ██████████░░░░░░░░░░ 46%
+Progress: ██████████░░░░░░░░░░ 48%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 105+ scripts
-- **Status**: Phase 19 started — ToxicPuddle hazard component and sewers zone autoload registrations complete. Ready for 19-02 (zone scene layout).
+- **Godot Files**: 107+ scripts
+- **Status**: Phase 19 in progress — Sewers zone fully built (sewers.gd + sewers.tscn) with darkness, corridors, enemies, hazards. Ready for 19-03 (neighborhood manhole & integration).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
 - [x] Phase 18: Shop System (COMPLETE — 18-01 Catalog & NPC, 18-02 Shop UI, 18-03 Sell Tab & Restock)
-- [ ] Phase 19: The Sewers Zone (IN PROGRESS — 19-01 complete)
+- [ ] Phase 19: The Sewers Zone (IN PROGRESS — 19-01, 19-02 complete)
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 19-01-PLAN.md (Toxic Puddle & Sewer Infrastructure)
+Stopped at: Completed 19-02-PLAN.md (Sewers Zone Scene Layout & Darkness)
 Resume file: None
 
 ## v1.3 Decisions
@@ -49,6 +49,10 @@ Resume file: None
 | Only unequipped equipment sellable | Prevents accidental sell of active gear — unequip via ring menu first |
 | Stock tracking with zone-entry restock | Limits buying per visit, encourages revisiting |
 | 0-stock items filtered from buy list | Cleaner than showing greyed-out unavailable items |
+| CanvasModulate + PointLight2D darkness | Near-black darkness with player-carried light — no shaders needed |
+| Programmatic dungeon layout (corridor arrays) | All walls/floors/water built in code, .tscn stays minimal |
+| S-curve corridor with 4 side rooms | Winding path creates exploration feel, rooms add optional content |
+| Boss door requires E press | Prevents accidental zone transition into boss fight |
 
 ---
 
@@ -123,6 +127,7 @@ Resume file: None
 |------|---------|----------|
 | Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, Nutkin's shop |
 | Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature | Shed, trees, bushes |
+| Sewers | Sewer Rats, Shadow Creatures | Dark dungeon, PointLight2D, toxic puddles, water channels, boss door |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
 ### Controls
