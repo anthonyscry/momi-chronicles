@@ -2,28 +2,28 @@
 
 ## Current Position
 
-Phase: 17 of 20 (New Enemy Types)
-Plan: 3 of 3 in current phase (COMPLETE)
-Status: v1.3 Content & Variety — Phase 17 complete
-Last activity: 2026-01-29 - Completed 17-03-PLAN.md (Shadow Creature Enemy)
+Phase: 18 of 20 (Shop System)
+Plan: 1 of 3 in current phase
+Status: v1.3 Content & Variety — Phase 18 in progress
+Last activity: 2026-01-29 - Completed 18-01-PLAN.md (Shop Catalog & NPC)
 
-Progress: ███░░░░░░░░░░░░░░░░░ 15%
+Progress: ████░░░░░░░░░░░░░░░░ 20%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 99+ scripts
-- **Status**: Phase 17 complete — all 3 new enemy types done. Ready for Phase 18.
+- **Godot Files**: 102+ scripts
+- **Status**: Phase 18 plan 01 complete — ShopCatalog autoload + Nutkin NPC placed. Ready for Plan 02 (Shop UI).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
-- [ ] Phase 18: Shop System
+- [ ] Phase 18: Shop System (IN PROGRESS — 18-01 done, 18-02 and 18-03 remaining)
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 17-03-PLAN.md (Phase 17 fully complete)
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
 
 ## v1.3 Decisions
@@ -40,6 +40,9 @@ Resume file: None
 | Phase cycling via modulate alpha | Shadow visibility toggle without shaders, matches stealth pattern |
 | Reusable projectile system (components/projectile/) | Shadow bolt pattern reusable for future ranged enemies/hazards |
 | Teleport evasion (random direction) | Unpredictable, mysterious — fits shadow creature lore |
+| Polygon-based NPC visuals (Nutkin squirrel) | Matches project pattern of programmatic Polygon2D sprites |
+| Area2D NPC interaction (collision_mask = 2) | Same pattern as ZoneExit — detects player layer |
+| 50% sell multiplier for shop | Standard RPG sell-back rate, balanced coin economy |
 
 ---
 
@@ -102,11 +105,17 @@ Resume file: None
 | Shadow Creature | 35 | 35 | 12 (ranged) | Phase in/out, shadow bolt, teleport evasion |
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
 
+### NPCs
+
+| NPC | Location | Function |
+|-----|----------|----------|
+| Nutkin the Squirrel | Neighborhood (400, 350) | Shop keeper — press E to interact |
+
 ### Zones
 
 | Zone | Enemies | Features |
 |------|---------|----------|
-| Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, shop (planned) |
+| Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, Nutkin's shop |
 | Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature | Shed, trees, bushes |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
@@ -120,6 +129,7 @@ Resume file: None
 | C / RMB | Ground Pound (level 5+) |
 | X | Dodge |
 | V | Block/Parry |
+| E | Interact (shop NPC) |
 | Tab | Ring Menu |
 | Q | Cycle Companion |
 | ESC | Pause |
