@@ -38,6 +38,9 @@ const SHOP_EQUIPMENT: Dictionary = {
 	"baseball_cap": 35,
 	"bandana": 55,
 	"guard_helmet": 140,
+	"raccoon_crown": 200,
+	"crow_feather_coat": 250,
+	"rat_king_collar": 220,
 }
 
 ## Sell-back multiplier (50% of buy price)

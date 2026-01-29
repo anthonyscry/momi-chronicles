@@ -8,6 +8,7 @@ const RECOVERY_TIME: float = 0.7
 const CROW_COUNT_MIN: int = 3
 const CROW_COUNT_MAX: int = 4
 const MAX_MINIONS: int = 4
+const CROW_SCENE = preload("res://characters/enemies/crow.tscn")
 
 var timer: float = 0.0
 var summoned: bool = false
@@ -59,7 +60,7 @@ func _do_summon() -> void:
 	if spawn_count <= 0:
 		return
 	
-	var crow_scene = load("res://characters/enemies/crow.tscn")
+	var crow_scene = CROW_SCENE
 	if not crow_scene:
 		return
 	

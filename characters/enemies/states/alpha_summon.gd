@@ -6,6 +6,7 @@ class_name AlphaSummon
 const CHARGE_TIME: float = 0.6
 const RECOVERY_TIME: float = 0.8
 const MAX_MINIONS: int = 3  # Cap total alive minions
+const RACCOON_SCENE = preload("res://characters/enemies/raccoon.tscn")
 
 var timer: float = 0.0
 var summoned: bool = false
@@ -59,7 +60,7 @@ func _do_summon() -> void:
 	if spawn_count <= 0:
 		return
 	
-	var raccoon_scene = load("res://characters/enemies/raccoon.tscn")
+	var raccoon_scene = RACCOON_SCENE
 	if not raccoon_scene:
 		return
 	
