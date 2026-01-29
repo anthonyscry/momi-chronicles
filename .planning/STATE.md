@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 17 of 20 (New Enemy Types)
-Plan: 1 of ? in current phase (IN PROGRESS)
+Plan: 2 of 3 in current phase (IN PROGRESS)
 Status: v1.3 Content & Variety — Phase 17 executing
-Last activity: 2026-01-28 - Completed 17-01-PLAN.md (Stray Cat Enemy)
+Last activity: 2026-01-29 - Completed 17-02-PLAN.md (Sewer Rat Enemy)
 
-Progress: █░░░░░░░░░░░░░░░░░░░ 5%
+Progress: ██░░░░░░░░░░░░░░░░░░ 10%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
-- **Last Updated**: 2026-01-28
-- **Godot Files**: 89+ scripts
-- **Status**: Phase 17 executing — Stray Cat enemy complete, next enemy pending
+- **Last Updated**: 2026-01-29
+- **Godot Files**: 93+ scripts
+- **Status**: Phase 17 executing — Stray Cat + Sewer Rat complete, Shadow enemy pending
 
 ## v1.3 Progress
-- [ ] Phase 17: New Enemy Types (IN PROGRESS — 17-01 Stray Cat ✓)
+- [ ] Phase 17: New Enemy Types (IN PROGRESS — 17-01 Stray Cat ✓, 17-02 Sewer Rat ✓)
 - [ ] Phase 18: Shop System
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
-Last session: 2026-01-28
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-01-29
+Stopped at: Completed 17-02-PLAN.md
 Resume file: None
 
 ## v1.3 Decisions
@@ -35,6 +35,8 @@ Resume file: None
 | Mini-bosses per zone | Replayability, rare loot motivation, optional challenge |
 | Path-based extends for new enemies | Avoids class_name autoload scope issues seen in Phase 16 |
 | Stealth = alpha modulation (0.15) | Simple, visual, no shader dependency |
+| Poison DoT on HealthComponent | Reusable by any enemy/hazard — not rat-specific |
+| Pack cohesion via position averaging | Simple swarm behavior without navigation agents |
 
 ---
 
@@ -93,6 +95,7 @@ Resume file: None
 | Raccoon | 40 | 55 | 15 | Patrol + Chase |
 | Crow | 25 | 75 | 10 | Fast, flies over walls |
 | Stray Cat | 30 | 90 | 20 | Stealth ambush + retreat |
+| Sewer Rat | 15 | 65 | 5+poison | Swarm packs, poison bite DoT |
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
 
 ### Zones
@@ -100,7 +103,7 @@ Resume file: None
 | Zone | Enemies | Features |
 |------|---------|----------|
 | Neighborhood | Raccoons, Crows, Stray Cats | Houses, fences, paths, shop (planned) |
-| Backyard | Raccoons, Crows | Shed, trees, bushes |
+| Backyard | Raccoons, Crows, Sewer Rats | Shed, trees, bushes |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
 ### Controls
