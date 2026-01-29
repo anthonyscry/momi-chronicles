@@ -2,32 +2,32 @@
 
 ## Current Position
 
-Phase: 28 of 29 (Critical Bug Fixes)
-Plan: 1 of 1 (Phase 28 complete)
+Phase: 29 of 29 (Signal Integrity & Polish)
+Plan: 1 of 3 (29-01 complete)
 Status: v1.5 Integration & Quality Audit — IN PROGRESS
-Last activity: 2026-01-29 — Completed 28-01-PLAN.md
+Last activity: 2026-01-29 — Completed 29-01-PLAN.md
 
-Progress: ██████████████████████░░░░░░░░░░░░░░░░░░░ 50% (v1.5)
+Progress: █████████████████████████████░░░░░░░░░░░░ 67% (v1.5)
 
 ## Current Status
 - **Version**: v1.5 Integration & Quality Audit (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts (100 .gd files)
-- **Status**: Phase 28 complete, Phase 29 pending
+- **Status**: Phase 28 complete, Phase 29 plan 01 complete, plans 02-03 pending
 
 ## v1.5 Audit Findings
 - [x] Full codebase audit completed (2026-01-29)
 - [x] BUG: Revival Bone ring menu stub — FIXED (28-01)
 - [x] BUG: Antidote cure_poison/clear_poison method name mismatch — FIXED (28-01)
 - [x] BUG: Boss summon runtime load() — FIXED (28-01)
-- [ ] MISS: save_corrupted signal has no UI handler
+- [x] MISS: save_corrupted signal has no UI handler — FIXED (29-01)
 - [ ] DEBT: 11 orphaned Events bus signals
 - [ ] DEBT: PROJECT.md character descriptions outdated
 - [x] DEBT: Enemy respawn uses runtime load() — FIXED (28-01)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 28-01-PLAN.md
+Stopped at: Completed 29-01-PLAN.md
 Resume file: None
 
 ## Accumulated Decisions (from v1.0-v1.5)
@@ -42,6 +42,8 @@ Resume file: None
 | Save version v3 with .get() defaults | Backward compatible migration |
 | First-in-first-revived ordering for Revival Bone | Simple, deterministic knocked_out.keys()[0] |
 | Cache scenes with load() at zone init | Dynamic scene paths can't use preload(); init-time load() is equivalent |
+| Re-emit Events signals for HUD refresh on load | All HUD elements already listen — zero child script changes needed |
+| Clear only Inventory.active_buffs on restart | Only autoload child state survives scene reload |
 
 ---
 
