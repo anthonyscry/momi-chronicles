@@ -592,10 +592,12 @@ Plans:
 4. All Events bus signals either have at least one connection or are documented as future hooks
 5. PROJECT.md reflects actual game state through v1.4
 
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD — created by /gsd-plan-phase
+- [ ] 29-01-PLAN.md — Wire save_corrupted, game_loaded, game_restarted signal handlers
+- [ ] 29-02-PLAN.md — Orphaned signal audit: doc comments + dead signal removal
+- [ ] 29-03-PLAN.md — PROJECT.md full rewrite through v1.4
 
 ---
 
