@@ -3,56 +3,76 @@
 **Defined:** 2026-01-29
 **Core Value:** Satisfying action RPG combat with Momi and friends — everything wired up and working
 
-## v1.5 Requirements
+## v1.6 Requirements
 
-Requirements for the Integration & Quality Audit milestone. All issues discovered during full codebase audit on 2026-01-29.
+Requirements for the Visual Polish milestone. Replace all placeholder colored shapes with AI-generated pixel art sprites.
 
-### Bug Fixes (BUG)
+### Tooling (TOOL)
 
-- [x] **BUG-01**: Revival Bone item from ring menu actually revives a knocked-out companion (not just consumed silently)
-- [x] **BUG-02**: Antidote item cures poison when used (method name matches health_component's clear_poison)
-- [x] **BUG-03**: Boss summon state uses preload() instead of runtime load() to prevent frame stutters
+- [ ] **TOOL-01**: Gemini automation script generates sprites from `prompts.json` via Playwright browser
+- [ ] **TOOL-02**: `rip_sprites.py` removes backgrounds and downscales all generated art to game-ready PNGs
 
-### Signal Integrity (SIG)
+### Character Sprites (CHAR)
 
-- [x] **SIG-01**: save_corrupted signal shows player-visible error feedback (toast, HUD message, or title screen warning)
-- [x] **SIG-02**: game_loaded signal triggers UI refresh (health bar, coin counter, EXP bar update to loaded values)
-- [x] **SIG-03**: game_restarted signal clears stale state (active buffs, poison visuals, combo counter)
+- [ ] **CHAR-01**: Player (Momi) uses animated sprite sheets for all states (idle, walk, run, attack, dodge, block, hurt, death)
+- [ ] **CHAR-02**: Cinnamon companion uses animated sprite sheets (idle, walk, attack, overheat)
+- [ ] **CHAR-03**: Philo companion uses animated sprite sheets (idle, walk, attack, motivated, lazy)
 
-### Tech Debt (DEBT)
+### Enemy Sprites (ENEM)
 
-- [x] **DEBT-01**: All scene instantiation uses preload() — no runtime load() in hot paths (boss_attack_summon.gd, base_zone.gd respawn)
-- [x] **DEBT-02**: Orphaned Events bus signals either connected to handlers or removed with comment explaining why
-- [x] **DEBT-03**: PROJECT.md reflects actual game state (characters, features, scope updated through v1.4)
+- [ ] **ENEM-01**: All 5 enemy types use sprite-based visuals instead of colored polygons (raccoon, crow, stray cat, sewer rat, shadow creature)
+- [ ] **ENEM-02**: All 3 mini-bosses use sprite-based visuals (Alpha Raccoon, Crow Matriarch, Rat King)
+- [ ] **ENEM-03**: Raccoon King boss uses sprite-based visuals with enrage variant
+
+### NPC & World Sprites (WRLD)
+
+- [ ] **WRLD-01**: Nutkin shop NPC uses sprite-based visuals
+- [ ] **WRLD-02**: Item and equipment icons display as pixel art in ring menu and shop UI
+
+### Effects & Particles (FX)
+
+- [ ] **FX-01**: Combat effects use sprite-based textures instead of ColorRect (hit spark, death poof, dust puff)
+- [ ] **FX-02**: Pickup items (health heart, coin) use sprite-based visuals instead of colored shapes
+
+### Integration (INTG)
+
+- [ ] **INTG-01**: All Polygon2D character nodes replaced with Sprite2D or AnimatedSprite2D across all .tscn files
+- [ ] **INTG-02**: EffectsManager particle spawning uses sprite textures instead of ColorRect.new()
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New gameplay features | This milestone is audit/fix only — no new mechanics |
-| AutoBot updates | Bot already works around the bugs; fixes target player experience |
-| UI redesign | Only add minimal UI for save_corrupted feedback |
-| Performance profiling | Fix known load() issues; full profiling deferred |
+| New audio/music | Audio system already complete (88 tracks) — defer to future milestone |
+| Zone tileset replacement | Existing tile_atlas.png works; full tileset rework is a separate milestone |
+| UI redesign (HUD layout) | Only skinning item/equipment icons, not restructuring HUD |
+| New gameplay features | Visual-only milestone — no mechanics changes |
+| AnimationPlayer rework | Swap shapes → sprites, keep existing state machine logic |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 28 | Complete |
-| BUG-02 | Phase 28 | Complete |
-| BUG-03 | Phase 28 | Complete |
-| SIG-01 | Phase 29 | Complete |
-| SIG-02 | Phase 29 | Complete |
-| SIG-03 | Phase 29 | Complete |
-| DEBT-01 | Phase 28 | Complete |
-| DEBT-02 | Phase 29 | Complete |
-| DEBT-03 | Phase 29 | Complete |
+| TOOL-01 | TBD | Pending |
+| TOOL-02 | TBD | Pending |
+| CHAR-01 | TBD | Pending |
+| CHAR-02 | TBD | Pending |
+| CHAR-03 | TBD | Pending |
+| ENEM-01 | TBD | Pending |
+| ENEM-02 | TBD | Pending |
+| ENEM-03 | TBD | Pending |
+| WRLD-01 | TBD | Pending |
+| WRLD-02 | TBD | Pending |
+| FX-01 | TBD | Pending |
+| FX-02 | TBD | Pending |
+| INTG-01 | TBD | Pending |
+| INTG-02 | TBD | Pending |
 
 **Coverage:**
-- v1.5 requirements: 9 total
-- Mapped to phases: 9
-- Unmapped: 0 ✓
+- v1.6 requirements: 14 total
+- Mapped to phases: 0
+- Unmapped: 14 ⚠️
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after codebase audit*
+*Last updated: 2026-01-29 after milestone v1.6 start*
