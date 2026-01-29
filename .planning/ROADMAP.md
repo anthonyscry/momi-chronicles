@@ -302,8 +302,10 @@ Defensive combat, item drops, persistent progression, ring menu, and automated U
 
 ---
 
-## Phase 17: New Enemy Types
+## Phase 17: New Enemy Types ✅
 **Goal**: Three new enemies with unique combat behaviors that force different tactics
+
+**Status**: COMPLETE
 
 **Deliverables**:
 - Stray Cat enemy (stealthy ambusher - hides, pounces from stealth, fast retreat)
@@ -317,9 +319,9 @@ Defensive combat, item drops, persistent progression, ring menu, and automated U
 **Plans:** 3 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Stray Cat enemy with stealth/pounce/retreat (Wave 1)
-- [ ] 17-02-PLAN.md — Sewer Rat enemy pack with poison DoT system (Wave 1)
-- [ ] 17-03-PLAN.md — Shadow Creature with projectile system (Wave 2)
+- [x] 17-01-PLAN.md — Stray Cat enemy with stealth/pounce/retreat (Wave 1)
+- [x] 17-02-PLAN.md — Sewer Rat enemy pack with poison DoT system (Wave 1)
+- [x] 17-03-PLAN.md — Shadow Creature with projectile system (Wave 2)
 
 ---
 
