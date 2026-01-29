@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dsb7x3m2k5p8q"]
+
+[ext_resource type="Script" path="res://components/projectile/shadow_bolt.gd" id="1_shadow_bolt"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="2_hitbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 4.0
+
+[node name="ShadowBolt" type="Node2D"]
+script = ExtResource("1_shadow_bolt")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = true
+monitorable = false
+script = ExtResource("2_hitbox")
+damage = 12
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_hitbox")
