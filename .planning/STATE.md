@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 18 of 20 (Shop System)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: v1.3 Content & Variety — Phase 18 in progress
-Last activity: 2026-01-29 - Completed 18-01-PLAN.md (Shop Catalog & NPC)
+Last activity: 2026-01-29 - Completed 18-02-PLAN.md (Shop UI)
 
-Progress: ████░░░░░░░░░░░░░░░░ 20%
+Progress: █████░░░░░░░░░░░░░░░ 25%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 102+ scripts
-- **Status**: Phase 18 plan 01 complete — ShopCatalog autoload + Nutkin NPC placed. Ready for Plan 02 (Shop UI).
+- **Godot Files**: 104+ scripts
+- **Status**: Phase 18 plan 02 complete — Shop UI with buy functionality. Ready for Plan 03 (Sell Tab).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
-- [ ] Phase 18: Shop System (IN PROGRESS — 18-01 done, 18-02 and 18-03 remaining)
+- [ ] Phase 18: Shop System (IN PROGRESS — 18-01, 18-02 done, 18-03 remaining)
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 18-01-PLAN.md
+Stopped at: Completed 18-02-PLAN.md
 Resume file: None
 
 ## v1.3 Decisions
@@ -43,6 +43,8 @@ Resume file: None
 | Polygon-based NPC visuals (Nutkin squirrel) | Matches project pattern of programmatic Polygon2D sprites |
 | Area2D NPC interaction (collision_mask = 2) | Same pattern as ZoneExit — detects player layer |
 | 50% sell multiplier for shop | Standard RPG sell-back rate, balanced coin economy |
+| Programmatic shop UI (all nodes in _ready) | Matches ring_menu pattern — full code control, no scene dependencies |
+| Q key for shop category toggle | Reuses cycle_companion action, natural sub-tab cycling |
 
 ---
 
