@@ -3,17 +3,17 @@
 ## Current Position
 
 Phase: 29 of 29 (Signal Integrity & Polish)
-Plan: 1 of 3 (29-01 complete)
+Plan: 3 of 3 (29-03 complete)
 Status: v1.5 Integration & Quality Audit — IN PROGRESS
-Last activity: 2026-01-29 — Completed 29-01-PLAN.md
+Last activity: 2026-01-29 — Completed 29-03-PLAN.md
 
-Progress: █████████████████████████████░░░░░░░░░░░░ 67% (v1.5)
+Progress: ████████████████████████████████████████ 100% (v1.5)
 
 ## Current Status
 - **Version**: v1.5 Integration & Quality Audit (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts (100 .gd files)
-- **Status**: Phase 28 complete, Phase 29 plan 01 complete, plans 02-03 pending
+- **Status**: Phase 29 complete (all 3 plans done)
 
 ## v1.5 Audit Findings
 - [x] Full codebase audit completed (2026-01-29)
@@ -22,12 +22,12 @@ Progress: ███████████████████████�
 - [x] BUG: Boss summon runtime load() — FIXED (28-01)
 - [x] MISS: save_corrupted signal has no UI handler — FIXED (29-01)
 - [ ] DEBT: 11 orphaned Events bus signals
-- [ ] DEBT: PROJECT.md character descriptions outdated
+- [x] DEBT: PROJECT.md character descriptions outdated — FIXED (29-03)
 - [x] DEBT: Enemy respawn uses runtime load() — FIXED (28-01)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 29-01-PLAN.md
+Stopped at: Completed 29-03-PLAN.md
 Resume file: None
 
 ## Accumulated Decisions (from v1.0-v1.5)
@@ -44,6 +44,7 @@ Resume file: None
 | Cache scenes with load() at zone init | Dynamic scene paths can't use preload(); init-time load() is equivalent |
 | Re-emit Events signals for HUD refresh on load | All HUD elements already listen — zero child script changes needed |
 | Clear only Inventory.active_buffs on restart | Only autoload child state survives scene reload |
+| Dual-audience PROJECT.md (overview + technical) | Accessible to anyone; detailed for developers |
 
 ---
 
