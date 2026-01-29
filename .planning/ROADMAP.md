@@ -619,6 +619,11 @@ Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and 
 
 **Dependencies**: None (first phase of v1.6)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 30-01-PLAN.md — Gemini art automation script + pipeline completeness verification
+
 **Success Criteria**:
 1. Running `gemini_automation.py` opens Gemini in browser, submits prompts from `prompts.json`, and downloads generated images to `art/generated/` with correct subdirectory structure
 2. Running `rip_sprites.py` on downloaded images removes white backgrounds, cleans color fringe, and outputs transparent PNGs
