@@ -119,6 +119,16 @@ signal boss_enraged(boss: Node)
 signal boss_defeated(boss: Node)
 
 # =============================================================================
+# MINI-BOSS SIGNALS
+# =============================================================================
+
+## Emitted when a mini-boss spawns (boss: the mini-boss node, boss_name: display name)
+signal mini_boss_spawned(boss: Node, boss_name: String)
+
+## Emitted when a mini-boss is defeated (boss: the mini-boss node, boss_key: save key)
+signal mini_boss_defeated(boss: Node, boss_key: String)
+
+# =============================================================================
 # PICKUP SIGNALS
 # =============================================================================
 
