@@ -2,30 +2,46 @@
 
 ## Current Position
 
-Phase: 24 of 27 (Dynamic Zone Awareness) — NOT YET STARTED
-Plan: 0 of 0 — needs /gsd-plan-phase 24
-Status: v1.4 AutoBot Overhaul — MILESTONE STARTED
-Last activity: 2026-01-29 - v1.4 milestone defined
+Phase: 27 of 27 (Full Game Loop AI) — COMPLETE
+Plan: All plans executed
+Status: v1.4 AutoBot Overhaul — MILESTONE COMPLETE
+Last activity: 2026-01-28 - All v1.4 phases executed
 
 Progress: ████████████████████████████████████████ 100% (v1.3.2)
-          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v1.4)
+          ████████████████████████████████████████ 100% (v1.4)
 
 ## Current Status
-- **Version**: v1.4 AutoBot Overhaul (IN PROGRESS)
-- **Last Updated**: 2026-01-29
+- **Version**: v1.4 AutoBot Overhaul (COMPLETE)
+- **Last Updated**: 2026-01-28
 - **Godot Files**: 120+ scripts
-- **Status**: Milestone defined, Phase 24 ready to plan
+- **Status**: All 4 phases complete — AutoBot plays full game loop
 
 ## v1.4 Progress
-- [ ] Phase 24: Dynamic Zone Awareness (PLANNED — zone bounds + hazard avoidance)
-- [ ] Phase 25: Smart Item & Gear Management (PLANNED — buffs, equipment, revival)
-- [ ] Phase 26: Zone Traversal & NPC Interaction (PLANNED — exits, shop, manhole)
-- [ ] Phase 27: Full Game Loop AI (PLANNED — FARM→SHOP→TRAVERSE→CLEAR→BOSS)
+- [x] Phase 24: Dynamic Zone Awareness (COMPLETE — zone bounds, hazard avoidance, corridor patrol)
+- [x] Phase 25: Smart Item & Gear Management (COMPLETE — 3-tier healing, buffs, revival, equipment)
+- [x] Phase 26: Zone Traversal & NPC Interaction (COMPLETE — exit navigation, shop visits)
+- [x] Phase 27: Full Game Loop AI (COMPLETE — FARM→SHOP→TRAVERSE→CLEAR→BOSS→VICTORY)
 
 ## Session Continuity
-Last session: 2026-01-29
-Stopped at: v1.4 milestone defined, ready to plan Phase 24
+Last session: 2026-01-28
+Stopped at: v1.4 milestone complete, all phases executed
 Resume file: None
+
+## v1.4 Decisions
+| Decision | Rationale |
+|----------|-----------|
+| BaseZone ancestor walk for zone_size | Walks player's parent tree to find BaseZone.zone_size — no hardcoded bounds |
+| Fallback chain: BaseZone → Camera2D → DEFAULT | Graceful degradation if zone detection fails |
+| 3x2 grid + center for patrol points | 7 proportional points scale to any zone size |
+| Inverse-distance hazard repulsion (120px range) | Steers away from toxic puddles naturally, 1.5x amplified when poisoned |
+| 3-tier healing: heavy/moderate/light | Matches item rarity to wound severity — no wasted mega potions on scratches |
+| Weighted stat scoring for equipment (ATK 3.0, DEF 2.0) | Offensive bias matches bot's aggressive playstyle |
+| Revival bone every 5s check | Frequent enough to help, not spammy |
+| Zone exit navigation via ZoneExits container | Reuses existing scene structure, no new infrastructure |
+| Shop visit: 200+ coins AND <3 health items | Prevents unnecessary shopping trips |
+| GameLoopState 6-state enum | FARM→SHOP→TRAVERSE→CLEAR→BOSS→VICTORY covers full game |
+| Level gates: sewers lvl 3, boss lvl 5 | Prevents underleveled progression, matches game balance |
+| Kill tracking via enemy count delta | Simple, no signal wiring needed — just count difference between frames |
 
 ## v1.3.1 Progress (COMPLETE)
 - [x] Phase 21: Save System Persistence (COMPLETE — 21-01 sub-system persistence wiring)

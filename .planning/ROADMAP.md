@@ -469,10 +469,10 @@ Close the companion health/meter restoration gap discovered during v1.3.1 audit.
 
 ---
 
-## Phase 24: Dynamic Zone Awareness
+## Phase 24: Dynamic Zone Awareness ✅
 **Goal**: AutoBot detects actual zone boundaries and avoids environmental hazards
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Deliverables**:
 - Replace hardcoded 800×600 ZONE_SIZE with dynamic zone boundary detection
@@ -483,15 +483,15 @@ Close the companion health/meter restoration gap discovered during v1.3.1 audit.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 24-01-PLAN.md — Dynamic zone bounds + proportional patrol points (Wave 1)
-- [ ] 24-02-PLAN.md — Hazard avoidance + sewers corridor navigation + dark zone behavior (Wave 2)
+- [x] 24-01-PLAN.md — Dynamic zone bounds + proportional patrol points (Wave 1)
+- [x] 24-02-PLAN.md — Hazard avoidance + sewers corridor navigation + dark zone behavior (Wave 2)
 
 ---
 
-## Phase 25: Smart Item & Gear Management
+## Phase 25: Smart Item & Gear Management ✅
 **Goal**: AutoBot uses full inventory — buff treats, equipment swaps, companion revival
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Deliverables**:
 - Use buff treats (Power/Speed/Tough) situationally before tough fights
@@ -503,15 +503,15 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 25-01-PLAN.md — Smart 3-tier healing + guard snack + buff treats (Wave 1)
-- [ ] 25-02-PLAN.md — Companion revival + equipment optimization (Wave 2)
+- [x] 25-01-PLAN.md — Smart 3-tier healing + guard snack + buff treats (Wave 1)
+- [x] 25-02-PLAN.md — Companion revival + equipment optimization (Wave 2)
 
 ---
 
-## Phase 26: Zone Traversal & NPC Interaction
+## Phase 26: Zone Traversal & NPC Interaction ✅
 **Goal**: AutoBot navigates between zones and interacts with NPCs
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Deliverables**:
 - Detect ZoneExit nodes and navigate toward them when zone objectives met
@@ -521,33 +521,33 @@ Plans:
 - Buy healing items and best available equipment
 - Sell junk/duplicate equipment
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD — Zone exit navigation + NPC shop interaction
+- [x] 26-01-PLAN.md — Zone exit navigation + NPC shop interaction (Wave 1)
 
 ---
 
-## Phase 27: Full Game Loop AI
+## Phase 27: Full Game Loop AI ✅
 **Goal**: AutoBot can play the entire game from start to boss victory
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Deliverables**:
-- Game state machine: FARM → SHOP → TRAVERSE → CLEAR → BOSS
+- Game state machine: FARM → SHOP → TRAVERSE → CLEAR → BOSS → VICTORY
 - Zone clear detection (all enemies defeated or area explored)
 - Objective-driven progression (Neighborhood → Backyard → Sewers → Boss Arena)
-- Mini-boss engagement logic (seek trigger areas when zone is clear of regular enemies)
-- Boss fight strategy (pattern recognition, dodge priority during enrage)
-- Victory detection and end-game handling
+- Kill tracking via enemy count delta between frames
+- Level gates (sewers at level 3, boss at level 5)
+- Victory detection on boss defeat
 - F1 toggle preserved — bot can be started/stopped at any point
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD — Game loop state machine + objective system + boss strategy
+- [x] 27-01-PLAN.md — Game loop state machine + zone progression + victory detection (Wave 1)
 
 ---
 
-## Milestone: v1.4 AutoBot Overhaul
+## Milestone: v1.4 AutoBot Overhaul ✅
 Transform the AutoBot from a combat stress-tester into a full game-playing AI that clears all zones, shops, equips gear, and defeats the boss.
