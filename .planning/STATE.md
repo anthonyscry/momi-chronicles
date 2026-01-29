@@ -2,35 +2,35 @@
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: v1.5 Integration & Quality Audit — DEFINING
-Last activity: 2026-01-29 — Milestone v1.5 started after full codebase audit
+Phase: 28 of 29 (Critical Bug Fixes)
+Plan: 1 of 1 (Phase 28 complete)
+Status: v1.5 Integration & Quality Audit — IN PROGRESS
+Last activity: 2026-01-29 — Completed 28-01-PLAN.md
 
-Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v1.5)
+Progress: ██████████████████████░░░░░░░░░░░░░░░░░░░ 50% (v1.5)
 
 ## Current Status
 - **Version**: v1.5 Integration & Quality Audit (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts (100 .gd files)
-- **Status**: Milestone initialized, bugs diagnosed
+- **Status**: Phase 28 complete, Phase 29 pending
 
 ## v1.5 Audit Findings
 - [x] Full codebase audit completed (2026-01-29)
-- [ ] BUG: Revival Bone ring menu stub — item consumed, no revive
-- [ ] BUG: Antidote cure_poison/clear_poison method name mismatch
-- [ ] BUG: Boss summon runtime load() — frame stutter risk
+- [x] BUG: Revival Bone ring menu stub — FIXED (28-01)
+- [x] BUG: Antidote cure_poison/clear_poison method name mismatch — FIXED (28-01)
+- [x] BUG: Boss summon runtime load() — FIXED (28-01)
 - [ ] MISS: save_corrupted signal has no UI handler
 - [ ] DEBT: 11 orphaned Events bus signals
 - [ ] DEBT: PROJECT.md character descriptions outdated
-- [ ] DEBT: Enemy respawn uses runtime load()
+- [x] DEBT: Enemy respawn uses runtime load() — FIXED (28-01)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Defining v1.5 milestone requirements
+Stopped at: Completed 28-01-PLAN.md
 Resume file: None
 
-## Accumulated Decisions (from v1.0-v1.4)
+## Accumulated Decisions (from v1.0-v1.5)
 | Decision | Rationale |
 |----------|-----------|
 | Component-based architecture | Composable, reusable systems |
@@ -40,6 +40,8 @@ Resume file: None
 | Programmatic UI (code-built in _ready) | Full control, matches ring_menu pattern |
 | preload() for all scene references | Eliminates runtime stutter |
 | Save version v3 with .get() defaults | Backward compatible migration |
+| First-in-first-revived ordering for Revival Bone | Simple, deterministic knocked_out.keys()[0] |
+| Cache scenes with load() at zone init | Dynamic scene paths can't use preload(); init-time load() is equivalent |
 
 ---
 
