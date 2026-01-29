@@ -50,6 +50,7 @@ var poison_damage: int = 0
 var poison_tick_interval: float = 0.5
 var poison_remaining: float = 0.0
 var _poison_tick_timer: float = 0.0
+var poison_stack_count: int = 0
 
 # =============================================================================
 # LIFECYCLE
@@ -145,21 +146,32 @@ func get_max_health() -> int:
 # POISON METHODS
 # =============================================================================
 
-## Apply poison damage-over-time. Refreshes duration if already poisoned.
+## Apply poison damage-over-time. Stacks: strongest damage, longest duration, escalating visual.
 func apply_poison(damage_per_tick: int, duration: float) -> void:
-	poison_damage = damage_per_tick
-	poison_remaining = duration
+	# Stack: use highest damage, refresh duration, track count
+	poison_damage = maxi(poison_damage, damage_per_tick)
+	poison_remaining = maxf(poison_remaining, duration)
 	_poison_tick_timer = 0.0
+	poison_stack_count += 1
 	
 	if not is_poisoned:
 		is_poisoned = true
 		poison_started.emit()
-		# Visual: tint sprite green to indicate poison
-		var parent = get_parent()
-		if parent:
-			var sprite = parent.get_node_or_null("Sprite2D")
-			if sprite:
-				sprite.modulate = Color(0.7, 1.0, 0.7)
+	
+	# Escalate visual — deeper green with more stacks
+	_update_poison_visual()
+
+
+func _update_poison_visual() -> void:
+	var parent = get_parent()
+	if not parent:
+		return
+	var sprite = parent.get_node_or_null("Sprite2D")
+	if not sprite:
+		return
+	# Deeper green per stack: 0.7 -> 0.55 -> 0.4 -> 0.3 (clamped)
+	var green_intensity = clampf(0.7 - (poison_stack_count - 1) * 0.15, 0.3, 0.7)
+	sprite.modulate = Color(green_intensity, 1.0, green_intensity)
 
 
 ## Remove poison status and restore visuals.
@@ -168,6 +180,7 @@ func clear_poison() -> void:
 	poison_damage = 0
 	poison_remaining = 0.0
 	_poison_tick_timer = 0.0
+	poison_stack_count = 0
 	poison_ended.emit()
 	# Restore sprite modulate
 	var parent = get_parent()
