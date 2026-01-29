@@ -420,10 +420,10 @@ Plans:
 
 ---
 
-## Phase 22: v1.3 Polish & Tech Debt
+## Phase 22: v1.3 Polish & Tech Debt ✅
 **Goal**: Close all low-severity tech debt from v1.3 milestone audit
 
-**Status**: PLANNED — Gap closure from v1.3 audit (low priority)
+**Status**: COMPLETE
 
 **Deliverables**:
 - Mini-boss loot items sellable in shop (3 items added to SHOP_EQUIPMENT)
@@ -434,9 +434,9 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 22-01-PLAN.md — Shop catalog fix, preload fix, poison stacking, Phase 17 verification (Wave 1)
+- [x] 22-01-PLAN.md — Shop catalog fix, preload fix, poison stacking, Phase 17 verification (Wave 1)
 
 ---
 
-## Milestone: v1.3.1 Tech Debt & Polish
+## Milestone: v1.3.1 Tech Debt & Polish ✅
 Close all tech debt identified in the v1.3 milestone audit. Equipment/inventory persistence (medium) + 4 low-severity quality fixes.
