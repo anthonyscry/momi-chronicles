@@ -382,10 +382,13 @@ Plans:
 - One-time defeat per save file, unique loot drops (rare equipment)
 - Mini-boss spawn triggers (area-based, optional fights)
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD — planned by /gsd-plan-phase
+- [ ] 20-01-PLAN.md — Foundation: MiniBossBase, Events, Save, GameManager, Equipment, HealthBar (Wave 1)
+- [ ] 20-02-PLAN.md — Alpha Raccoon: Neighborhood mini-boss with ground slam + summon (Wave 2)
+- [ ] 20-03-PLAN.md — Crow Matriarch: Backyard mini-boss with dive bomb + crow swarm (Wave 2)
+- [ ] 20-04-PLAN.md — Rat King: Sewers mini-boss with poison cloud + 50% HP split (Wave 2)
 
 ---
 
