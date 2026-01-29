@@ -21,6 +21,7 @@ const COLOR_TITLE_GOLD := Color(1.0, 0.84, 0.0)
 const COLOR_OWNED_GRAY := Color(0.5, 0.55, 0.5, 0.7)
 const COLOR_SUCCESS_FLASH := Color(0.3, 0.8, 0.3, 0.4)
 const COLOR_FAIL_FLASH := Color(0.8, 0.2, 0.2, 0.4)
+const COLOR_SELL_GOLD_FLASH := Color(1.0, 0.84, 0.0, 0.4)
 
 ## Layout
 const PANEL_WIDTH: int = 280
@@ -256,7 +257,7 @@ func _build_ui() -> void:
 	# --- Navigation Hints (bottom) ---
 	nav_hints = Label.new()
 	nav_hints.name = "NavHints"
-	nav_hints.text = "[W/S] Select  [A/D] Tab  [Q] Category  [Z] Buy  [Esc] Close"
+	nav_hints.text = "[W/S] Select  [A/D] Tab  [Q] Category  [Z] Action  [Esc] Close"
 	nav_hints.position = Vector2(8, PANEL_HEIGHT - 10)
 	nav_hints.size = Vector2(PANEL_WIDTH - 16, 10)
 	nav_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -428,9 +429,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	
-	# Buy (Z / attack)
+	# Buy / Sell (Z / attack)
 	if event.is_action_pressed("attack"):
-		_buy_selected()
+		if current_tab == 0:
+			_buy_selected()
+		else:
+			_sell_selected()
 		get_viewport().set_input_as_handled()
 		return
 
@@ -489,7 +493,10 @@ func _refresh_list() -> void:
 		else:  # Equipment
 			current_list = ShopCatalog.get_all_shop_equipment()
 	else:  # SELL
-		current_list = []
+		if current_category == 0:  # Items
+			current_list = _get_sell_items()
+		else:  # Equipment
+			current_list = _get_sell_equipment()
 	
 	selected_index = clampi(selected_index, 0, maxi(current_list.size() - 1, 0))
 	scroll_offset = clampi(scroll_offset, 0, maxi(current_list.size() - VISIBLE_ROWS, 0))
@@ -529,25 +536,36 @@ func _update_rows() -> void:
 		if name_lbl:
 			name_lbl.text = item.get("name", "???")
 		
-		# Price
-		var price = item.get("buy_price", 0)
-		var can_afford = GameManager.coins >= price
+		# Price and Quantity depend on tab
 		var price_lbl = row.get_node("Price") as Label
-		if price_lbl:
-			price_lbl.text = str(price)
-			price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_afford else COLOR_PRICE_EXPENSIVE)
-		
-		# Quantity / Ownership
 		var qty_lbl = row.get_node("Quantity") as Label
-		if qty_lbl:
-			if item.get("type") == "equipment":
-				if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(item.get("id", "")):
-					qty_lbl.text = "Own"
+		
+		if current_tab == 0:  # BUY
+			var price = item.get("buy_price", 0)
+			var can_afford = GameManager.coins >= price
+			if price_lbl:
+				price_lbl.text = str(price) + "g"
+				price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_afford else COLOR_PRICE_EXPENSIVE)
+			if qty_lbl:
+				if item.get("type") == "equipment":
+					if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(item.get("id", "")):
+						qty_lbl.text = "Own"
+					else:
+						qty_lbl.text = ""
 				else:
-					qty_lbl.text = ""
-			else:
-				var owned = GameManager.inventory.get_quantity(item.get("id", "")) if GameManager.inventory else 0
-				qty_lbl.text = "x%d" % owned if owned > 0 else ""
+					var owned = GameManager.inventory.get_quantity(item.get("id", "")) if GameManager.inventory else 0
+					qty_lbl.text = "x%d" % owned if owned > 0 else ""
+		else:  # SELL
+			var sell_price = item.get("sell_price", 0)
+			if price_lbl:
+				price_lbl.text = str(sell_price) + "g"
+				price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD)
+			if qty_lbl:
+				if item.get("type") == "equipment":
+					qty_lbl.text = "x1"
+				else:
+					var qty = item.get("quantity", 1)
+					qty_lbl.text = "x%d" % qty
 
 
 func _update_detail() -> void:
@@ -559,34 +577,54 @@ func _update_detail() -> void:
 		detail_action.text = ""
 		
 		if current_tab == 1:
-			detail_name.text = "Sell Tab"
-			detail_desc.text = "Coming soon!"
+			detail_name.text = "Nothing to sell!"
+			detail_desc.text = ""
 			detail_action.text = ""
-		return
-	
-	if current_tab == 1:  # SELL placeholder
-		detail_name.text = "Sell Tab"
-		detail_desc.text = "Coming soon!"
-		detail_price.text = ""
-		detail_stats.text = ""
-		detail_action.text = ""
 		return
 	
 	var item = current_list[selected_index]
 	var item_id = item.get("id", "")
-	var price = item.get("buy_price", 0)
-	var can_afford = GameManager.coins >= price
 	var is_equipment = item.get("type") == "equipment"
-	var already_owned = false
-	
-	if is_equipment and GameManager.equipment_manager:
-		already_owned = GameManager.equipment_manager.has_equipment(item_id)
 	
 	# Name
 	detail_name.text = item.get("name", "???")
 	
 	# Description
 	detail_desc.text = item.get("desc", "")
+	
+	if current_tab == 1:  # SELL detail
+		var sell_price = item.get("sell_price", 0)
+		
+		# Price in gold
+		detail_price.text = "Sell: %d coins" % sell_price
+		detail_price.add_theme_color_override("font_color", COLOR_PRICE_AFFORD)
+		
+		# Stats (equipment only)
+		if is_equipment and item.has("stats"):
+			var stat_text = ""
+			var stats = item.get("stats", {})
+			for stat_type in stats:
+				var val = stats[stat_type]
+				var stat_name = _get_stat_name(stat_type)
+				if stat_text != "":
+					stat_text += ", "
+				stat_text += "+%s %s" % [str(val), stat_name]
+			detail_stats.text = stat_text
+		else:
+			detail_stats.text = ""
+		
+		# Action prompt
+		detail_action.text = "[Z] Sell"
+		detail_action.add_theme_color_override("font_color", COLOR_PRICE_AFFORD)
+		return
+	
+	# BUY detail
+	var price = item.get("buy_price", 0)
+	var can_afford = GameManager.coins >= price
+	var already_owned = false
+	
+	if is_equipment and GameManager.equipment_manager:
+		already_owned = GameManager.equipment_manager.has_equipment(item_id)
 	
 	# Price
 	detail_price.text = "Price: %d coins" % price
@@ -677,6 +715,107 @@ func _buy_selected() -> void:
 
 
 # =============================================================================
+# SELL TRANSACTION
+# =============================================================================
+
+func _sell_selected() -> void:
+	if current_list.is_empty() or current_tab != 1:
+		return
+	
+	var item = current_list[selected_index]
+	var item_id = item.get("id", "")
+	var sell_price = item.get("sell_price", 0)
+	var item_name = item.get("name", "???")
+	var is_equipment = item.get("type") == "equipment"
+	
+	# Perform sell
+	if is_equipment:
+		if GameManager.equipment_manager:
+			GameManager.equipment_manager.remove_equipment(item_id)
+	else:
+		if GameManager.inventory:
+			GameManager.inventory.remove_item(item_id, 1)
+	
+	# Add coins
+	GameManager.add_coins(sell_price)
+	
+	# Feedback
+	_flash_feedback(COLOR_SELL_GOLD_FLASH)
+	_spawn_sell_coin_text(sell_price)
+	AudioManager.play_sfx("health_pickup")
+	print("[Shop] Sold: %s for %d coins" % [item_name, sell_price])
+	
+	# Refresh display
+	_refresh_list()
+	_update_coin_display()
+	
+	# Clamp selected_index if list shrank
+	if current_list.is_empty():
+		selected_index = 0
+	elif selected_index >= current_list.size():
+		selected_index = current_list.size() - 1
+	
+	_update_rows()
+	_update_detail()
+
+
+## Build sell list from player's inventory items
+func _get_sell_items() -> Array:
+	var result: Array = []
+	if not GameManager.inventory:
+		return result
+	
+	var all_items = GameManager.inventory.get_all_items()
+	for item in all_items:
+		var item_id = item.get("id", "")
+		var sell_price = ShopCatalog.get_sell_price(item_id)
+		if sell_price >= 0:
+			item["sell_price"] = sell_price
+			result.append(item)
+	return result
+
+
+## Build sell list from player's unequipped equipment inventory
+func _get_sell_equipment() -> Array:
+	var result: Array = []
+	if not GameManager.equipment_manager:
+		return result
+	
+	for equip_id in GameManager.equipment_manager.equipment_inventory:
+		var data = EquipmentDatabase.get_equipment(equip_id)
+		if data.is_empty():
+			continue
+		var sell_price = ShopCatalog.get_sell_price(equip_id)
+		if sell_price >= 0:
+			data["sell_price"] = sell_price
+			result.append(data)
+	return result
+
+
+## Floating "+coins" text near coin display
+func _spawn_sell_coin_text(amount: int) -> void:
+	var float_label = Label.new()
+	float_label.text = "+%d" % amount
+	float_label.add_theme_font_size_override("font_size", 8)
+	float_label.add_theme_color_override("font_color", COLOR_PRICE_AFFORD)
+	float_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	float_label.add_theme_constant_override("shadow_offset_x", 1)
+	float_label.add_theme_constant_override("shadow_offset_y", 1)
+	float_label.position = Vector2(coin_label.position.x + 65, coin_label.position.y - 2)
+	float_label.z_index = 20
+	panel.add_child(float_label)
+	
+	# Tween up and fade out
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.set_parallel(true)
+	tween.tween_property(float_label, "position:y", float_label.position.y - 16, 0.6).set_ease(Tween.EASE_OUT)
+	tween.tween_property(float_label, "modulate:a", 0.0, 0.6).set_ease(Tween.EASE_IN).set_delay(0.2)
+	tween.set_parallel(false)
+	tween.tween_callback(float_label.queue_free)
+
+
+# =============================================================================
 # UI UPDATES
 # =============================================================================
 
@@ -708,10 +847,6 @@ func _update_tab_label() -> void:
 
 func _update_category_label() -> void:
 	if not category_label:
-		return
-	
-	if current_tab == 1:
-		category_label.text = "[Q] Sell (Coming soon)"
 		return
 	
 	if current_category == 0:
