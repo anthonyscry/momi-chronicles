@@ -403,10 +403,10 @@ New enemies with unique mechanics, a shop to spend coins, a dungeon zone, and ch
 
 ---
 
-## Phase 21: Save System Persistence
+## Phase 21: Save System Persistence ✅
 **Goal**: Persist equipment, inventory, and party state across save/load cycles
 
-**Status**: PLANNED — Gap closure from v1.3 audit (medium priority)
+**Status**: COMPLETE
 
 **Deliverables**:
 - Wire SaveManager to call existing get_save_data()/load_save_data() on EquipmentManager, Inventory, PartyManager
@@ -416,7 +416,7 @@ New enemies with unique mechanics, a shop to spend coins, a dungeon zone, and ch
 **Plans:** 1 plan
 
 Plans:
-- [ ] 21-01-PLAN.md — Wire sub-system persistence into SaveManager (Wave 1)
+- [x] 21-01-PLAN.md — Wire sub-system persistence into SaveManager (Wave 1)
 
 ---
 
