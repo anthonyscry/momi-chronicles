@@ -542,6 +542,7 @@ func _update_rows() -> void:
 		
 		if current_tab == 0:  # BUY
 			var price = item.get("buy_price", 0)
+			var stock = item.get("stock", 0)
 			var can_afford = GameManager.coins >= price
 			if price_lbl:
 				price_lbl.text = str(price) + "g"
@@ -551,10 +552,9 @@ func _update_rows() -> void:
 					if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(item.get("id", "")):
 						qty_lbl.text = "Own"
 					else:
-						qty_lbl.text = ""
+						qty_lbl.text = "x%d" % stock
 				else:
-					var owned = GameManager.inventory.get_quantity(item.get("id", "")) if GameManager.inventory else 0
-					qty_lbl.text = "x%d" % owned if owned > 0 else ""
+					qty_lbl.text = "x%d" % stock
 		else:  # SELL
 			var sell_price = item.get("sell_price", 0)
 			if price_lbl:
@@ -704,12 +704,15 @@ func _buy_selected() -> void:
 		if GameManager.inventory:
 			GameManager.inventory.add_item(item_id)
 	
+	# Reduce stock
+	ShopCatalog.reduce_stock(item_id)
+	
 	# Feedback
 	_flash_feedback(COLOR_SUCCESS_FLASH)
 	AudioManager.play_sfx("health_pickup")
 	print("[Shop] Bought: %s for %d coins" % [item.get("name", ""), price])
 	
-	# Refresh display
+	# Refresh display (items with 0 stock disappear)
 	_refresh_list()
 	_update_coin_display()
 
