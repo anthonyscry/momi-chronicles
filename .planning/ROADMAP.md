@@ -462,3 +462,90 @@ Plans:
 
 ## Milestone: v1.3.2 Companion Save Fix ✅
 Close the companion health/meter restoration gap discovered during v1.3.1 audit.
+
+---
+
+# v1.4 AUTOBOT OVERHAUL
+
+---
+
+## Phase 24: Dynamic Zone Awareness
+**Goal**: AutoBot detects actual zone boundaries and avoids environmental hazards
+
+**Status**: PLANNED
+
+**Deliverables**:
+- Replace hardcoded 800×600 ZONE_SIZE with dynamic zone boundary detection
+- Detect ToxicPuddle nodes and add hazard avoidance steering
+- Awareness of darkness zones (Sewers PointLight2D range)
+- Bot respects zone-specific terrain (water channels, walls in sewers corridors)
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — Dynamic zone bounds + hazard avoidance
+
+---
+
+## Phase 25: Smart Item & Gear Management
+**Goal**: AutoBot uses full inventory — buff treats, equipment swaps, companion revival
+
+**Status**: PLANNED
+
+**Deliverables**:
+- Use buff treats (Power/Speed/Tough) situationally before tough fights
+- Use Revival Bone to revive knocked-out companions
+- Equip best available gear via EquipmentManager (compare stat totals)
+- Smart healing: prioritize Acorn/Seed for light damage, Potions for heavy
+- Guard Snack usage when guard is broken mid-fight
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — Inventory AI + equipment optimization + companion revival
+
+---
+
+## Phase 26: Zone Traversal & NPC Interaction
+**Goal**: AutoBot navigates between zones and interacts with NPCs
+
+**Status**: PLANNED
+
+**Deliverables**:
+- Detect ZoneExit nodes and navigate toward them when zone objectives met
+- Interact with manhole (E key) for Neighborhood ↔ Sewers transition
+- Navigate through boss door (E key) in Sewers
+- Shop at Nutkin when supplies low (health items < 3 or coins > 200)
+- Buy healing items and best available equipment
+- Sell junk/duplicate equipment
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — Zone exit navigation + NPC shop interaction
+
+---
+
+## Phase 27: Full Game Loop AI
+**Goal**: AutoBot can play the entire game from start to boss victory
+
+**Status**: PLANNED
+
+**Deliverables**:
+- Game state machine: FARM → SHOP → TRAVERSE → CLEAR → BOSS
+- Zone clear detection (all enemies defeated or area explored)
+- Objective-driven progression (Neighborhood → Backyard → Sewers → Boss Arena)
+- Mini-boss engagement logic (seek trigger areas when zone is clear of regular enemies)
+- Boss fight strategy (pattern recognition, dodge priority during enrage)
+- Victory detection and end-game handling
+- F1 toggle preserved — bot can be started/stopped at any point
+
+**Plans:** (created by /gsd-plan-phase)
+
+Plans:
+- [ ] TBD — Game loop state machine + objective system + boss strategy
+
+---
+
+## Milestone: v1.4 AutoBot Overhaul
+Transform the AutoBot from a combat stress-tester into a full game-playing AI that clears all zones, shops, equips gear, and defeats the boss.

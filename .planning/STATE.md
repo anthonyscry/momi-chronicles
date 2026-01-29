@@ -2,32 +2,37 @@
 
 ## Current Position
 
-Phase: 23 of 23 (Companion Save Restoration)
-Plan: 1 of 1 in current phase
-Status: v1.3.2 COMPLETE — Companion save restoration gap closed
-Last activity: 2026-01-29 - Completed 23-01-PLAN.md
+Phase: 24 of 27 (Dynamic Zone Awareness) — NOT YET STARTED
+Plan: 0 of 0 — needs /gsd-plan-phase 24
+Status: v1.4 AutoBot Overhaul — MILESTONE STARTED
+Last activity: 2026-01-29 - v1.4 milestone defined
 
-Progress: ████████████████████████████████████████ 100% (v1.3)
-          ████████████████████████████████████████ 100% (v1.3.1)
-          ████████████████████████████████████████ 100% (v1.3.2)
+Progress: ████████████████████████████████████████ 100% (v1.3.2)
+          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v1.4)
 
 ## Current Status
-- **Version**: v1.3.2 Companion Save Fix (COMPLETE)
+- **Version**: v1.4 AutoBot Overhaul (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts
-- **Status**: v1.3.2 milestone complete — companion health/meter restoration gap closed
+- **Status**: Milestone defined, Phase 24 ready to plan
 
-## v1.3.1 Progress
-- [x] Phase 21: Save System Persistence (COMPLETE — 21-01 sub-system persistence wiring)
-- [x] Phase 22: v1.3 Polish & Tech Debt (COMPLETE — 22-01 shop catalog, preload, poison stacking, Phase 17 verification)
-
-## v1.3.2 Progress
-- [x] Phase 23: Companion Save Restoration (COMPLETE — 23-01 deferred health/meter restoration)
+## v1.4 Progress
+- [ ] Phase 24: Dynamic Zone Awareness (PLANNED — zone bounds + hazard avoidance)
+- [ ] Phase 25: Smart Item & Gear Management (PLANNED — buffs, equipment, revival)
+- [ ] Phase 26: Zone Traversal & NPC Interaction (PLANNED — exits, shop, manhole)
+- [ ] Phase 27: Full Game Loop AI (PLANNED — FARM→SHOP→TRAVERSE→CLEAR→BOSS)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 23-01-PLAN.md (v1.3.2 milestone complete)
+Stopped at: v1.4 milestone defined, ready to plan Phase 24
 Resume file: None
+
+## v1.3.1 Progress (COMPLETE)
+- [x] Phase 21: Save System Persistence (COMPLETE — 21-01 sub-system persistence wiring)
+- [x] Phase 22: v1.3 Polish & Tech Debt (COMPLETE — 22-01 shop catalog, preload, poison stacking, Phase 17 verification)
+
+## v1.3.2 Progress (COMPLETE)
+- [x] Phase 23: Companion Save Restoration (COMPLETE — 23-01 deferred health/meter restoration)
 
 ## v1.3.1 Decisions
 | Decision | Rationale |
