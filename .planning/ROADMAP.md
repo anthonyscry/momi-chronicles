@@ -571,10 +571,10 @@ Transform the AutoBot from a combat stress-tester into a full game-playing AI th
 3. Boss summon state uses preload() — no frame stutter when Raccoon King summons minions
 4. Enemy respawn system uses preload() — no stutter on respawn
 
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD — created by /gsd-plan-phase
+- [ ] 28-01-PLAN.md — Fix Revival Bone, Antidote, boss preload, respawn caching
 
 ---
 
