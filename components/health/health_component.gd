@@ -18,6 +18,12 @@ signal healed(amount: int)
 ## Emitted when health reaches zero
 signal died
 
+## Emitted when poison is applied
+signal poison_started
+
+## Emitted when poison wears off
+signal poison_ended
+
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
@@ -38,12 +44,33 @@ var current_health: int
 ## Whether already dead (prevents multiple death triggers)
 var _is_dead: bool = false
 
+## Poison damage-over-time state
+var is_poisoned: bool = false
+var poison_damage: int = 0
+var poison_tick_interval: float = 0.5
+var poison_remaining: float = 0.0
+var _poison_tick_timer: float = 0.0
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
 
 func _ready() -> void:
 	current_health = max_health
+
+
+func _process(delta: float) -> void:
+	if not is_poisoned:
+		return
+	
+	_poison_tick_timer += delta
+	if _poison_tick_timer >= poison_tick_interval:
+		_poison_tick_timer -= poison_tick_interval
+		take_damage(poison_damage)
+	
+	poison_remaining -= delta
+	if poison_remaining <= 0.0:
+		clear_poison()
 
 # =============================================================================
 # PUBLIC METHODS
@@ -113,6 +140,41 @@ func get_current_health() -> int:
 ## Get maximum health value
 func get_max_health() -> int:
 	return max_health
+
+# =============================================================================
+# POISON METHODS
+# =============================================================================
+
+## Apply poison damage-over-time. Refreshes duration if already poisoned.
+func apply_poison(damage_per_tick: int, duration: float) -> void:
+	poison_damage = damage_per_tick
+	poison_remaining = duration
+	_poison_tick_timer = 0.0
+	
+	if not is_poisoned:
+		is_poisoned = true
+		poison_started.emit()
+		# Visual: tint sprite green to indicate poison
+		var parent = get_parent()
+		if parent:
+			var sprite = parent.get_node_or_null("Sprite2D")
+			if sprite:
+				sprite.modulate = Color(0.7, 1.0, 0.7)
+
+
+## Remove poison status and restore visuals.
+func clear_poison() -> void:
+	is_poisoned = false
+	poison_damage = 0
+	poison_remaining = 0.0
+	_poison_tick_timer = 0.0
+	poison_ended.emit()
+	# Restore sprite modulate
+	var parent = get_parent()
+	if parent:
+		var sprite = parent.get_node_or_null("Sprite2D")
+		if sprite:
+			sprite.modulate = Color.WHITE
 
 # =============================================================================
 # PRIVATE METHODS
