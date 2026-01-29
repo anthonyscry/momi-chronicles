@@ -558,10 +558,10 @@ Transform the AutoBot from a combat stress-tester into a full game-playing AI th
 
 ---
 
-## Phase 28: Critical Bug Fixes
+## Phase 28: Critical Bug Fixes ✅
 **Goal**: Fix all player-facing bugs discovered in codebase audit — items work as expected
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Requirements Covered**: BUG-01, BUG-02, BUG-03, DEBT-01
 
@@ -574,7 +574,7 @@ Transform the AutoBot from a combat stress-tester into a full game-playing AI th
 **Plans:** 1 plan
 
 Plans:
-- [ ] 28-01-PLAN.md — Fix Revival Bone, Antidote, boss preload, respawn caching
+- [x] 28-01-PLAN.md — Fix Revival Bone, Antidote, boss preload, respawn caching
 
 ---
 

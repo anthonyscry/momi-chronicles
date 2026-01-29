@@ -9,9 +9,9 @@ Requirements for the Integration & Quality Audit milestone. All issues discovere
 
 ### Bug Fixes (BUG)
 
-- [ ] **BUG-01**: Revival Bone item from ring menu actually revives a knocked-out companion (not just consumed silently)
-- [ ] **BUG-02**: Antidote item cures poison when used (method name matches health_component's clear_poison)
-- [ ] **BUG-03**: Boss summon state uses preload() instead of runtime load() to prevent frame stutters
+- [x] **BUG-01**: Revival Bone item from ring menu actually revives a knocked-out companion (not just consumed silently)
+- [x] **BUG-02**: Antidote item cures poison when used (method name matches health_component's clear_poison)
+- [x] **BUG-03**: Boss summon state uses preload() instead of runtime load() to prevent frame stutters
 
 ### Signal Integrity (SIG)
 
@@ -21,7 +21,7 @@ Requirements for the Integration & Quality Audit milestone. All issues discovere
 
 ### Tech Debt (DEBT)
 
-- [ ] **DEBT-01**: All scene instantiation uses preload() — no runtime load() in hot paths (boss_attack_summon.gd, base_zone.gd respawn)
+- [x] **DEBT-01**: All scene instantiation uses preload() — no runtime load() in hot paths (boss_attack_summon.gd, base_zone.gd respawn)
 - [ ] **DEBT-02**: Orphaned Events bus signals either connected to handlers or removed with comment explaining why
 - [ ] **DEBT-03**: PROJECT.md reflects actual game state (characters, features, scope updated through v1.4)
 
@@ -38,13 +38,13 @@ Requirements for the Integration & Quality Audit milestone. All issues discovere
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 28 | Pending |
-| BUG-02 | Phase 28 | Pending |
-| BUG-03 | Phase 28 | Pending |
+| BUG-01 | Phase 28 | Complete |
+| BUG-02 | Phase 28 | Complete |
+| BUG-03 | Phase 28 | Complete |
 | SIG-01 | Phase 29 | Pending |
 | SIG-02 | Phase 29 | Pending |
 | SIG-03 | Phase 29 | Pending |
-| DEBT-01 | Phase 28 | Pending |
+| DEBT-01 | Phase 28 | Complete |
 | DEBT-02 | Phase 29 | Pending |
 | DEBT-03 | Phase 29 | Pending |
 
