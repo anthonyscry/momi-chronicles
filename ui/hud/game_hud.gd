@@ -40,6 +40,9 @@ func _ready() -> void:
 	
 	# Connect to save events
 	Events.game_saved.connect(_on_game_saved)
+	
+	# Connect to game_loaded to refresh all HUD elements after loading a save
+	Events.game_loaded.connect(_on_game_loaded)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -48,7 +51,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_F3:
 			debug_visible = not debug_visible
 			debug_panel.visible = debug_visible
-			print("[HUD] Debug panel: %s (F3 to toggle)" % ("ON" if debug_visible else "OFF"))
+			DebugLogger.log_ui("Debug panel: %s (F3 to toggle)" % ("ON" if debug_visible else "OFF"))
 
 
 func _setup_save_indicator() -> void:
@@ -73,6 +76,35 @@ func _on_game_saved() -> void:
 	tween.tween_property(save_indicator, "modulate:a", 1.0, 0.15)
 	tween.tween_interval(1.0)
 	tween.tween_property(save_indicator, "modulate:a", 0.0, 0.4)
+
+
+func _on_game_loaded() -> void:
+	# Wait for player to spawn after zone load (same pattern as save_manager)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return
+	
+	# Refresh health bar
+	var health_comp = player.get_node_or_null("HealthComponent")
+	if health_comp:
+		Events.player_health_changed.emit(health_comp.current_health, health_comp.max_health)
+	
+	# Refresh coin counter
+	Events.coins_changed.emit(GameManager.coins)
+	
+	# Refresh EXP bar and level display
+	var progression = player.get_node_or_null("ProgressionComponent")
+	if progression:
+		Events.exp_gained.emit(0, progression.current_level, progression.get_exp_progress(), progression.get_exp_to_next_level())
+		Events.player_leveled_up.emit(progression.current_level)
+	
+	# Refresh guard bar
+	var guard_comp = player.get_node_or_null("GuardComponent")
+	if guard_comp:
+		Events.guard_changed.emit(guard_comp.current_guard, guard_comp.max_guard)
 
 
 func _setup_buff_icons() -> void:
