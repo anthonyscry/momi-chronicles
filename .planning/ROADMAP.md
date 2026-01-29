@@ -499,10 +499,11 @@ Plans:
 - Smart healing: prioritize Acorn/Seed for light damage, Potions for heavy
 - Guard Snack usage when guard is broken mid-fight
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD — Inventory AI + equipment optimization + companion revival
+- [ ] 25-01-PLAN.md — Smart healing + guard snack + buff treats (Wave 1)
+- [ ] 25-02-PLAN.md — Companion revival + equipment optimization (Wave 2)
 
 ---
 
