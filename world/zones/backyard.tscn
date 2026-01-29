@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cby7k3m2p5x8q"]
+[gd_scene load_steps=11 format=3 uid="uid://cby7k3m2p5x8q"]
 
 [ext_resource type="Script" path="res://world/zones/backyard.gd" id="1_backyard"]
 [ext_resource type="TileSet" uid="uid://cwt7k3m2p5x8q" path="res://assets/tiles/world_tileset.tres" id="2_tileset"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cxr7k3m2p5w8q" path="res://ui/menus/pause_menu.tscn" id="7_pause"]
 [ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="8_game_over"]
 [ext_resource type="PackedScene" uid="uid://bze7k3m2p5x8q" path="res://components/zone_exit/zone_exit.tscn" id="9_zone_exit"]
+[ext_resource type="PackedScene" uid="uid://drt5q8x9nw3k" path="res://characters/enemies/sewer_rat.tscn" id="10_sewer_rat"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_h"]
 size = Vector2(384, 16)
@@ -200,6 +201,18 @@ position = Vector2(250, 50)
 
 [node name="Crow2" parent="Enemies" instance=ExtResource("5_crow")]
 position = Vector2(350, 150)
+
+[node name="SewerRat1" parent="Enemies" instance=ExtResource("10_sewer_rat")]
+position = Vector2(280, 80)
+
+[node name="SewerRat2" parent="Enemies" instance=ExtResource("10_sewer_rat")]
+position = Vector2(290, 90)
+
+[node name="SewerRat3" parent="Enemies" instance=ExtResource("10_sewer_rat")]
+position = Vector2(275, 95)
+
+[node name="SewerRat4" parent="Enemies" instance=ExtResource("10_sewer_rat")]
+position = Vector2(295, 75)
 
 [node name="ZoneExits" type="Node2D" parent="."]
 
