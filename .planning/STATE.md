@@ -64,6 +64,10 @@ Resume file: None
 | Summon cap of 3 alive minions | Prevents raccoon flood overwhelming player |
 | Zone trigger at park_center (150, 480) | Open space for fight, matches existing spawn point |
 | Warning ground decor fades on spawn | Telegraphs danger zone, cleans up after encounter starts |
+| Split in _on_hurt() not a state | Boss continues fighting after splitting — more dramatic mid-fight moment |
+| has_split boolean guard | Prevents infinite rat spawning when hit repeatedly below 50% HP |
+| Post-split shrink + speed up (2.0→1.7, 55→70) | Wounded desperation — visual + mechanical feedback of damage |
+| Poison cloud 4s duration + pulse tween | Long enough to zone players, auto-despawn prevents clutter |
 
 ---
 
