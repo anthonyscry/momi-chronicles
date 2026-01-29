@@ -43,6 +43,13 @@ var zone_scenes: Dictionary = {
 ## Track boss defeat for save state
 var boss_defeated: bool = false
 
+## Track which mini-bosses have been defeated (one-time per save)
+var mini_bosses_defeated: Dictionary = {
+	"alpha_raccoon": false,
+	"crow_matriarch": false,
+	"rat_king": false,
+}
+
 ## Spawn point to use after zone transition
 var pending_spawn_point: String = ""
 
@@ -52,11 +59,14 @@ func _ready() -> void:
 	Events.zone_entered.connect(_on_zone_entered)
 	Events.zone_transition_requested.connect(_on_zone_transition_requested)
 	Events.boss_defeated.connect(_on_boss_defeated)
+	Events.mini_boss_defeated.connect(_on_mini_boss_defeated)
 	
 	# Auto-save on zone entry
 	Events.zone_entered.connect(_on_zone_entered_autosave)
 	# Auto-save after boss defeat (delayed for celebration)
 	Events.boss_defeated.connect(_on_boss_defeated_autosave)
+	# Auto-save after mini-boss defeat
+	Events.mini_boss_defeated.connect(_on_mini_boss_defeated_autosave)
 	
 	# Initialize inventory system (Phase 16)
 	inventory = InventoryClass.new()
@@ -75,6 +85,16 @@ func _ready() -> void:
 
 func _on_boss_defeated(_boss: Node) -> void:
 	boss_defeated = true
+
+func _on_mini_boss_defeated(_boss: Node, boss_key: String) -> void:
+	if mini_bosses_defeated.has(boss_key):
+		mini_bosses_defeated[boss_key] = true
+
+func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
+	# Wait 2 seconds for death animation + loot notification
+	await get_tree().create_timer(2.0).timeout
+	SaveManager.save_game()
+	print("[GameManager] Auto-saved after mini-boss defeat")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):

@@ -176,6 +176,35 @@ const EQUIPMENT: Dictionary = {
 		"stats": {StatType.DEFENSE: 10, StatType.GUARD_REGEN: 5},
 		"color": Color(0.5, 0.5, 0.55),  # Steel
 	},
+	
+	# === MINI-BOSS LOOT (RARE) ===
+	"raccoon_crown": {
+		"id": "raccoon_crown",
+		"name": "Raccoon Crown",
+		"desc": "Trophy from the Alpha. +15 Max HP, +5 Attack",
+		"type": "equipment",
+		"slot": Slot.HAT,
+		"stats": {StatType.MAX_HEALTH: 15, StatType.ATTACK_DAMAGE: 5},
+		"color": Color(1.0, 0.85, 0.2),  # Gold crown
+	},
+	"crow_feather_coat": {
+		"id": "crow_feather_coat",
+		"name": "Crow Feather Coat",
+		"desc": "Dark plumage of the Matriarch. +10 Speed, +10% Defense",
+		"type": "equipment",
+		"slot": Slot.COAT,
+		"stats": {StatType.MOVE_SPEED: 10, StatType.DEFENSE: 10},
+		"color": Color(0.1, 0.08, 0.15),  # Dark purple-black
+	},
+	"rat_king_collar": {
+		"id": "rat_king_collar",
+		"name": "Rat King's Collar",
+		"desc": "Filthy but powerful. +8 Attack, +5 Guard Regen",
+		"type": "equipment",
+		"slot": Slot.COLLAR,
+		"stats": {StatType.ATTACK_DAMAGE: 8, StatType.GUARD_REGEN: 5},
+		"color": Color(0.4, 0.35, 0.2),  # Dirty brown
+	},
 }
 
 ## Get equipment data by ID

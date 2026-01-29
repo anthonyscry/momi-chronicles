@@ -7,7 +7,7 @@ extends Node
 
 const SAVE_PATH: String = "user://save.dat"
 const BACKUP_PATH: String = "user://save.dat.bak"
-const SAVE_VERSION: int = 1
+const SAVE_VERSION: int = 2
 
 # =============================================================================
 # SAVE DATA STRUCTURE
@@ -22,6 +22,11 @@ func _get_default_data() -> Dictionary:
 		"coins": 0,
 		"current_zone": "neighborhood",
 		"boss_defeated": false,
+		"mini_bosses_defeated": {
+			"alpha_raccoon": false,
+			"crow_matriarch": false,
+			"rat_king": false,
+		},
 		"timestamp": Time.get_unix_time_from_system()
 	}
 
@@ -73,6 +78,7 @@ func _gather_save_data() -> Dictionary:
 	data.coins = GameManager.coins
 	data.current_zone = GameManager.current_zone if GameManager.current_zone != "" else "neighborhood"
 	data.boss_defeated = GameManager.boss_defeated
+	data.mini_bosses_defeated = GameManager.mini_bosses_defeated.duplicate()
 	data.timestamp = Time.get_unix_time_from_system()
 	
 	return data
@@ -90,6 +96,13 @@ func _apply_save_data(data: Dictionary) -> bool:
 	# Apply to GameManager
 	GameManager.coins = data.get("coins", 0)
 	GameManager.boss_defeated = data.get("boss_defeated", false)
+	
+	# Version migration: add mini_bosses_defeated for v1 saves
+	GameManager.mini_bosses_defeated = data.get("mini_bosses_defeated", {
+		"alpha_raccoon": false,
+		"crow_matriarch": false,
+		"rat_king": false,
+	})
 	
 	# Store zone for transition (GameManager handles zone loading)
 	var target_zone = data.get("current_zone", "neighborhood")
