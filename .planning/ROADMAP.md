@@ -396,3 +396,47 @@ Plans:
 
 ## Milestone: v1.3 Content & Variety ✅
 New enemies with unique mechanics, a shop to spend coins, a dungeon zone, and challenging mini-bosses.
+
+---
+
+# v1.3.1 TECH DEBT & POLISH
+
+---
+
+## Phase 21: Save System Persistence
+**Goal**: Persist equipment, inventory, and party state across save/load cycles
+
+**Status**: PLANNED — Gap closure from v1.3 audit (medium priority)
+
+**Deliverables**:
+- Wire SaveManager to call existing get_save_data()/load_save_data() on EquipmentManager, Inventory, PartyManager
+- Save version bump v2→v3 with backward compatibility
+- Equipment, inventory, and party data survive save/load cycles
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 21-01-PLAN.md — Wire sub-system persistence into SaveManager (Wave 1)
+
+---
+
+## Phase 22: v1.3 Polish & Tech Debt
+**Goal**: Close all low-severity tech debt from v1.3 milestone audit
+
+**Status**: PLANNED — Gap closure from v1.3 audit (low priority)
+
+**Deliverables**:
+- Mini-boss loot items sellable in shop (3 items added to SHOP_EQUIPMENT)
+- Summon states use preload() instead of runtime load() (alpha_summon, crow_swarm_summon)
+- Poison visual escalation on multi-source overlap (stack-based green tint)
+- Phase 17 formal VERIFICATION.md created
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 22-01-PLAN.md — Shop catalog fix, preload fix, poison stacking, Phase 17 verification (Wave 1)
+
+---
+
+## Milestone: v1.3.1 Tech Debt & Polish
+Close all tech debt identified in the v1.3 milestone audit. Equipment/inventory persistence (medium) + 4 low-severity quality fixes.

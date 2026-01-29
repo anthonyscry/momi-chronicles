@@ -2,31 +2,49 @@
 
 ## Current Position
 
-Phase: 20 of 20 (Mini-Boss System)
-Plan: 4 of 4 in current phase
-Status: v1.3 MILESTONE COMPLETE
-Last activity: 2026-01-29 - Phase 20 verified (11/11 must-haves PASS), v1.3 milestone complete
+Phase: 21 of 22 (Save System Persistence)
+Plan: 0 of 1 in current phase
+Status: v1.3.1 GAP CLOSURE — Planning complete, ready to execute
+Last activity: 2026-01-29 - Gap closure phases planned from v1.3 audit
 
-Progress: ████████████████████████████████████████ 100%
+Progress: ████████████████████████████████████████ 100% (v1.3)
+          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0% (v1.3.1)
 
 ## Current Status
-- **Version**: v1.3 Content & Variety (COMPLETE)
+- **Version**: v1.3.1 Tech Debt & Polish (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts
-- **Status**: v1.3 MILESTONE COMPLETE — All 4 phases (17-20) done. New enemies, shop, sewers dungeon, and mini-bosses all verified and shipped.
+- **Status**: Gap closure from v1.3 audit — 2 phases planned (21: save persistence, 22: polish)
 
-## v1.3 Progress
+## v1.3.1 Progress
+- [ ] Phase 21: Save System Persistence (1 plan — wire existing helpers into SaveManager)
+- [ ] Phase 22: v1.3 Polish & Tech Debt (1 plan — shop catalog, preload, poison stacking, Phase 17 verification)
+
+## Session Continuity
+Last session: 2026-01-29
+Stopped at: Gap closure phases planned, ready for `/gsd-execute-phase 21`
+Resume file: None
+
+## v1.3.1 Decisions
+| Decision | Rationale |
+|----------|-----------|
+| Save version v2→v3 | Backward compat via .get() defaults for old saves |
+| maxi() for stacked poison damage | Strongest wins, not additive (prevents OP stacking) |
+| Sell-only mini-boss items (not in DEFAULT_EQUIPMENT_STOCK) | Players can sell rare loot but shop won't re-sell unique items |
+| preload() const pattern for summon scenes | Matches rat_king.gd pattern, eliminates runtime stutter |
+| Stack-based poison visual (0.15 per stack) | Deepening green signals danger, clamped at 0.3 for visibility |
+
+---
+
+## PREVIOUS MILESTONES
+
+### v1.3 Progress (COMPLETE)
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
 - [x] Phase 18: Shop System (COMPLETE — 18-01 Catalog & NPC, 18-02 Shop UI, 18-03 Sell Tab & Restock)
 - [x] Phase 19: The Sewers Zone (COMPLETE — 19-01 Toxic Puddles, 19-02 Zone Layout, 19-03 Manhole & Integration)
 - [x] Phase 20: Mini-Boss System (COMPLETE — 20-01 Foundation, 20-02 Alpha Raccoon, 20-03 Crow Matriarch, 20-04 Rat King)
 
-## Session Continuity
-Last session: 2026-01-29
-Stopped at: v1.3 milestone COMPLETE — all phases verified
-Resume file: None
-
-## v1.3 Decisions
+### v1.3 Decisions
 | Decision | Rationale |
 |----------|-----------|
 | 3 new enemy types | Cat (stealth), Rat (swarm), Shadow (ranged) — each forces different tactics |
@@ -68,10 +86,6 @@ Resume file: None
 | has_split boolean guard | Prevents infinite rat spawning when hit repeatedly below 50% HP |
 | Post-split shrink + speed up (2.0→1.7, 55→70) | Wounded desperation — visual + mechanical feedback of damage |
 | Poison cloud 4s duration + pulse tween | Long enough to zone players, auto-despawn prevents clutter |
-
----
-
-## PREVIOUS MILESTONES
 
 ### v1.2 Progress (COMPLETE)
 - [x] Phase 12: Block & Parry System
@@ -169,3 +183,4 @@ Resume file: None
 
 *v1.3 Content & Variety started: 2026-01-29*
 *v1.3 Content & Variety completed: 2026-01-29*
+*v1.3.1 Tech Debt & Polish started: 2026-01-29*
