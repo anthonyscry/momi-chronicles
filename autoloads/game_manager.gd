@@ -36,7 +36,8 @@ var zone_scenes: Dictionary = {
 	"neighborhood": "res://world/zones/neighborhood.tscn",
 	"backyard": "res://world/zones/backyard.tscn",
 	"boss_arena": "res://world/zones/boss_arena.tscn",
-	"test_zone": "res://world/zones/test_zone.tscn"
+	"test_zone": "res://world/zones/test_zone.tscn",
+	"sewers": "res://world/zones/sewers.tscn"
 }
 
 ## Track boss defeat for save state

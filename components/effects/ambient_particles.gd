@@ -10,7 +10,7 @@ class_name AmbientParticles
 # =============================================================================
 
 ## Particle styles per zone type
-enum ParticleStyle { DUST_MOTES, LEAVES, FIREFLIES }
+enum ParticleStyle { DUST_MOTES, LEAVES, FIREFLIES, SEWER_DRIPS }
 
 @export var style: ParticleStyle = ParticleStyle.DUST_MOTES
 @export var max_particles: int = 15
@@ -52,6 +52,8 @@ func _spawn_particle() -> void:
 			_spawn_leaf(cam_center)
 		ParticleStyle.FIREFLIES:
 			_spawn_firefly(cam_center)
+		ParticleStyle.SEWER_DRIPS:
+			_spawn_sewer_drip(cam_center)
 
 
 ## Floating dust motes - gentle upward drift
@@ -183,6 +185,34 @@ func _spawn_firefly(center: Vector2) -> void:
 	)
 
 
+## Dripping water drops — fall straight down, sewer ambience
+func _spawn_sewer_drip(center: Vector2) -> void:
+	var drip = ColorRect.new()
+	drip.size = Vector2(2, 3)
+	drip.color = Color(0.3, 0.4, 0.5, randf_range(0.2, 0.5))
+	drip.z_index = 45
+	
+	# Spawn above viewport at random x position
+	var x_pos = center.x + randf_range(-viewport_size.x / 2, viewport_size.x / 2)
+	drip.global_position = Vector2(x_pos, center.y - viewport_size.y / 2 - 10)
+	get_tree().current_scene.add_child(drip)
+	_active_particles.append(drip)
+	
+	# Fall straight down (dripping water effect)
+	var fall_time = randf_range(1.0, 2.0)
+	var fall_y = viewport_size.y + 20
+	
+	var tween = create_tween()
+	tween.tween_property(drip, "global_position:y", drip.global_position.y + fall_y, fall_time)
+	# Fade out in last 30% of fall
+	var fade_delay = fall_time * 0.7
+	tween.parallel().tween_property(drip, "modulate:a", 0.0, fall_time * 0.3).set_delay(fade_delay)
+	tween.tween_callback(func():
+		_active_particles.erase(drip)
+		drip.queue_free()
+	)
+
+
 ## Set style based on zone name
 func set_style_for_zone(zone_name: String) -> void:
 	match zone_name:
@@ -195,6 +225,9 @@ func set_style_for_zone(zone_name: String) -> void:
 		"boss_arena":
 			style = ParticleStyle.FIREFLIES
 			max_particles = 18
+		"sewers":
+			style = ParticleStyle.SEWER_DRIPS
+			max_particles = 10
 		_:
 			style = ParticleStyle.DUST_MOTES
 			max_particles = 12

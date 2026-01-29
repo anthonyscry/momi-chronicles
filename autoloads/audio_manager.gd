@@ -40,6 +40,9 @@ var music_tracks: Dictionary = {
 	"victory": "res://assets/audio/music/victory.wav",
 	"pause": "res://assets/audio/music/pause.wav",
 	
+	# Zone - Sewers
+	"sewers": "res://assets/audio/music/sewers.wav",
+	
 	# Zone variations - Neighborhood
 	"neighborhood_morning": "res://assets/audio/music/neighborhood_morning.wav",
 	"neighborhood_evening": "res://assets/audio/music/neighborhood_evening.wav",
@@ -396,6 +399,9 @@ func _get_zone_track() -> String:
 		"boss_arena":
 			return "combat"  # Boss arena uses combat music
 		
+		"sewers":
+			return "sewers"
+		
 		_:
 			return zone_base_track if not zone_base_track.is_empty() else "neighborhood"
 
@@ -690,6 +696,8 @@ func _on_zone_entered(zone_name: String) -> void:
 			zone_base_track = "backyard_deep"
 		"shed", "backyard_shed":
 			zone_base_track = "backyard_shed"
+		"sewers":
+			zone_base_track = "sewers"
 		_:
 			zone_base_track = "neighborhood"
 	
