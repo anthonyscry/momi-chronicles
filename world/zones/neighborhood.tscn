@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="8_game_over"]
 [ext_resource type="PackedScene" uid="uid://bze7k3m2p5x8q" path="res://components/zone_exit/zone_exit.tscn" id="9_zone_exit"]
 [ext_resource type="PackedScene" uid="uid://cat7s3m2p5x8q" path="res://characters/enemies/stray_cat.tscn" id="10_stray_cat"]
+[ext_resource type="PackedScene" uid="uid://dsc7x3m2k5p8q" path="res://characters/enemies/shadow_creature.tscn" id="11_shadow_creature"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_boundary_h"]
 size = Vector2(800, 16)
@@ -1359,6 +1360,10 @@ position = Vector2(300, 400)
 
 [node name="StrayCat2" parent="Enemies" instance=ExtResource("10_stray_cat")]
 position = Vector2(550, 200)
+
+;; Shadow Creature — mysterious phasing ranged attacker
+[node name="ShadowCreature1" parent="Enemies" instance=ExtResource("11_shadow_creature")]
+position = Vector2(180, 300)
 
 ;; ============================================================================
 ;; ZONE EXITS
