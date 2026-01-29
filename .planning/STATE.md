@@ -2,28 +2,28 @@
 
 ## Current Position
 
-Phase: 18 of 20 (Shop System)
-Plan: 2 of 3 in current phase
-Status: v1.3 Content & Variety — Phase 18 in progress
-Last activity: 2026-01-29 - Completed 18-02-PLAN.md (Shop UI)
+Phase: 18 of 20 (Shop System) — COMPLETE
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: v1.3 Content & Variety — Phase 18 complete, ready for Phase 19
+Last activity: 2026-01-28 - Completed 18-03-PLAN.md (Sell Tab & Restock)
 
-Progress: █████░░░░░░░░░░░░░░░ 25%
+Progress: ██████████░░░░░░░░░░ 50%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
-- **Last Updated**: 2026-01-29
+- **Last Updated**: 2026-01-28
 - **Godot Files**: 104+ scripts
-- **Status**: Phase 18 plan 02 complete — Shop UI with buy functionality. Ready for Plan 03 (Sell Tab).
+- **Status**: Phase 18 complete — Full shop economy loop (buy, sell, restock). Ready for Phase 19 (Sewers Zone).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
-- [ ] Phase 18: Shop System (IN PROGRESS — 18-01, 18-02 done, 18-03 remaining)
+- [x] Phase 18: Shop System (COMPLETE — 18-01 Catalog & NPC, 18-02 Shop UI, 18-03 Sell Tab & Restock)
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
-Last session: 2026-01-29
-Stopped at: Completed 18-02-PLAN.md
+Last session: 2026-01-28
+Stopped at: Completed 18-03-PLAN.md (Phase 18 complete)
 Resume file: None
 
 ## v1.3 Decisions
@@ -45,6 +45,10 @@ Resume file: None
 | 50% sell multiplier for shop | Standard RPG sell-back rate, balanced coin economy |
 | Programmatic shop UI (all nodes in _ready) | Matches ring_menu pattern — full code control, no scene dependencies |
 | Q key for shop category toggle | Reuses cycle_companion action, natural sub-tab cycling |
+| Sell 1 at a time (not bulk) | Simpler UX, matches buy-1-at-a-time pattern |
+| Only unequipped equipment sellable | Prevents accidental sell of active gear — unequip via ring menu first |
+| Stock tracking with zone-entry restock | Limits buying per visit, encourages revisiting |
+| 0-stock items filtered from buy list | Cleaner than showing greyed-out unavailable items |
 
 ---
 
