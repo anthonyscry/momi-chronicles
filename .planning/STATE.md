@@ -3,17 +3,17 @@
 ## Current Position
 
 Phase: 30 — Art Pipeline Tooling
-Plan: —
-Status: v1.6 Visual Polish — ROADMAP CREATED, ready to plan Phase 30
-Last activity: 2026-01-29 — v1.6 roadmap created (Phases 30-35)
+Plan: 01 of 01 (Gemini Art Automation)
+Status: In progress
+Last activity: 2026-01-29 — Completed 30-01-PLAN.md
 
-Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v1.6)
+Progress: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~5% (v1.6)
 
 ## Current Milestone: v1.6 Visual Polish
 
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
-| 30 | Art Pipeline Tooling | TOOL-01, TOOL-02 | ⬜ Pending |
+| 30 | Art Pipeline Tooling | TOOL-01, TOOL-02 | 🔄 Plan 01 complete |
 | 31 | Art Generation Checkpoint | (human gate) | ⬜ Pending |
 | 32 | Player Sprite Integration | CHAR-01 | ⬜ Pending |
 | 33 | Companion Sprites | CHAR-02, CHAR-03 | ⬜ Pending |
@@ -36,10 +36,12 @@ Progress: ░░░░░░░░░░░░░░░░░░░░░░░�
 | Clear only Inventory.active_buffs on restart | Only autoload child state survives scene reload |
 | Dual-audience PROJECT.md (overview + technical) | Accessible to anyone; detailed for developers |
 | White background prompts for AI art generation | AI generators ignore hex color requests; flood-fill from corners works reliably |
+| Suno pattern for Gemini automation | Consistent Playwright sync API, argparse CLI, try/except import guard |
+| 3-tier image download fallback | Gemini DOM varies; blob extraction → JS fetch → manual save prevents crashes |
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: v1.6 roadmap created, ready to plan Phase 30
+Stopped at: Completed 30-01-PLAN.md (Gemini Art Automation Tool)
 Resume file: None
 
 ---
