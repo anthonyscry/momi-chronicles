@@ -603,3 +603,132 @@ Plans:
 
 ## Milestone: v1.5 Integration & Quality Audit ✅
 Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and update documentation. All issues from full codebase audit on 2026-01-29.
+
+---
+
+# v1.6 VISUAL POLISH
+
+---
+
+## Phase 30: Art Pipeline Tooling
+**Goal**: Automated art generation and processing pipeline produces game-ready sprite PNGs from structured prompts
+
+**Status**: PLANNED
+
+**Requirements Covered**: TOOL-01, TOOL-02
+
+**Dependencies**: None (first phase of v1.6)
+
+**Success Criteria**:
+1. Running `gemini_automation.py` opens Gemini in browser, submits prompts from `prompts.json`, and downloads generated images to `art/generated/` with correct subdirectory structure
+2. Running `rip_sprites.py` on downloaded images removes white backgrounds, cleans color fringe, and outputs transparent PNGs
+3. Output PNGs are downscaled to game-ready sizes by category (16×16 items, 32×32 characters, etc.) matching the `rip_sprites.py` size config
+4. Pipeline handles all 96 prompts in `prompts.json` without manual intervention per-prompt (batch operation)
+
+---
+
+## Phase 31: Art Generation Checkpoint ⏸️
+**Goal**: All sprite assets exist as processed PNGs ready for Godot integration
+
+**Status**: PLANNED — USER-DRIVEN CHECKPOINT
+
+**Requirements Covered**: (none — human gate between tooling and integration)
+
+**Dependencies**: Phase 30 (tooling must work first)
+
+**Description**:
+This is a human-driven checkpoint, not a Claude-built phase. The user:
+1. Runs `gemini_automation.py` to generate all art via Gemini
+2. Reviews generated images for quality (re-runs specific prompts if needed)
+3. Runs `rip_sprites.py` to process all images into game-ready PNGs
+4. Confirms sprite assets exist in `art/generated/` for all categories
+
+**Gate Criteria** (user verifies before proceeding):
+1. Character sprites exist for Momi (8 states), Cinnamon (4 states), Philo (5 states)
+2. Enemy sprites exist for all 5 enemy types, 3 mini-bosses, and Raccoon King (normal + enrage)
+3. NPC sprite exists for Nutkin, item/equipment icons exist for all inventory items
+4. Effect sprites exist for hit spark, death poof, dust puff, health heart, and coin
+
+---
+
+## Phase 32: Player Sprite Integration
+**Goal**: Momi transforms from a colored polygon into a fully animated pixel art character across all gameplay states
+
+**Status**: PLANNED
+
+**Requirements Covered**: CHAR-01
+
+**Dependencies**: Phase 31 (art assets must exist)
+
+**Success Criteria**:
+1. Momi displays as an animated sprite in all 8 states (idle, walk, run, attack, dodge, block, hurt, death) — no colored polygons visible
+2. Sprite animations play at correct frame rates and transition smoothly between states via the existing state machine
+3. Sprite faces the correct direction based on movement (flip_h or directional sheets)
+4. Hitbox and hurtbox alignment matches the new sprite dimensions (combat still works correctly)
+5. All existing combat mechanics (combo chain, charge attack, ground pound) function identically with sprite visuals
+
+---
+
+## Phase 33: Companion Sprites
+**Goal**: Cinnamon and Philo display as animated pixel art characters with state-specific animations
+
+**Status**: PLANNED
+
+**Requirements Covered**: CHAR-02, CHAR-03
+
+**Dependencies**: Phase 32 (player sprite pattern established)
+
+**Success Criteria**:
+1. Cinnamon displays as animated sprite in all 4 states (idle, walk, attack, overheat) — no colored polygon visible
+2. Philo displays as animated sprite in all 5 states (idle, walk, attack, motivated, lazy) — no colored polygon visible
+3. Companion sprites follow Momi correctly with proper facing direction
+4. Unique mechanic states are visually distinct (Cinnamon's overheat looks different from idle; Philo's motivated looks different from lazy)
+
+---
+
+## Phase 34: Enemy & Boss Sprites
+**Goal**: All enemies, mini-bosses, and the final boss display as sprite-based characters instead of colored polygons
+
+**Status**: PLANNED
+
+**Requirements Covered**: ENEM-01, ENEM-02, ENEM-03
+
+**Dependencies**: Phase 32 (sprite integration pattern established)
+
+**Success Criteria**:
+1. All 5 regular enemy types display as sprites with idle/attack/hurt/death animations (raccoon, crow, stray cat, sewer rat, shadow creature)
+2. All 3 mini-bosses display as sprites with unique attack animations (Alpha Raccoon ground slam, Crow Matriarch dive bomb, Rat King split)
+3. Raccoon King boss displays as sprite with normal and enrage visual variants
+4. Enemy AI behavior is unchanged — sprite swap is visual only, no gameplay regression
+5. Boss health bar and mini-boss health bar still display correctly over sprite-based enemies
+
+---
+
+## Phase 35: World, Items & Effects Polish
+**Goal**: NPCs, inventory icons, and particle effects all use sprite-based visuals — zero colored shapes remain in the game
+
+**Status**: PLANNED
+
+**Requirements Covered**: WRLD-01, WRLD-02, FX-01, FX-02, INTG-01, INTG-02
+
+**Dependencies**: Phase 32 (sprite integration pattern); Phase 34 (enemy sprites done)
+
+**Success Criteria**:
+1. Nutkin shop NPC displays as a sprite with idle animation — no colored polygon
+2. All item and equipment icons in the ring menu and shop UI display as pixel art (not colored rectangles or placeholder text)
+3. Hit spark, death poof, and dust puff effects use sprite textures instead of ColorRect.new() — EffectsManager spawns sprite-based particles
+4. Health heart and coin pickups display as animated sprites instead of colored shapes
+5. Full game walkthrough shows zero Polygon2D placeholder shapes and zero ColorRect particles — all visual elements are sprite-based (INTG-01 + INTG-02 verified)
+
+---
+
+## Milestone: v1.6 Visual Polish
+Replace all placeholder colored shapes with AI-generated pixel art sprites. Automated art pipeline, player/companion/enemy sprite integration, icon replacement, and particle effects upgrade.
+
+**Coverage**: 14/14 requirements mapped
+- TOOL: 2 → Phase 30
+- CHAR: 3 → Phases 32-33
+- ENEM: 3 → Phase 34
+- WRLD: 2 → Phase 35
+- FX: 2 → Phase 35
+- INTG: 2 → Phase 35 (cross-cutting verification)

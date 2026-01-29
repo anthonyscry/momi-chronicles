@@ -2,18 +2,23 @@
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 30 — Art Pipeline Tooling
 Plan: —
-Status: v1.6 Visual Polish — DEFINING REQUIREMENTS
-Last activity: 2026-01-29 — Milestone v1.6 started
+Status: v1.6 Visual Polish — ROADMAP CREATED, ready to plan Phase 30
+Last activity: 2026-01-29 — v1.6 roadmap created (Phases 30-35)
 
 Progress: ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0% (v1.6)
 
-## Current Status
-- **Version**: v1.6 Visual Polish (STARTING)
-- **Last Updated**: 2026-01-29
-- **Godot Files**: 120+ scripts (100 .gd files)
-- **Status**: Defining requirements
+## Current Milestone: v1.6 Visual Polish
+
+| Phase | Name | Requirements | Status |
+|-------|------|-------------|--------|
+| 30 | Art Pipeline Tooling | TOOL-01, TOOL-02 | ⬜ Pending |
+| 31 | Art Generation Checkpoint | (human gate) | ⬜ Pending |
+| 32 | Player Sprite Integration | CHAR-01 | ⬜ Pending |
+| 33 | Companion Sprites | CHAR-02, CHAR-03 | ⬜ Pending |
+| 34 | Enemy & Boss Sprites | ENEM-01, ENEM-02, ENEM-03 | ⬜ Pending |
+| 35 | World, Items & Effects | WRLD-01, WRLD-02, FX-01, FX-02, INTG-01, INTG-02 | ⬜ Pending |
 
 ## Accumulated Decisions (from v1.0-v1.5)
 | Decision | Rationale |
@@ -34,7 +39,7 @@ Progress: ░░░░░░░░░░░░░░░░░░░░░░░�
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Defining v1.6 requirements
+Stopped at: v1.6 roadmap created, ready to plan Phase 30
 Resume file: None
 
 ---
@@ -51,6 +56,7 @@ Resume file: None
 | v1.3.2 Companion Save Fix | 23 | ✅ COMPLETE |
 | v1.4 AutoBot Overhaul | 24-27 | ✅ COMPLETE |
 | v1.5 Integration & Quality Audit | 28-29 | ✅ COMPLETE |
+| v1.6 Visual Polish | 30-35 | 🔄 IN PROGRESS |
 
 ---
 

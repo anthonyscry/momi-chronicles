@@ -53,26 +53,26 @@ Requirements for the Visual Polish milestone. Replace all placeholder colored sh
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOL-01 | TBD | Pending |
-| TOOL-02 | TBD | Pending |
-| CHAR-01 | TBD | Pending |
-| CHAR-02 | TBD | Pending |
-| CHAR-03 | TBD | Pending |
-| ENEM-01 | TBD | Pending |
-| ENEM-02 | TBD | Pending |
-| ENEM-03 | TBD | Pending |
-| WRLD-01 | TBD | Pending |
-| WRLD-02 | TBD | Pending |
-| FX-01 | TBD | Pending |
-| FX-02 | TBD | Pending |
-| INTG-01 | TBD | Pending |
-| INTG-02 | TBD | Pending |
+| TOOL-01 | Phase 30 | Pending |
+| TOOL-02 | Phase 30 | Pending |
+| CHAR-01 | Phase 32 | Pending |
+| CHAR-02 | Phase 33 | Pending |
+| CHAR-03 | Phase 33 | Pending |
+| ENEM-01 | Phase 34 | Pending |
+| ENEM-02 | Phase 34 | Pending |
+| ENEM-03 | Phase 34 | Pending |
+| WRLD-01 | Phase 35 | Pending |
+| WRLD-02 | Phase 35 | Pending |
+| FX-01 | Phase 35 | Pending |
+| FX-02 | Phase 35 | Pending |
+| INTG-01 | Phase 35 | Pending |
+| INTG-02 | Phase 35 | Pending |
 
 **Coverage:**
 - v1.6 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after milestone v1.6 start*
+*Last updated: 2026-01-29 after v1.6 roadmap creation*
