@@ -50,9 +50,10 @@ func enter() -> void:
 		combo_index = 0
 		total_combo_damage = 0
 	
-	# Calculate and set damage for this hit
+	# Calculate and set damage for this hit (uses player effective damage with equipment + buffs)
 	var current_data = COMBO_DATA[combo_index]
-	var damage = int(BASE_DAMAGE * current_data.damage_mult)
+	var effective_base = player.get_effective_base_damage()
+	var damage = int(effective_base * current_data.damage_mult)
 	
 	if player.hitbox:
 		player.hitbox.damage = damage
@@ -122,7 +123,9 @@ func _check_chain_input() -> void:
 		return
 	
 	# Check for attack input during combo window
-	var attack_pressed = Input.is_action_just_pressed("attack") or Input.is_action_just_pressed("attack_alt")
+	var attack_pressed = Input.is_action_just_pressed("attack")
+	if not attack_pressed and InputMap.has_action("attack_alt"):
+		attack_pressed = Input.is_action_just_pressed("attack_alt")
 	
 	# Bot control
 	if player.bot_controlled:
@@ -136,7 +139,7 @@ func _check_chain_input() -> void:
 func _finish_attack() -> void:
 	# Track damage for this hit
 	var current_data = COMBO_DATA[combo_index]
-	total_combo_damage += int(BASE_DAMAGE * current_data.damage_mult)
+	total_combo_damage += int(player.get_effective_base_damage() * current_data.damage_mult)
 	
 	if chain_requested and combo_index < COMBO_DATA.size() - 1:
 		# Chain to next attack
@@ -148,12 +151,13 @@ func _finish_attack() -> void:
 		hitbox_active = false
 		can_chain = false
 		
-		# Set up next hit
+		# Set up next hit (uses player effective damage with equipment + buffs)
 		var next_data = COMBO_DATA[combo_index]
-		var damage = int(BASE_DAMAGE * next_data.damage_mult)
+		var next_effective_base = player.get_effective_base_damage()
+		var next_damage = int(next_effective_base * next_data.damage_mult)
 		
 		if player.hitbox:
-			player.hitbox.damage = damage
+			player.hitbox.damage = next_damage
 			player.hitbox.reset()
 		
 		_position_hitbox()

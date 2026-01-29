@@ -1182,8 +1182,9 @@ func _on_zone_entered_particles(zone_name: String) -> void:
 		_ambient_particles.queue_free()
 	
 	# Create new ambient particles for this zone
-	var AmbientParticlesClass = preload("res://components/effects/ambient_particles.gd")
-	_ambient_particles = AmbientParticles.new()
+	# NOTE: Must preload script since class_name isn't available in autoload scope
+	var AmbientParticlesScript = preload("res://components/effects/ambient_particles.gd")
+	_ambient_particles = AmbientParticlesScript.new()
 	_ambient_particles.set_style_for_zone(zone_name)
 	add_child(_ambient_particles)
 

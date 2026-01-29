@@ -176,13 +176,10 @@ func _hit_enemies_in_range() -> void:
 		
 		var distance = player.global_position.distance_to(enemy.global_position)
 		if distance <= AOE_RADIUS:
-			# Calculate damage (reduced at edges)
+			# Calculate damage (reduced at edges), includes equipment + buff bonuses
 			var falloff = 1.0 - (distance / AOE_RADIUS) * 0.5  # 100% at center, 50% at edge
-			var final_damage = int(DAMAGE * falloff)
-			
-			# Apply level bonus
-			if player.progression:
-				final_damage += player.progression.get_stat_bonus("attack_damage")
+			var base_dmg = DAMAGE + (player.get_effective_base_damage() - player.BASE_ATTACK_DAMAGE)
+			var final_damage = int(base_dmg * falloff)
 			
 			# Damage enemy
 			if enemy.health:

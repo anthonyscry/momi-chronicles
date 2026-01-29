@@ -75,6 +75,10 @@ func _ready() -> void:
 	if progression:
 		progression.level_changed.connect(_on_level_changed)
 	
+	# Connect to equipment changes to re-apply stats
+	if GameManager.equipment_manager:
+		GameManager.equipment_manager.stats_recalculated.connect(_on_equipment_changed)
+	
 	# Apply initial stats
 	_apply_level_stats()
 
@@ -126,6 +130,21 @@ func _on_hurt(attacking_hitbox: Hitbox) -> void:
 			return
 		# Normal block - reduced damage
 		damage = int(damage * (1.0 - guard.get_damage_reduction()))
+	
+	# Apply equipment defense (flat % reduction)
+	if GameManager.equipment_manager:
+		var defense_pct = GameManager.equipment_manager.get_stat_bonus(EquipmentDatabase.StatType.DEFENSE)
+		if defense_pct > 0.0:
+			damage = int(damage * maxf(0.1, 1.0 - defense_pct))
+	
+	# Apply defense buff multiplier (temporary buff from items)
+	if GameManager.inventory:
+		var def_mult = GameManager.inventory.get_buff_multiplier(ItemDatabase.EffectType.BUFF_DEFENSE)
+		if def_mult > 1.0:
+			damage = int(damage / def_mult)  # e.g. 1.3x defense = take 1/1.3 damage
+	
+	# Ensure minimum 1 damage
+	damage = maxi(damage, 1)
 	
 	if health:
 		health.take_damage(damage)
@@ -193,7 +212,7 @@ func set_combo_count(count: int) -> void:
 	Events.combo_changed.emit(count)
 
 ## Called when player levels up
-func _on_level_changed(new_level: int) -> void:
+func _on_level_changed(_new_level: int) -> void:
 	_apply_level_stats()
 	_push_away_from_enemies()  # Prevent getting stuck on dying enemies
 
@@ -217,41 +236,81 @@ func _push_away_from_enemies() -> void:
 		push_dir = push_dir.normalized() * 60.0  # Push velocity
 		velocity = push_dir
 
-## Apply stats based on current level
+## Apply stats based on current level (called on init and level up — full heals)
 func _apply_level_stats() -> void:
 	if not progression:
 		return
 	
-	# Update health
-	var health_bonus = progression.get_stat_bonus("max_health")
+	_recalculate_stats()
+	
+	# FULL HEAL on level up / init (reward for leveling)
 	if health:
-		var new_max = BASE_MAX_HEALTH + health_bonus
-		health.max_health = new_max
-		# FULL HEAL on level up! (reward for leveling)
 		health.current_health = health.max_health
 		Events.player_healed.emit(health.max_health)
+
+## Recalculate all stats from level + equipment + buffs (no heal)
+func _recalculate_stats() -> void:
+	if not progression:
+		return
 	
-	# Update attack damage
-	var damage_bonus = progression.get_stat_bonus("attack_damage")
+	# Update health: base + level + equipment
+	var health_bonus = progression.get_stat_bonus("max_health")
+	var equip_health: int = 0
+	if GameManager.equipment_manager:
+		equip_health = int(GameManager.equipment_manager.get_stat_bonus(EquipmentDatabase.StatType.MAX_HEALTH))
+	if health:
+		health.max_health = BASE_MAX_HEALTH + health_bonus + equip_health
+		# Clamp current health to new max (don't exceed)
+		health.current_health = mini(health.current_health, health.max_health)
+	
+	# Update attack damage: base + level + equipment (buff applied per-attack)
 	if hitbox:
-		hitbox.damage = BASE_ATTACK_DAMAGE + damage_bonus
+		hitbox.damage = get_effective_base_damage()
 	
 	# Emit for UI
 	Events.stats_updated.emit("all", progression.get_level())
 
-## Get effective walk speed (with level bonus)
-func get_effective_walk_speed() -> float:
-	var bonus = 0
-	if progression:
-		bonus = progression.get_stat_bonus("move_speed")
-	return BASE_WALK_SPEED + bonus
+## Called when equipment changes — recalculate without full heal
+func _on_equipment_changed() -> void:
+	_recalculate_stats()
 
-## Get effective run speed (with level bonus)
-func get_effective_run_speed() -> float:
-	var bonus = 0
+## Get effective walk speed (level + equipment + buff)
+func get_effective_walk_speed() -> float:
+	var bonus: float = 0.0
 	if progression:
-		bonus = progression.get_stat_bonus("move_speed")
-	return BASE_RUN_SPEED + bonus * 1.5  # Run gets bigger bonus
+		bonus += progression.get_stat_bonus("move_speed")
+	if GameManager.equipment_manager:
+		bonus += GameManager.equipment_manager.get_stat_bonus(EquipmentDatabase.StatType.MOVE_SPEED)
+	var speed = BASE_WALK_SPEED + bonus
+	# Apply speed buff multiplier
+	if GameManager.inventory:
+		speed *= GameManager.inventory.get_buff_multiplier(ItemDatabase.EffectType.BUFF_SPEED)
+	return speed
+
+## Get effective run speed (level + equipment + buff)
+func get_effective_run_speed() -> float:
+	var bonus: float = 0.0
+	if progression:
+		bonus += progression.get_stat_bonus("move_speed")
+	if GameManager.equipment_manager:
+		bonus += GameManager.equipment_manager.get_stat_bonus(EquipmentDatabase.StatType.MOVE_SPEED)
+	var speed = BASE_RUN_SPEED + bonus * 1.5  # Run gets bigger bonus
+	# Apply speed buff multiplier
+	if GameManager.inventory:
+		speed *= GameManager.inventory.get_buff_multiplier(ItemDatabase.EffectType.BUFF_SPEED)
+	return speed
+
+## Get effective base attack damage (level + equipment + buff)
+func get_effective_base_damage() -> int:
+	var base: int = BASE_ATTACK_DAMAGE
+	if progression:
+		base += progression.get_stat_bonus("attack_damage")
+	if GameManager.equipment_manager:
+		base += int(GameManager.equipment_manager.get_stat_bonus(EquipmentDatabase.StatType.ATTACK_DAMAGE))
+	# Apply attack buff multiplier
+	if GameManager.inventory:
+		base = int(base * GameManager.inventory.get_buff_multiplier(ItemDatabase.EffectType.BUFF_ATTACK))
+	return base
 
 ## Get current level
 func get_current_level() -> int:

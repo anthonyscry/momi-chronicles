@@ -83,7 +83,9 @@ func _update_charging(delta: float) -> void:
 	charge_time += delta
 	
 	# Check if attack button released
-	var attack_held = Input.is_action_pressed("attack") or Input.is_action_pressed("attack_alt")
+	var attack_held = Input.is_action_pressed("attack")
+	if not attack_held and InputMap.has_action("attack_alt"):
+		attack_held = Input.is_action_pressed("attack_alt")
 	
 	# Bot control - releases after reaching target charge time
 	if player.bot_controlled:
@@ -108,22 +110,19 @@ func _release_attack() -> void:
 	is_charging = false
 	release_timer = 0.0
 	
-	# Calculate damage based on charge level
+	# Calculate damage based on charge level (uses effective base with equipment + buffs)
 	var charge_percent = clampf(charge_time / MAX_CHARGE_TIME, 0, 1)
+	var effective_base = player.get_effective_base_damage()
 	
 	if charge_time < MIN_CHARGE_TIME:
 		# Not enough charge - do weak attack
-		calculated_damage = int(BASE_DAMAGE * 0.75)
+		calculated_damage = int(effective_base * 0.75)
 	else:
 		# Interpolate between min and max multiplier
 		var charge_normalized = (charge_time - MIN_CHARGE_TIME) / (MAX_CHARGE_TIME - MIN_CHARGE_TIME)
 		charge_normalized = clampf(charge_normalized, 0, 1)
 		var multiplier = lerpf(MIN_DAMAGE_MULT, MAX_DAMAGE_MULT, charge_normalized)
-		calculated_damage = int(BASE_DAMAGE * multiplier)
-	
-	# Apply level bonus
-	if player.progression:
-		calculated_damage += player.progression.get_stat_bonus("attack_damage")
+		calculated_damage = int(effective_base * multiplier)
 	
 	# Set hitbox damage
 	if player.hitbox:

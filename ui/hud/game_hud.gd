@@ -14,7 +14,7 @@ var is_low_hp: bool = false
 const LOW_HP_THRESHOLD: float = 0.25
 
 ## Buff status icons
-var buff_icons: BuffIcons
+var buff_icons = null  # BuffIcons instance (preloaded to avoid scope issues)
 
 ## Save indicator
 var save_indicator: Label
@@ -76,7 +76,8 @@ func _on_game_saved() -> void:
 
 
 func _setup_buff_icons() -> void:
-	buff_icons = BuffIcons.new()
+	var BuffIconsScript = preload("res://ui/hud/buff_icons.gd")
+	buff_icons = BuffIconsScript.new()
 	buff_icons.name = "BuffIcons"
 	# Position bottom-left below health bar
 	buff_icons.position = Vector2(8, 60)

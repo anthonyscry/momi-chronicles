@@ -50,6 +50,27 @@ var respawn_check_timer: float = 0.0
 const RESPAWN_CHECK_INTERVAL: float = 5.0  # Check every 5 seconds
 
 # =============================================================================
+# COMPANION SPAWNING
+# =============================================================================
+
+## Companion scenes (preloaded for zone entry)
+const COMPANION_SCENES: Dictionary = {
+	"momi": preload("res://characters/companions/momi_companion.tscn"),
+	"cinnamon": preload("res://characters/companions/cinnamon_companion.tscn"),
+	"philo": preload("res://characters/companions/philo_companion.tscn"),
+}
+
+## Spawn offsets from player position for each companion
+const COMPANION_OFFSETS: Dictionary = {
+	"momi": Vector2(-20, 10),
+	"cinnamon": Vector2(20, 10),
+	"philo": Vector2(0, 20),
+}
+
+## Spawned companion nodes (tracked for cleanup)
+var spawned_companions: Array[Node] = []
+
+# =============================================================================
 # LIFECYCLE
 # =============================================================================
 
@@ -58,6 +79,8 @@ func _ready() -> void:
 	_setup_zone()
 	_capture_enemy_spawn_data()
 	_connect_enemy_death_signals()
+	_spawn_companions()
+	_spawn_grass()
 	Events.zone_entered.emit(zone_id)
 
 
@@ -74,6 +97,67 @@ func _setup_camera() -> void:
 func _setup_zone() -> void:
 	# Override in child classes for custom setup
 	pass
+
+
+## Spawn companion party members near the player
+func _spawn_companions() -> void:
+	if not player:
+		return
+	
+	# Don't double-spawn if companions already exist in scene
+	if get_tree().get_nodes_in_group("companions").size() > 0:
+		return
+	
+	# Spawn each companion from the party
+	for companion_id in COMPANION_SCENES.keys():
+		var scene = COMPANION_SCENES[companion_id]
+		var companion = scene.instantiate()
+		
+		# Position near player with offset
+		var offset = COMPANION_OFFSETS.get(companion_id, Vector2(0, 15))
+		companion.global_position = player.global_position + offset
+		
+		# Add to scene tree — companion's _ready() auto-registers with party_manager
+		add_child(companion)
+		spawned_companions.append(companion)
+	
+	# After all companions registered, set AI follow targets to player node
+	# (non-active companions follow the player via AI)
+	await get_tree().process_frame
+	for companion in spawned_companions:
+		if is_instance_valid(companion) and companion.ai and not companion.is_player_controlled:
+			companion.ai.set_follow_target(player)
+	
+	print("[Zone] Spawned %d companions" % spawned_companions.size())
+
+
+## Spawn interactive grass tufts throughout the zone
+func _spawn_grass() -> void:
+	# Scatter grass clusters across walkable areas
+	var grass_count = randi_range(8, 14)
+	var margin = 30  # Keep away from zone edges
+	
+	for i in range(grass_count):
+		var grass = InteractiveGrass.new()
+		
+		# Random position within zone bounds (avoiding edges)
+		var x = randf_range(margin, zone_size.x - margin)
+		var y = randf_range(margin, zone_size.y - margin)
+		grass.global_position = Vector2(x, y)
+		
+		# Slight color variance per zone
+		match zone_id:
+			"backyard":
+				grass.blade_color = Color(0.25, 0.65, 0.2, 0.8)  # Darker green
+			"boss_arena":
+				grass.blade_color = Color(0.4, 0.55, 0.2, 0.6)  # Dry/yellow
+				grass.blade_count = 2
+			_:
+				grass.blade_color = Color(0.3, 0.7, 0.25, 0.8)  # Default green
+		
+		add_child(grass)
+	
+	print("[Zone] Spawned %d grass tufts" % grass_count)
 
 # =============================================================================
 # ZONE MANAGEMENT

@@ -1,4 +1,4 @@
-extends CompanionBase
+extends "res://characters/companions/companion_base.gd"
 class_name PhiloCompanion
 
 ## Motivation affects healing output
