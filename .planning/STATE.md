@@ -2,18 +2,18 @@
 
 ## Current Position
 
-Phase: 19 of 20 (The Sewers Zone)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-01-29 - Completed 19-03-PLAN.md (Neighborhood Manhole & Integration)
+Phase: 20 of 20 (Mini-Boss System)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-01-29 - Completed 20-01-PLAN.md (Mini-Boss Foundation)
 
-Progress: ██████████░░░░░░░░░░ 50%
+Progress: ████████████████████░░░░░░░░░░░░░░░░░░░░ 48%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 107+ scripts
-- **Status**: Phase 19 COMPLETE — Sewers zone fully built and connected to Neighborhood via manhole entrance. Bidirectional transitions, save, camera, companions, respawn all verified. Ready for Phase 20 (Mini-Boss System).
+- **Godot Files**: 109+ scripts
+- **Status**: Phase 20 IN PROGRESS — Mini-boss foundation complete (MiniBossBase, Events, Save, GameManager, Equipment, HealthBar). Ready for Plans 02-04 (individual mini-bosses).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
@@ -23,7 +23,7 @@ Progress: ██████████░░░░░░░░░░ 50%
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 19-03-PLAN.md (Neighborhood Manhole & Integration)
+Stopped at: Completed 20-01-PLAN.md (Mini-Boss Foundation)
 Resume file: None
 
 ## v1.3 Decisions
@@ -55,6 +55,11 @@ Resume file: None
 | Boss door requires E press | Prevents accidental zone transition into boss fight |
 | Manhole at (530, 370) with require_interaction | Clear of NPCs, press E to enter sewers — prevents accidental transition |
 | Programmatic manhole build (_build_manhole) | Matches sewers.gd pattern — code-built visuals, minimal .tscn changes |
+| MiniBossIdle uses player. convention | Matches State base class and 10+ regular enemy states (not legacy enemy.) |
+| Save v1→v2 with .get() defaults | Graceful migration for existing saves without mini_bosses_defeated |
+| Separate mini-boss signals from boss | mini_boss_spawned/defeated avoid conflicts with existing boss flow |
+| Orange health bar for mini-bosses | Color(0.9, 0.6, 0.2) visually distinguishes from red boss bar |
+| 2s auto-save delay after mini-boss defeat | Shorter than 3s boss delay — lighter celebration |
 
 ---
 

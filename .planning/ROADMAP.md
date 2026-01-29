@@ -385,7 +385,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 20-01-PLAN.md — Foundation: MiniBossBase, Events, Save, GameManager, Equipment, HealthBar (Wave 1)
+- [x] 20-01-PLAN.md — Foundation: MiniBossBase, Events, Save, GameManager, Equipment, HealthBar (Wave 1)
 - [ ] 20-02-PLAN.md — Alpha Raccoon: Neighborhood mini-boss with ground slam + summon (Wave 2)
 - [ ] 20-03-PLAN.md — Crow Matriarch: Backyard mini-boss with dive bomb + crow swarm (Wave 2)
 - [ ] 20-04-PLAN.md — Rat King: Sewers mini-boss with poison cloud + 50% HP split (Wave 2)
