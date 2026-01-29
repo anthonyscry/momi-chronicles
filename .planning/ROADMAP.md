@@ -325,8 +325,10 @@ Plans:
 
 ---
 
-## Phase 18: Shop System
+## Phase 18: Shop System ✅
 **Goal**: Spend coins on items and equipment from a friendly shopkeeper
+
+**Status**: COMPLETE
 
 **Deliverables**:
 - Shop NPC (Nutkin the Squirrel, placed in Neighborhood zone)
@@ -340,9 +342,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 18-01-PLAN.md — Shop NPC (Nutkin) + price catalog + interaction system (Wave 1)
-- [ ] 18-02-PLAN.md — Shop UI panel with buy functionality (Wave 2)
-- [ ] 18-03-PLAN.md — Sell tab + restock mechanic + stock tracking (Wave 3)
+- [x] 18-01-PLAN.md — Shop NPC (Nutkin) + price catalog + interaction system (Wave 1)
+- [x] 18-02-PLAN.md — Shop UI panel with buy functionality (Wave 2)
+- [x] 18-03-PLAN.md — Sell tab + restock mechanic + stock tracking (Wave 3)
 
 ---
 
