@@ -21,7 +21,7 @@ Progress: ███████████████████████�
 - [x] BUG: Antidote cure_poison/clear_poison method name mismatch — FIXED (28-01)
 - [x] BUG: Boss summon runtime load() — FIXED (28-01)
 - [x] MISS: save_corrupted signal has no UI handler — FIXED (29-01)
-- [ ] DEBT: 11 orphaned Events bus signals
+- [x] DEBT: 11 orphaned Events bus signals — CLEANED (29-02)
 - [x] DEBT: PROJECT.md character descriptions outdated — FIXED (29-03)
 - [x] DEBT: Enemy respawn uses runtime load() — FIXED (28-01)
 
