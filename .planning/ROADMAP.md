@@ -370,8 +370,10 @@ Plans:
 
 ---
 
-## Phase 20: Mini-Boss System
+## Phase 20: Mini-Boss System ✅
 **Goal**: Unique mini-boss encounters in each zone for replayability
+
+**Status**: COMPLETE
 
 **Deliverables**:
 - Mini-boss base class (extended from EnemyBase, 2 attack patterns each)
@@ -386,11 +388,11 @@ Plans:
 
 Plans:
 - [x] 20-01-PLAN.md — Foundation: MiniBossBase, Events, Save, GameManager, Equipment, HealthBar (Wave 1)
-- [ ] 20-02-PLAN.md — Alpha Raccoon: Neighborhood mini-boss with ground slam + summon (Wave 2)
-- [ ] 20-03-PLAN.md — Crow Matriarch: Backyard mini-boss with dive bomb + crow swarm (Wave 2)
-- [ ] 20-04-PLAN.md — Rat King: Sewers mini-boss with poison cloud + 50% HP split (Wave 2)
+- [x] 20-02-PLAN.md — Alpha Raccoon: Neighborhood mini-boss with ground slam + summon (Wave 2)
+- [x] 20-03-PLAN.md — Crow Matriarch: Backyard mini-boss with dive bomb + crow swarm (Wave 2)
+- [x] 20-04-PLAN.md — Rat King: Sewers mini-boss with poison cloud + 50% HP split (Wave 2)
 
 ---
 
-## Milestone: v1.3 Content & Variety
+## Milestone: v1.3 Content & Variety ✅
 New enemies with unique mechanics, a shop to spend coins, a dungeon zone, and challenging mini-bosses.

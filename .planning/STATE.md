@@ -4,16 +4,16 @@
 
 Phase: 20 of 20 (Mini-Boss System)
 Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-01-29 - Completed 20-04-PLAN.md (Rat King)
+Status: v1.3 MILESTONE COMPLETE
+Last activity: 2026-01-29 - Phase 20 verified (11/11 must-haves PASS), v1.3 milestone complete
 
-Progress: ████████████████████████░░░░░░░░░░░░░░░░░░ 55%
+Progress: ████████████████████████████████████████ 100%
 
 ## Current Status
-- **Version**: v1.3 Content & Variety (IN PROGRESS)
+- **Version**: v1.3 Content & Variety (COMPLETE)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 109+ scripts
-- **Status**: Phase 20 COMPLETE — All 4 plans done (Foundation, Alpha Raccoon, Crow Matriarch, Rat King). 3 zone mini-bosses with unique mechanics + rare loot.
+- **Godot Files**: 120+ scripts
+- **Status**: v1.3 MILESTONE COMPLETE — All 4 phases (17-20) done. New enemies, shop, sewers dungeon, and mini-bosses all verified and shipped.
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
@@ -23,7 +23,7 @@ Progress: ███████████████████████�
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 20-04-PLAN.md (Rat King) — Phase 20 complete
+Stopped at: v1.3 milestone COMPLETE — all phases verified
 Resume file: None
 
 ## v1.3 Decisions
@@ -168,3 +168,4 @@ Resume file: None
 ---
 
 *v1.3 Content & Variety started: 2026-01-29*
+*v1.3 Content & Variety completed: 2026-01-29*
