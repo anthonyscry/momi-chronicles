@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 17 of 20 (New Enemy Types)
-Plan: 0 of ? in current phase (PLANNING)
-Status: v1.3 Content & Variety — Phase 17 planning
-Last activity: 2026-01-29 - Started v1.3 milestone
+Plan: 1 of ? in current phase (IN PROGRESS)
+Status: v1.3 Content & Variety — Phase 17 executing
+Last activity: 2026-01-28 - Completed 17-01-PLAN.md (Stray Cat Enemy)
 
-Progress: ░░░░░░░░░░░░░░░░░░░░ 0%
+Progress: █░░░░░░░░░░░░░░░░░░░ 5%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
-- **Last Updated**: 2026-01-29
-- **Godot Files**: 84+ scripts
-- **Status**: Phase 17 planning — New Enemy Types
+- **Last Updated**: 2026-01-28
+- **Godot Files**: 89+ scripts
+- **Status**: Phase 17 executing — Stray Cat enemy complete, next enemy pending
 
 ## v1.3 Progress
-- [ ] Phase 17: New Enemy Types (PLANNING)
+- [ ] Phase 17: New Enemy Types (IN PROGRESS — 17-01 Stray Cat ✓)
 - [ ] Phase 18: Shop System
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
-Last session: 2026-01-29
-Stopped at: Planning Phase 17
+Last session: 2026-01-28
+Stopped at: Completed 17-01-PLAN.md
 Resume file: None
 
 ## v1.3 Decisions
@@ -33,6 +33,8 @@ Resume file: None
 | Shop system with NPC | Coin sink, gives purpose to currency earned |
 | Sewers dungeon zone | Darker atmosphere, linear progression, boss at end |
 | Mini-bosses per zone | Replayability, rare loot motivation, optional challenge |
+| Path-based extends for new enemies | Avoids class_name autoload scope issues seen in Phase 16 |
+| Stealth = alpha modulation (0.15) | Simple, visual, no shader dependency |
 
 ---
 
@@ -90,13 +92,14 @@ Resume file: None
 |-------|-----|-------|--------|----------|
 | Raccoon | 40 | 55 | 15 | Patrol + Chase |
 | Crow | 25 | 75 | 10 | Fast, flies over walls |
+| Stray Cat | 30 | 90 | 20 | Stealth ambush + retreat |
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
 
 ### Zones
 
 | Zone | Enemies | Features |
 |------|---------|----------|
-| Neighborhood | Raccoons, Crows | Houses, fences, paths, shop (planned) |
+| Neighborhood | Raccoons, Crows, Stray Cats | Houses, fences, paths, shop (planned) |
 | Backyard | Raccoons, Crows | Shed, trees, bushes |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
