@@ -2,18 +2,18 @@
 
 ## Current Position
 
-Phase: 30 — Art Pipeline Tooling
-Plan: 01 of 01 (Gemini Art Automation)
-Status: In progress
-Last activity: 2026-01-29 — Completed 30-01-PLAN.md
+Phase: 31 — Art Generation Checkpoint ⏸️
+Plan: —
+Status: v1.6 Visual Polish — Phase 30 COMPLETE, awaiting user art generation
+Last activity: 2026-01-29 — Phase 30 Art Pipeline Tooling verified ✅
 
-Progress: ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~5% (v1.6)
+Progress: ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~17% (v1.6)
 
 ## Current Milestone: v1.6 Visual Polish
 
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
-| 30 | Art Pipeline Tooling | TOOL-01, TOOL-02 | 🔄 Plan 01 complete |
+| 30 | Art Pipeline Tooling | TOOL-01, TOOL-02 | ✅ Complete |
 | 31 | Art Generation Checkpoint | (human gate) | ⬜ Pending |
 | 32 | Player Sprite Integration | CHAR-01 | ⬜ Pending |
 | 33 | Companion Sprites | CHAR-02, CHAR-03 | ⬜ Pending |
@@ -41,7 +41,7 @@ Progress: ██░░░░░░░░░░░░░░░░░░░░░�
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 30-01-PLAN.md (Gemini Art Automation Tool)
+Stopped at: Phase 30 complete, Phase 31 is user-driven checkpoint
 Resume file: None
 
 ---

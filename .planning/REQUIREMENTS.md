@@ -9,8 +9,8 @@ Requirements for the Visual Polish milestone. Replace all placeholder colored sh
 
 ### Tooling (TOOL)
 
-- [ ] **TOOL-01**: Gemini automation script generates sprites from `prompts.json` via Playwright browser
-- [ ] **TOOL-02**: `rip_sprites.py` removes backgrounds and downscales all generated art to game-ready PNGs
+- [x] **TOOL-01**: Gemini automation script generates sprites from `prompts.json` via Playwright browser
+- [x] **TOOL-02**: `rip_sprites.py` removes backgrounds and downscales all generated art to game-ready PNGs
 
 ### Character Sprites (CHAR)
 
@@ -53,8 +53,8 @@ Requirements for the Visual Polish milestone. Replace all placeholder colored sh
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOL-01 | Phase 30 | Pending |
-| TOOL-02 | Phase 30 | Pending |
+| TOOL-01 | Phase 30 | Complete |
+| TOOL-02 | Phase 30 | Complete |
 | CHAR-01 | Phase 32 | Pending |
 | CHAR-02 | Phase 33 | Pending |
 | CHAR-03 | Phase 33 | Pending |
@@ -75,4 +75,4 @@ Requirements for the Visual Polish milestone. Replace all placeholder colored sh
 
 ---
 *Requirements defined: 2026-01-29*
-*Last updated: 2026-01-29 after v1.6 roadmap creation*
+*Last updated: 2026-01-29 after Phase 30 completion*

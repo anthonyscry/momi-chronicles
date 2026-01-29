@@ -610,10 +610,10 @@ Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and 
 
 ---
 
-## Phase 30: Art Pipeline Tooling
+## Phase 30: Art Pipeline Tooling ✅
 **Goal**: Automated art generation and processing pipeline produces game-ready sprite PNGs from structured prompts
 
-**Status**: PLANNED
+**Status**: COMPLETE
 
 **Requirements Covered**: TOOL-01, TOOL-02
 
@@ -622,7 +622,7 @@ Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and 
 **Plans:** 1 plan
 
 Plans:
-- [ ] 30-01-PLAN.md — Gemini art automation script + pipeline completeness verification
+- [x] 30-01-PLAN.md — Gemini art automation script + pipeline completeness verification
 
 **Success Criteria**:
 1. Running `gemini_automation.py` opens Gemini in browser, submits prompts from `prompts.json`, and downloads generated images to `art/generated/` with correct subdirectory structure
