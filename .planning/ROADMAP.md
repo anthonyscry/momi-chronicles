@@ -359,10 +359,12 @@ Plans:
 - Linear path leading to Rat King mini-boss room
 - Sewer ambient effects (dripping, gloom particles)
 
-**Plans:** (created by /gsd-plan-phase)
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD — planned by /gsd-plan-phase
+- [ ] 19-01-PLAN.md — Toxic puddle component & sewer infrastructure (Wave 1)
+- [ ] 19-02-PLAN.md — Sewers zone scene: layout, darkness & atmosphere (Wave 2)
+- [ ] 19-03-PLAN.md — Neighborhood manhole & integration testing (Wave 3)
 
 ---
 
