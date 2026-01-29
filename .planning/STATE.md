@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 19 of 20 (The Sewers Zone)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-29 - Completed 19-02-PLAN.md (Sewers Zone Scene Layout & Darkness)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-01-29 - Completed 19-03-PLAN.md (Neighborhood Manhole & Integration)
 
-Progress: ██████████░░░░░░░░░░ 48%
+Progress: ██████████░░░░░░░░░░ 50%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 107+ scripts
-- **Status**: Phase 19 in progress — Sewers zone fully built (sewers.gd + sewers.tscn) with darkness, corridors, enemies, hazards. Ready for 19-03 (neighborhood manhole & integration).
+- **Status**: Phase 19 COMPLETE — Sewers zone fully built and connected to Neighborhood via manhole entrance. Bidirectional transitions, save, camera, companions, respawn all verified. Ready for Phase 20 (Mini-Boss System).
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
 - [x] Phase 18: Shop System (COMPLETE — 18-01 Catalog & NPC, 18-02 Shop UI, 18-03 Sell Tab & Restock)
-- [ ] Phase 19: The Sewers Zone (IN PROGRESS — 19-01, 19-02 complete)
+- [x] Phase 19: The Sewers Zone (COMPLETE — 19-01 Toxic Puddles, 19-02 Zone Layout, 19-03 Manhole & Integration)
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 19-02-PLAN.md (Sewers Zone Scene Layout & Darkness)
+Stopped at: Completed 19-03-PLAN.md (Neighborhood Manhole & Integration)
 Resume file: None
 
 ## v1.3 Decisions
@@ -53,6 +53,8 @@ Resume file: None
 | Programmatic dungeon layout (corridor arrays) | All walls/floors/water built in code, .tscn stays minimal |
 | S-curve corridor with 4 side rooms | Winding path creates exploration feel, rooms add optional content |
 | Boss door requires E press | Prevents accidental zone transition into boss fight |
+| Manhole at (530, 370) with require_interaction | Clear of NPCs, press E to enter sewers — prevents accidental transition |
+| Programmatic manhole build (_build_manhole) | Matches sewers.gd pattern — code-built visuals, minimal .tscn changes |
 
 ---
 
@@ -125,7 +127,7 @@ Resume file: None
 
 | Zone | Enemies | Features |
 |------|---------|----------|
-| Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, Nutkin's shop |
+| Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, Nutkin's shop, manhole to sewers |
 | Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature | Shed, trees, bushes |
 | Sewers | Sewer Rats, Shadow Creatures | Dark dungeon, PointLight2D, toxic puddles, water channels, boss door |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
