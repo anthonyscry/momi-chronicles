@@ -767,7 +767,7 @@ func _build_zone_exits() -> void:
 	to_neighborhood.position = Vector2(24, 324)
 	to_neighborhood.exit_id = "to_neighborhood"
 	to_neighborhood.target_zone = "neighborhood"
-	to_neighborhood.target_spawn = "from_backyard"  # Reuse backyard return spawn
+	to_neighborhood.target_spawn = "from_sewers"
 	exits_container.add_child(to_neighborhood)
 	
 	# Exit to boss room (at the boss door)
