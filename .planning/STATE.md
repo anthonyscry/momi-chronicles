@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 17 of 20 (New Enemy Types)
-Plan: 2 of 3 in current phase (IN PROGRESS)
-Status: v1.3 Content & Variety — Phase 17 executing
-Last activity: 2026-01-29 - Completed 17-02-PLAN.md (Sewer Rat Enemy)
+Plan: 3 of 3 in current phase (COMPLETE)
+Status: v1.3 Content & Variety — Phase 17 complete
+Last activity: 2026-01-29 - Completed 17-03-PLAN.md (Shadow Creature Enemy)
 
-Progress: ██░░░░░░░░░░░░░░░░░░ 10%
+Progress: ███░░░░░░░░░░░░░░░░░ 15%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
-- **Godot Files**: 93+ scripts
-- **Status**: Phase 17 executing — Stray Cat + Sewer Rat complete, Shadow enemy pending
+- **Godot Files**: 99+ scripts
+- **Status**: Phase 17 complete — all 3 new enemy types done. Ready for Phase 18.
 
 ## v1.3 Progress
-- [ ] Phase 17: New Enemy Types (IN PROGRESS — 17-01 Stray Cat ✓, 17-02 Sewer Rat ✓)
+- [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
 - [ ] Phase 18: Shop System
 - [ ] Phase 19: The Sewers Zone
 - [ ] Phase 20: Mini-Boss System
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 17-02-PLAN.md
+Stopped at: Completed 17-03-PLAN.md (Phase 17 fully complete)
 Resume file: None
 
 ## v1.3 Decisions
@@ -37,6 +37,9 @@ Resume file: None
 | Stealth = alpha modulation (0.15) | Simple, visual, no shader dependency |
 | Poison DoT on HealthComponent | Reusable by any enemy/hazard — not rat-specific |
 | Pack cohesion via position averaging | Simple swarm behavior without navigation agents |
+| Phase cycling via modulate alpha | Shadow visibility toggle without shaders, matches stealth pattern |
+| Reusable projectile system (components/projectile/) | Shadow bolt pattern reusable for future ranged enemies/hazards |
+| Teleport evasion (random direction) | Unpredictable, mysterious — fits shadow creature lore |
 
 ---
 
@@ -96,14 +99,15 @@ Resume file: None
 | Crow | 25 | 75 | 10 | Fast, flies over walls |
 | Stray Cat | 30 | 90 | 20 | Stealth ambush + retreat |
 | Sewer Rat | 15 | 65 | 5+poison | Swarm packs, poison bite DoT |
+| Shadow Creature | 35 | 35 | 12 (ranged) | Phase in/out, shadow bolt, teleport evasion |
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
 
 ### Zones
 
 | Zone | Enemies | Features |
 |------|---------|----------|
-| Neighborhood | Raccoons, Crows, Stray Cats | Houses, fences, paths, shop (planned) |
-| Backyard | Raccoons, Crows, Sewer Rats | Shed, trees, bushes |
+| Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, shop (planned) |
+| Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature | Shed, trees, bushes |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
 ### Controls
