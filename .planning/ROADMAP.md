@@ -551,3 +551,53 @@ Plans:
 
 ## Milestone: v1.4 AutoBot Overhaul ✅
 Transform the AutoBot from a combat stress-tester into a full game-playing AI that clears all zones, shops, equips gear, and defeats the boss.
+
+---
+
+# v1.5 INTEGRATION & QUALITY AUDIT
+
+---
+
+## Phase 28: Critical Bug Fixes
+**Goal**: Fix all player-facing bugs discovered in codebase audit — items work as expected
+
+**Status**: PLANNED
+
+**Requirements Covered**: BUG-01, BUG-02, BUG-03, DEBT-01
+
+**Success Criteria**:
+1. Using Revival Bone from ring menu revives a knocked-out companion with 50% HP
+2. Using Antidote from ring menu clears active poison (DoT stops, green tint removed)
+3. Boss summon state uses preload() — no frame stutter when Raccoon King summons minions
+4. Enemy respawn system uses preload() — no stutter on respawn
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD — created by /gsd-plan-phase
+
+---
+
+## Phase 29: Signal Integrity & Polish
+**Goal**: Wire missing signal handlers, clean up orphaned signals, update project documentation
+
+**Status**: PLANNED
+
+**Requirements Covered**: SIG-01, SIG-02, SIG-03, DEBT-02, DEBT-03
+
+**Success Criteria**:
+1. Corrupt save file shows visible error message to player (not silent failure)
+2. Loading a saved game refreshes all HUD elements to loaded values
+3. Restarting game clears all temporary state (buffs, poison, combo counter)
+4. All Events bus signals either have at least one connection or are documented as future hooks
+5. PROJECT.md reflects actual game state through v1.4
+
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD — created by /gsd-plan-phase
+
+---
+
+## Milestone: v1.5 Integration & Quality Audit
+Fix 3 confirmed bugs, wire missing signal handlers, clean orphaned signals, and update documentation. All issues from full codebase audit on 2026-01-29.

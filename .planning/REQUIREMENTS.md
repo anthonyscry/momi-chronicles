@@ -1,80 +1,58 @@
-# Momi's Adventure - v1 Requirements
+# Requirements: Momi's Adventure
 
-## Category: Core Movement (MOV)
-- **MOV-01**: Player can move in 8 directions using WASD/arrow keys
-- **MOV-02**: Player has walk and run speeds (run with Shift held)
-- **MOV-03**: Player sprite faces movement direction
-- **MOV-04**: Movement feels responsive (no input lag)
-- **MOV-05**: Player cannot walk through solid objects
+**Defined:** 2026-01-29
+**Core Value:** Satisfying action RPG combat with Momi and friends — everything wired up and working
 
-## Category: Combat System (CMB)
-- **CMB-01**: Player can perform basic attack with action button
-- **CMB-02**: Attacks have hitboxes that detect enemies
-- **CMB-03**: Player can dodge/roll with dodge button
-- **CMB-04**: Dodge has invincibility frames
-- **CMB-05**: Attack has recovery time before next action
-- **CMB-06**: Visual feedback on hit (flash, particles)
+## v1.5 Requirements
 
-## Category: Health & Damage (HLT)
-- **HLT-01**: Player has health points (HP)
-- **HLT-02**: Taking damage reduces HP
-- **HLT-03**: HP reaching 0 triggers death state
-- **HLT-04**: Invincibility frames after taking damage
-- **HLT-05**: Health displays in UI
+Requirements for the Integration & Quality Audit milestone. All issues discovered during full codebase audit on 2026-01-29.
 
-## Category: Enemies (ENM)
-- **ENM-01**: Basic enemy type exists (raccoon)
-- **ENM-02**: Enemies have health and can be defeated
-- **ENM-03**: Enemies deal contact damage
-- **ENM-04**: Enemies have basic AI (patrol, chase, attack)
-- **ENM-05**: Defeated enemies play death animation
-- **ENM-06**: At least 2 enemy types with different behaviors
+### Bug Fixes (BUG)
 
-## Category: Camera (CAM)
-- **CAM-01**: Camera follows player smoothly
-- **CAM-02**: Camera has position smoothing
-- **CAM-03**: Camera respects zone boundaries
-- **CAM-04**: No jarring camera movements
+- [ ] **BUG-01**: Revival Bone item from ring menu actually revives a knocked-out companion (not just consumed silently)
+- [ ] **BUG-02**: Antidote item cures poison when used (method name matches health_component's clear_poison)
+- [ ] **BUG-03**: Boss summon state uses preload() instead of runtime load() to prevent frame stutters
 
-## Category: Animation (ANI)
-- **ANI-01**: Player has idle animation
-- **ANI-02**: Player has walk animation (4 directions)
-- **ANI-03**: Player has run animation (4 directions)
-- **ANI-04**: Player has attack animation
-- **ANI-05**: Player has hurt animation
-- **ANI-06**: Player has dodge/roll animation
-- **ANI-07**: Enemies have idle, walk, attack, hurt, death animations
+### Signal Integrity (SIG)
 
-## Category: UI/HUD (UI)
-- **UI-01**: Health bar displays current/max HP
-- **UI-02**: Pause menu accessible with ESC
-- **UI-03**: Pause menu has Resume and Quit options
-- **UI-04**: Simple title screen
-- **UI-05**: Game over screen on death
+- [ ] **SIG-01**: save_corrupted signal shows player-visible error feedback (toast, HUD message, or title screen warning)
+- [ ] **SIG-02**: game_loaded signal triggers UI refresh (health bar, coin counter, EXP bar update to loaded values)
+- [ ] **SIG-03**: game_restarted signal clears stale state (active buffs, poison visuals, combo counter)
 
-## Category: World/Zones (WLD)
-- **WLD-01**: Test zone exists for development
-- **WLD-02**: Zone has collision boundaries
-- **WLD-03**: Basic tilemap for ground/walls
-- **WLD-04**: Zone transitions work (doors/exits)
+### Tech Debt (DEBT)
 
-## Category: Audio (AUD)
-- **AUD-01**: Background music plays
-- **AUD-02**: Sound effects for attacks
-- **AUD-03**: Sound effects for taking damage
-- **AUD-04**: Sound effects for enemy death
-- **AUD-05**: Audio can be toggled in settings
+- [ ] **DEBT-01**: All scene instantiation uses preload() — no runtime load() in hot paths (boss_attack_summon.gd, base_zone.gd respawn)
+- [ ] **DEBT-02**: Orphaned Events bus signals either connected to handlers or removed with comment explaining why
+- [ ] **DEBT-03**: PROJECT.md reflects actual game state (characters, features, scope updated through v1.4)
 
-## Category: State Management (STA)
-- **STA-01**: Player states managed by state machine
-- **STA-02**: States: Idle, Walk, Run, Attack, Hurt, Dodge, Death
-- **STA-03**: Clean state transitions with no stuck states
-- **STA-04**: Game can be paused/unpaused
-- **STA-05**: Game state persists during session
+## Out of Scope
 
-## Category: Technical (TEC)
-- **TEC-01**: Consistent 60 FPS performance
-- **TEC-02**: No memory leaks during gameplay
-- **TEC-03**: Pixel-perfect rendering (no blur)
-- **TEC-04**: Input actions configurable
-- **TEC-05**: Game runs on Windows
+| Feature | Reason |
+|---------|--------|
+| New gameplay features | This milestone is audit/fix only — no new mechanics |
+| AutoBot updates | Bot already works around the bugs; fixes target player experience |
+| UI redesign | Only add minimal UI for save_corrupted feedback |
+| Performance profiling | Fix known load() issues; full profiling deferred |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| BUG-01 | Phase 28 | Pending |
+| BUG-02 | Phase 28 | Pending |
+| BUG-03 | Phase 28 | Pending |
+| SIG-01 | Phase 29 | Pending |
+| SIG-02 | Phase 29 | Pending |
+| SIG-03 | Phase 29 | Pending |
+| DEBT-01 | Phase 28 | Pending |
+| DEBT-02 | Phase 29 | Pending |
+| DEBT-03 | Phase 29 | Pending |
+
+**Coverage:**
+- v1.5 requirements: 9 total
+- Mapped to phases: 9
+- Unmapped: 0 ✓
+
+---
+*Requirements defined: 2026-01-29*
+*Last updated: 2026-01-29 after codebase audit*
