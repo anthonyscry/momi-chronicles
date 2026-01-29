@@ -443,10 +443,10 @@ Close all tech debt identified in the v1.3 milestone audit. Equipment/inventory 
 
 ---
 
-## Phase 23: Companion Save Restoration
+## Phase 23: Companion Save Restoration ✅
 **Goal**: Restore companion health and meter values when loading a save
 
-**Status**: PLANNED — Gap closure from v1.3.1 audit (medium priority)
+**Status**: COMPLETE
 
 **Deliverables**:
 - Deferred health/meter restoration in PartyManager.load_save_data()
@@ -456,9 +456,9 @@ Close all tech debt identified in the v1.3 milestone audit. Equipment/inventory 
 **Plans:** 1 plan
 
 Plans:
-- [ ] 23-01-PLAN.md — Deferred companion health/meter restoration (Wave 1)
+- [x] 23-01-PLAN.md — Deferred companion health/meter restoration (Wave 1)
 
 ---
 
-## Milestone: v1.3.2 Companion Save Fix
+## Milestone: v1.3.2 Companion Save Fix ✅
 Close the companion health/meter restoration gap discovered during v1.3.1 audit.

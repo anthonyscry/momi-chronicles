@@ -2,27 +2,31 @@
 
 ## Current Position
 
-Phase: 22 of 22 (v1.3 Polish & Tech Debt)
+Phase: 23 of 23 (Companion Save Restoration)
 Plan: 1 of 1 in current phase
-Status: v1.3.1 COMPLETE — All tech debt resolved
-Last activity: 2026-01-29 - Completed 22-01-PLAN.md
+Status: v1.3.2 COMPLETE — Companion save restoration gap closed
+Last activity: 2026-01-29 - Completed 23-01-PLAN.md
 
 Progress: ████████████████████████████████████████ 100% (v1.3)
           ████████████████████████████████████████ 100% (v1.3.1)
+          ████████████████████████████████████████ 100% (v1.3.2)
 
 ## Current Status
-- **Version**: v1.3.1 Tech Debt & Polish (COMPLETE)
+- **Version**: v1.3.2 Companion Save Fix (COMPLETE)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 120+ scripts
-- **Status**: v1.3.1 milestone complete — all tech debt from v1.3 audit resolved
+- **Status**: v1.3.2 milestone complete — companion health/meter restoration gap closed
 
 ## v1.3.1 Progress
 - [x] Phase 21: Save System Persistence (COMPLETE — 21-01 sub-system persistence wiring)
 - [x] Phase 22: v1.3 Polish & Tech Debt (COMPLETE — 22-01 shop catalog, preload, poison stacking, Phase 17 verification)
 
+## v1.3.2 Progress
+- [x] Phase 23: Companion Save Restoration (COMPLETE — 23-01 deferred health/meter restoration)
+
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 22-01-PLAN.md (v1.3.1 milestone complete)
+Stopped at: Completed 23-01-PLAN.md (v1.3.2 milestone complete)
 Resume file: None
 
 ## v1.3.1 Decisions
@@ -33,6 +37,7 @@ Resume file: None
 | Sell-only mini-boss items (not in DEFAULT_EQUIPMENT_STOCK) | Players can sell rare loot but shop won't re-sell unique items |
 | preload() const pattern for summon scenes | Matches rat_king.gd pattern, eliminates runtime stutter |
 | Stack-based poison visual (0.15 per stack) | Deepening green signals danger, clamped at 0.3 for visibility |
+| _pending_health/_pending_meters deferred restoration | Matches SaveManager _pending_level pattern — store on load, apply on register |
 
 ---
 
