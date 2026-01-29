@@ -125,6 +125,10 @@ func _apply_item_effect(item_data: Dictionary, target: Node) -> bool:
 		
 		ItemDatabase.EffectType.BUFF_ATTACK:
 			_apply_buff(ItemDatabase.EffectType.BUFF_ATTACK, value, item_data.get("duration", 30.0))
+			# Energy Treat: apply all three buffs at once
+			if item_data.get("all_buffs", false):
+				_apply_buff(ItemDatabase.EffectType.BUFF_SPEED, value, item_data.get("duration", 30.0))
+				_apply_buff(ItemDatabase.EffectType.BUFF_DEFENSE, value, item_data.get("duration", 30.0))
 			_spawn_buff_effect(target, item_data.get("color", Color.ORANGE))
 			return true
 		
@@ -145,11 +149,37 @@ func _apply_item_effect(item_data: Dictionary, target: Node) -> bool:
 			# Fallback if no guard component - just succeed
 			return true
 		
+		ItemDatabase.EffectType.CURE_STATUS:
+			# Cure poison and other negative effects
+			if target.has_node("HealthComponent"):
+				var hp = target.get_node("HealthComponent")
+				if hp.has_method("clear_poison"):
+					hp.clear_poison()
+				# Also clear poison visual via modulate reset
+				if target.has_node("Sprite2D"):
+					target.get_node("Sprite2D").modulate = Color.WHITE
+				_spawn_buff_effect(target, Color(0.2, 1.0, 0.4))
+				return true
+			return true  # Succeed even without target (clears status)
+		
+		ItemDatabase.EffectType.INVINCIBLE:
+			# Brief invincibility (smoke bomb)
+			if target.has_node("Hurtbox"):
+				var hurtbox_node = target.get_node("Hurtbox")
+				hurtbox_node.start_invincibility(value)
+				_spawn_smoke_effect(target)
+				return true
+			return false
+		
 		ItemDatabase.EffectType.REVIVE:
-			# Will be used by party system
-			if GameManager.has_method("get") and GameManager.get("party_manager"):
-				# Find first knocked out companion in ring menu selection
-				# For now, just return true - proper implementation in 16-04
+			# Revive first knocked-out companion
+			if GameManager.party_manager:
+				var knocked = GameManager.party_manager.knocked_out
+				if knocked.is_empty():
+					return false  # No one to revive — don't consume item
+				var companion_id = knocked.keys()[0]
+				GameManager.party_manager.revive_companion(companion_id, value)
+				_spawn_buff_effect(target, Color(1.0, 0.95, 0.5))  # Gold glow
 				return true
 			return false
 	
@@ -165,6 +195,12 @@ func _spawn_buff_effect(target: Node, color: Color) -> void:
 	if has_node("/root/EffectsManager"):
 		get_node("/root/EffectsManager").spawn_pickup_effect(
 			target.global_position, color
+		)
+
+func _spawn_smoke_effect(target: Node) -> void:
+	if has_node("/root/EffectsManager"):
+		get_node("/root/EffectsManager").spawn_pickup_effect(
+			target.global_position, Color(0.5, 0.5, 0.5, 0.8)
 		)
 
 # =============================================================================
