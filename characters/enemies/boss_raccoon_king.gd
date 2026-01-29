@@ -141,6 +141,12 @@ func _on_died() -> void:
 	# Boss death is special
 	Events.boss_defeated.emit(self)
 	
+	# Grant legendary equipment: King's Mantle
+	if GameManager.equipment_manager:
+		if not GameManager.equipment_manager.has_equipment("kings_mantle"):
+			GameManager.equipment_manager.add_equipment("kings_mantle")
+			_show_loot_notification("kings_mantle")
+	
 	# Spawn drops (boss always drops lots of loot!)
 	_spawn_drops()
 	
@@ -148,12 +154,32 @@ func _on_died() -> void:
 	_play_death_sequence()
 
 
-## Boss drops: 100% chance for 10-20 coins, 100% chance for 3-5 health
+## Boss drops: 100% coins, 100% health, guaranteed King's Mantle + energy treat
 func _init_default_drops() -> void:
 	drop_table = [
 		{"scene": COIN_PICKUP_SCENE, "chance": 1.0, "min": 10, "max": 20},
 		{"scene": HEALTH_PICKUP_SCENE, "chance": 1.0, "min": 3, "max": 5},
+		{"item_id": "energy_treat", "chance": 1.0, "min": 1, "max": 1},
 	]
+
+## Show floating text notification for boss loot drop
+func _show_loot_notification(equip_id: String) -> void:
+	var equip_data = EquipmentDatabase.get_equipment(equip_id)
+	if equip_data.is_empty():
+		return
+	var label = Label.new()
+	label.text = "Got %s!" % equip_data.get("name", "???")
+	label.add_theme_font_size_override("font_size", 10)
+	label.add_theme_color_override("font_color", equip_data.get("color", Color.GOLD))
+	label.global_position = global_position + Vector2(-30, -30)
+	label.z_index = 100
+	get_parent().add_child(label)
+	var tween = label.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - 30, 1.2)
+	tween.tween_property(label, "modulate:a", 0.0, 1.2).set_delay(0.5)
+	tween.chain().tween_callback(label.queue_free)
+
 
 func _play_death_sequence() -> void:
 	# Disable collision

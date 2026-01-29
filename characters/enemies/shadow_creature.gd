@@ -57,11 +57,13 @@ func _ready() -> void:
 		add_child(glow_aura)
 
 
-## Shadow drops: 80% 2-4 coins, 30% health
+## Shadow drops: 80% 2-4 coins, 30% health, 8% guard snack, 5% power treat
 func _init_default_drops() -> void:
 	drop_table = [
 		{"scene": COIN_PICKUP_SCENE, "chance": 0.8, "min": 2, "max": 4},
 		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.3, "min": 1, "max": 1},
+		{"item_id": "guard_snack", "chance": 0.08, "min": 1, "max": 1},
+		{"item_id": "power_treat", "chance": 0.05, "min": 1, "max": 1},
 	]
 
 

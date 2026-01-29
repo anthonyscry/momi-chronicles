@@ -12,6 +12,7 @@ enum EffectType {
 	RESTORE_GUARD,  # Restore guard meter
 	CURE_STATUS,    # Remove negative effects
 	REVIVE,         # Revive companion
+	INVINCIBLE,     # Brief invincibility
 }
 
 ## All item definitions
@@ -133,6 +134,48 @@ const ITEMS: Dictionary = {
 		"effect": EffectType.RESTORE_GUARD,
 		"value": 100.0,
 		"color": Color(0.4, 0.6, 1.0),  # Blue
+	},
+	
+	# === STATUS CURE ITEMS ===
+	"antidote": {
+		"id": "antidote",
+		"name": "Antidote",
+		"desc": "Cures poison. Tastes awful",
+		"type": "item",
+		"consumable": true,
+		"stackable": true,
+		"max_stack": 10,
+		"effect": EffectType.CURE_STATUS,
+		"value": 0,  # Cures all negative status
+		"color": Color(0.2, 0.9, 0.4),  # Bright green
+	},
+	
+	# === TACTICAL ITEMS ===
+	"smoke_bomb": {
+		"id": "smoke_bomb",
+		"name": "Smoke Bomb",
+		"desc": "Brief invincibility for 3 seconds",
+		"type": "item",
+		"consumable": true,
+		"stackable": true,
+		"max_stack": 5,
+		"effect": EffectType.INVINCIBLE,
+		"value": 3.0,  # 3 second duration
+		"color": Color(0.5, 0.5, 0.5),  # Gray smoke
+	},
+	"energy_treat": {
+		"id": "energy_treat",
+		"name": "Energy Treat",
+		"desc": "All buffs at once! +25% ATK/SPD/DEF for 20s",
+		"type": "item",
+		"consumable": true,
+		"stackable": true,
+		"max_stack": 3,
+		"effect": EffectType.BUFF_ATTACK,  # Primary effect — code applies all 3
+		"value": 0.25,
+		"duration": 20.0,
+		"all_buffs": true,  # Special flag: apply ATK + SPD + DEF
+		"color": Color(1.0, 0.85, 0.0),  # Gold
 	},
 	
 	# === REVIVAL ITEMS ===

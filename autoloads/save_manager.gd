@@ -194,7 +194,7 @@ func _write_save_file(data: Dictionary) -> bool:
 	DirAccess.rename_absolute(temp_path, SAVE_PATH)
 	
 	Events.game_saved.emit()
-	print("[SaveManager] Game saved successfully")
+	DebugLogger.log_save("Game saved successfully")
 	return true
 
 func _read_save_file() -> Dictionary:
@@ -205,7 +205,7 @@ func _read_save_file() -> Dictionary:
 		# Try backup
 		if FileAccess.file_exists(BACKUP_PATH):
 			file_path = BACKUP_PATH
-			print("[SaveManager] Using backup save file")
+			DebugLogger.log_save("Using backup save file")
 		else:
 			return {}
 	

@@ -244,7 +244,7 @@ func _ready() -> void:
 
 
 func _deferred_init() -> void:
-	print("[AutoBot] Initialized - Press F1 to toggle (currently: %s)" % ("ON" if enabled else "OFF"))
+	DebugLogger.log_bot("Initialized - Press F1 to toggle (currently: %s)" % ("ON" if enabled else "OFF"))
 	_initialized = true
 
 
@@ -264,10 +264,10 @@ func _physics_process(delta: float) -> void:
 			if scene is TitleScreen:
 				auto_start_attempted = true
 				if SaveManager.has_save():
-					print("[AutoBot] Continuing saved game!")
+					DebugLogger.log_bot("Continuing saved game!")
 					scene._on_continue_pressed()
 				else:
-					print("[AutoBot] Starting new game!")
+					DebugLogger.log_bot("Starting new game!")
 					scene._on_start_pressed()
 	
 	# Get player reference
@@ -352,7 +352,7 @@ func _handle_toggle_input() -> void:
 	if Input.is_key_pressed(KEY_F1) and not _f1_held:
 		_f1_held = true
 		enabled = not enabled
-		print("[AutoBot] %s" % ("ENABLED" if enabled else "DISABLED"))
+		DebugLogger.log_bot("%s" % ("ENABLED" if enabled else "DISABLED"))
 		_update_player_control()
 	elif not Input.is_key_pressed(KEY_F1):
 		_f1_held = false
@@ -362,7 +362,7 @@ func _ensure_player_reference() -> void:
 	if player_ref == null or not is_instance_valid(player_ref):
 		player_ref = get_tree().get_first_node_in_group("player")
 		if player_ref != null:
-			print("[AutoBot] Found player")
+			DebugLogger.log_bot("Found player")
 			auto_start_attempted = false  # Reset for next title screen visit
 			auto_start_delay = 1.5  # Reset delay for next title screen
 			_zone_size_detected = false  # Re-detect zone on new player
@@ -1030,7 +1030,7 @@ func _update_zone_awareness() -> void:
 			current_zone_ref = node
 			current_zone_size = node.zone_size
 			_zone_size_detected = true
-			print("[AutoBot] Zone detected: %s (size: %s)" % [node.zone_id, current_zone_size])
+			DebugLogger.log_bot("Zone detected: %s (size: %s)" % [node.zone_id, current_zone_size])
 			return
 		node = node.get_parent()
 	
@@ -1043,13 +1043,13 @@ func _update_zone_awareness() -> void:
 		if w > 0 and h > 0 and w < 100000 and h < 100000:
 			current_zone_size = Vector2(w, h)
 			_zone_size_detected = true
-			print("[AutoBot] Zone size from camera: %s" % current_zone_size)
+			DebugLogger.log_bot("Zone size from camera: %s" % current_zone_size)
 			return
 	
 	# Ultimate fallback
 	current_zone_size = DEFAULT_ZONE_SIZE
 	_zone_size_detected = true
-	print("[AutoBot] Using default zone size: %s" % current_zone_size)
+	DebugLogger.log_bot("Using default zone size: %s" % current_zone_size)
 
 
 func _update_health_status() -> void:
@@ -1450,7 +1450,7 @@ func _try_use_smart_healing() -> void:
 		if GameManager.inventory.has_item(item_id):
 			if GameManager.inventory.use_item(item_id):
 				last_item_use_time = current_time
-				print("[AutoBot] Smart heal (%d%% HP): used %s" % [int(player_health_percent * 100), item_id])
+				DebugLogger.log_bot("Smart heal (%d%% HP): used %s" % [int(player_health_percent * 100), item_id])
 				return
 
 
@@ -1476,7 +1476,7 @@ func _try_use_guard_snack() -> void:
 	if GameManager.inventory.has_item("guard_snack"):
 		if GameManager.inventory.use_item("guard_snack"):
 			last_guard_snack_time = current_time
-			print("[AutoBot] Used guard_snack (guard was %.0f%%)" % (player_ref.guard.get_guard_percent() * 100))
+			DebugLogger.log_bot("Used guard_snack (guard was %.0f%%)" % (player_ref.guard.get_guard_percent() * 100))
 
 
 ## Use buff treats before tough encounters
@@ -1498,7 +1498,7 @@ func _try_use_buff_treats() -> void:
 		if GameManager.inventory.has_item("speed_treat"):
 			if GameManager.inventory.use_item("speed_treat"):
 				last_buff_use_time = current_time
-				print("[AutoBot] Used speed_treat (critical HP escape)")
+				DebugLogger.log_bot("Used speed_treat (critical HP escape)")
 				return
 	
 	if not is_tough_fight:
@@ -1509,7 +1509,7 @@ func _try_use_buff_treats() -> void:
 		if GameManager.inventory.has_item("power_treat"):
 			if GameManager.inventory.use_item("power_treat"):
 				last_buff_use_time = current_time
-				print("[AutoBot] Used power_treat (tough fight)")
+				DebugLogger.log_bot("Used power_treat (tough fight)")
 				return
 	
 	# Tough treat — reduce incoming damage
@@ -1517,7 +1517,7 @@ func _try_use_buff_treats() -> void:
 		if GameManager.inventory.has_item("tough_treat"):
 			if GameManager.inventory.use_item("tough_treat"):
 				last_buff_use_time = current_time
-				print("[AutoBot] Used tough_treat (tough fight)")
+				DebugLogger.log_bot("Used tough_treat (tough fight)")
 				return
 
 
@@ -1555,7 +1555,7 @@ func _try_revive_companion() -> void:
 	for companion_id in knocked_out:
 		if GameManager.inventory.use_item("revival_bone"):
 			GameManager.party_manager.revive_companion(companion_id, 0.5)
-			print("[AutoBot] Used revival_bone to revive %s" % companion_id)
+			DebugLogger.log_bot("Used revival_bone to revive %s" % companion_id)
 			return
 
 
@@ -1590,7 +1590,7 @@ func _optimize_equipment() -> void:
 		# Equip if better option found
 		if best_id != current_id and best_id != "":
 			em.equip(best_id)
-			print("[AutoBot] Equipped %s (score: %.0f > %.0f)" % [best_id, best_score, current_score])
+			DebugLogger.log_bot("Equipped %s (score: %.0f > %.0f)" % [best_id, best_score, current_score])
 
 
 ## Score equipment by weighted stat totals
@@ -1672,7 +1672,7 @@ func _game_loop_farm(zone_id: String, level: int) -> void:
 	if level >= MIN_LEVEL_FOR_SEWERS or zone_kills >= FARM_KILL_TARGET:
 		# Transition to SHOP before moving on
 		game_loop_state = GameLoopState.SHOP
-		print("[AutoBot GameLoop] FARM → SHOP (level: %d, kills: %d)" % [level, zone_kills])
+		DebugLogger.log_bot("GameLoop: FARM → SHOP (level: %d, kills: %d)" % [level, zone_kills])
 		return
 	
 	# Otherwise, just fight (default wander + combat behavior handles this)
@@ -1695,13 +1695,13 @@ func _game_loop_shop(zone_id: String) -> void:
 		else:
 			# Not enough coins, skip shopping
 			game_loop_state = GameLoopState.TRAVERSE
-			print("[AutoBot GameLoop] SHOP → TRAVERSE (low coins)")
+			DebugLogger.log_bot("GameLoop: SHOP → TRAVERSE (low coins)")
 			return
 	
 	# If shop visit completed (wants_to_shop reset by navigation)
 	if not wants_to_shop and not navigating_to_shop:
 		game_loop_state = GameLoopState.TRAVERSE
-		print("[AutoBot GameLoop] SHOP → TRAVERSE")
+		DebugLogger.log_bot("GameLoop: SHOP → TRAVERSE")
 
 
 ## TRAVERSE state: Move to next zone
@@ -1713,7 +1713,7 @@ func _game_loop_traverse(zone_id: String, level: int) -> void:
 		# Already in target zone, move to CLEAR
 		game_loop_state = GameLoopState.CLEAR
 		zone_kills = 0
-		print("[AutoBot GameLoop] TRAVERSE → CLEAR (zone: %s)" % zone_id)
+		DebugLogger.log_bot("GameLoop: TRAVERSE → CLEAR (zone: %s)" % zone_id)
 		return
 	
 	# Navigate to destination
@@ -1732,15 +1732,15 @@ func _game_loop_clear(zone_id: String, level: int) -> void:
 		if zone_id == "sewers" and level >= MIN_LEVEL_FOR_BOSS:
 			# Ready for boss
 			game_loop_state = GameLoopState.BOSS
-			print("[AutoBot GameLoop] CLEAR → BOSS (sewers cleared)")
+			DebugLogger.log_bot("GameLoop: CLEAR → BOSS (sewers cleared)")
 		elif zone_id == "neighborhood":
 			# Move to backyard
 			game_loop_state = GameLoopState.TRAVERSE
-			print("[AutoBot GameLoop] CLEAR → TRAVERSE (neighborhood cleared)")
+			DebugLogger.log_bot("GameLoop: CLEAR → TRAVERSE (neighborhood cleared)")
 		elif zone_id == "backyard":
 			# Move to sewers
 			game_loop_state = GameLoopState.TRAVERSE
-			print("[AutoBot GameLoop] CLEAR → TRAVERSE (backyard cleared)")
+			DebugLogger.log_bot("GameLoop: CLEAR → TRAVERSE (backyard cleared)")
 		else:
 			# Default: go back to farming
 			game_loop_state = GameLoopState.FARM
@@ -1774,7 +1774,7 @@ func _game_loop_boss(zone_id: String) -> void:
 		var boss_defeated = GameManager.boss_defeated if "boss_defeated" in GameManager else false
 		if boss_defeated:
 			game_loop_state = GameLoopState.VICTORY
-			print("[AutoBot GameLoop] BOSS → VICTORY! Boss defeated!")
+			DebugLogger.log_bot("GameLoop: BOSS → VICTORY! Boss defeated!")
 
 
 ## Determine next zone in progression
@@ -1831,7 +1831,7 @@ func _navigate_to_zone_exit(delta: float) -> bool:
 	if target_zone_exit == null or not is_instance_valid(target_zone_exit):
 		target_zone_exit = _find_zone_exit(target_exit_zone_id)
 		if target_zone_exit == null:
-			print("[AutoBot] No exit found for zone: %s" % target_exit_zone_id)
+			DebugLogger.log_bot("No exit found for zone: %s" % target_exit_zone_id)
 			wants_zone_transition = false
 			return false
 	
@@ -1854,7 +1854,7 @@ func _navigate_to_zone_exit(delta: float) -> bool:
 			if target_zone_exit.require_interaction:
 				# Simulate E press for interactive exits (manhole, boss door)
 				_tap_action("interact")
-				print("[AutoBot] Pressing interact at zone exit: %s" % target_zone_exit.exit_id)
+				DebugLogger.log_bot("Pressing interact at zone exit: %s" % target_zone_exit.exit_id)
 			# Non-interactive exits trigger automatically when player walks in
 		
 		desired_direction = (exit_pos - player_pos).normalized() * 0.3
@@ -1921,7 +1921,7 @@ func _navigate_to_shop_npc() -> bool:
 		navigating_to_shop = false
 		wants_to_shop = false
 		Events.shop_interact_requested.emit()
-		print("[AutoBot] Interacting with shop NPC")
+		DebugLogger.log_bot("Interacting with shop NPC")
 		
 		# Schedule shop close after brief browse
 		_schedule_shop_close()
@@ -1944,7 +1944,7 @@ func _schedule_shop_close() -> void:
 	
 	# Close shop via ESC/E
 	_tap_action("interact")
-	print("[AutoBot] Closing shop")
+	DebugLogger.log_bot("Closing shop")
 
 
 ## Cycle to next companion using Q key
@@ -1959,7 +1959,7 @@ func _cycle_companion() -> void:
 	# Simulate Q key press
 	_tap_action("cycle_companion")
 	
-	print("[AutoBot] Cycled companion -> %s" % GameManager.party_manager.active_companion_id)
+	DebugLogger.log_bot("Cycled companion -> %s" % GameManager.party_manager.active_companion_id)
 
 
 ## Test the ring menu by opening, browsing, and closing it
@@ -1967,7 +1967,7 @@ func _test_ring_menu() -> void:
 	# Open ring menu
 	_tap_action("ring_menu")
 	
-	print("[AutoBot] Testing ring menu...")
+	DebugLogger.log_bot("Testing ring menu...")
 	
 	# Take screenshot after a short delay to let menu animate open
 	await get_tree().create_timer(0.3).timeout
@@ -1980,20 +1980,20 @@ func _test_ring_menu() -> void:
 func _capture_ring_menu_screenshot() -> void:
 	var viewport = get_viewport()
 	if viewport == null:
-		print("[AutoBot] No viewport for screenshot")
+		DebugLogger.log_bot("No viewport for screenshot")
 		return
 	
 	var image = viewport.get_texture().get_image()
 	if image == null:
-		print("[AutoBot] Failed to get viewport image")
+		DebugLogger.log_bot("Failed to get viewport image")
 		return
 	
 	# Save to project root for easy access
 	var error = image.save_png("res://screenshot.png")
 	if error == OK:
-		print("[AutoBot] Ring menu screenshot saved to screenshot.png")
+		DebugLogger.log_bot("Ring menu screenshot saved to screenshot.png")
 	else:
-		print("[AutoBot] Failed to save screenshot: error %d" % error)
+		DebugLogger.log_bot("Failed to save screenshot: error %d" % error)
 
 
 ## Schedule ring menu navigation actions
@@ -2018,4 +2018,4 @@ func _schedule_ring_menu_navigation() -> void:
 	# Close ring menu
 	_tap_action("ring_menu")
 	
-	print("[AutoBot] Ring menu test complete")
+	DebugLogger.log_bot("Ring menu test complete")

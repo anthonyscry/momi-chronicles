@@ -70,6 +70,8 @@ func _ready() -> void:
 		hurtbox.hurt.connect(_on_hurt)
 	if health:
 		health.died.connect(_on_died)
+	if hitbox:
+		hitbox.hit_landed.connect(_on_hit_landed)
 	
 	# Connect to level up for stat scaling
 	if progression:
@@ -155,6 +157,12 @@ func _on_hurt(attacking_hitbox: Hitbox) -> void:
 
 func _on_died() -> void:
 	state_machine.transition_to("Death")
+
+## Emitted when player's hitbox lands on an enemy hurtbox
+func _on_hit_landed(hurtbox: Hurtbox) -> void:
+	var enemy = hurtbox.get_parent()
+	if enemy and enemy.is_in_group("enemies"):
+		Events.player_hit_enemy.emit(enemy)
 
 func get_input_direction() -> Vector2:
 	# Bot control takes priority

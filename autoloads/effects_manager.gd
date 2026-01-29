@@ -81,7 +81,7 @@ func _ready() -> void:
 	# Auto-spawn ambient particles on zone entry
 	Events.zone_entered.connect(_on_zone_entered_particles)
 	
-	print("EffectsManager ready")
+	DebugLogger.log_custom("INIT", "EffectsManager ready")
 
 
 func _process(delta: float) -> void:

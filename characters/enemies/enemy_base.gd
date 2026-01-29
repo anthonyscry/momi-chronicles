@@ -166,9 +166,23 @@ func _init_default_drops() -> void:
 ## Spawn drops on death based on drop table
 func _spawn_drops() -> void:
 	for drop in drop_table:
-		var scene = drop.get("scene")
 		var chance = drop.get("chance", 0.0)
-		if scene and randf() <= chance:
+		if randf() > chance:
+			continue
+		
+		# Item drops go directly to inventory (no pickup scene needed)
+		var item_id = drop.get("item_id", "")
+		if item_id != "":
+			var qty = randi_range(drop.get("min", 1), drop.get("max", 1))
+			if GameManager.inventory:
+				GameManager.inventory.add_item(item_id, qty)
+				# Floating text notification
+				_show_item_drop_text(item_id, qty)
+			continue
+		
+		# Scene-based drops (health_pickup, coin_pickup)
+		var scene = drop.get("scene")
+		if scene:
 			var min_count = drop.get("min", 1)
 			var max_count = drop.get("max", 1)
 			var count = randi_range(min_count, max_count)
@@ -184,6 +198,27 @@ func _spawn_single_drop(scene: PackedScene, index: int) -> void:
 	pickup.global_position = global_position + offset
 	# Add to parent (the zone) so it persists after enemy is freed
 	get_parent().add_child(pickup)
+
+## Show floating text when an item drops directly to inventory
+func _show_item_drop_text(item_id: String, qty: int) -> void:
+	var item_data = ItemDatabase.get_item(item_id)
+	if item_data.is_empty():
+		return
+	var label = Label.new()
+	var item_name = item_data.get("name", item_id)
+	label.text = "+%d %s" % [qty, item_name] if qty > 1 else "+%s" % item_name
+	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_color_override("font_color", item_data.get("color", Color.WHITE))
+	label.global_position = global_position + Vector2(-20, -25)
+	label.z_index = 100
+	get_parent().add_child(label)
+	# Float up and fade
+	var tween = label.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "position:y", label.position.y - 20, 0.8)
+	tween.tween_property(label, "modulate:a", 0.0, 0.8).set_delay(0.3)
+	tween.chain().tween_callback(label.queue_free)
+
 
 func _on_detection_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):

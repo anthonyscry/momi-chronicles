@@ -19,6 +19,9 @@ const SHOP_ITEMS: Dictionary = {
 	"guard_snack": 20,
 	"revival_bone": 100,
 	"bird_seed": 3,
+	"antidote": 15,
+	"smoke_bomb": 60,
+	"energy_treat": 150,
 }
 
 ## Equipment prices (equipment_id -> buy_price in coins)
@@ -41,6 +44,7 @@ const SHOP_EQUIPMENT: Dictionary = {
 	"raccoon_crown": 200,
 	"crow_feather_coat": 250,
 	"rat_king_collar": 220,
+	"kings_mantle": 500,
 }
 
 ## Sell-back multiplier (50% of buy price)
@@ -62,6 +66,9 @@ const DEFAULT_ITEM_STOCK: Dictionary = {
 	"tough_treat": 3,
 	"guard_snack": 5,
 	"revival_bone": 2,
+	"antidote": 5,
+	"smoke_bomb": 2,
+	"energy_treat": 1,
 }
 
 ## Default equipment stock (each piece available once per restock)
@@ -119,7 +126,7 @@ func restock() -> void:
 		else:
 			shop_stock[equip_id] = DEFAULT_EQUIPMENT_STOCK[equip_id]
 	
-	print("[ShopCatalog] Shop restocked!")
+	DebugLogger.log_item("Shop restocked")
 
 
 ## Get current stock for an item.

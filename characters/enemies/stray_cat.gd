@@ -38,9 +38,11 @@ func get_attack_state_name() -> String:
 	return "CatPounce"
 
 
-## Cat drops: 70% chance for 1-2 coins, 20% chance for health
+## Cat drops: 70% coins, 20% health, 5% speed treat (rare!), 8% smoke bomb
 func _init_default_drops() -> void:
 	drop_table = [
 		{"scene": COIN_PICKUP_SCENE, "chance": 0.7, "min": 1, "max": 2},
 		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.2, "min": 1, "max": 1},
+		{"item_id": "speed_treat", "chance": 0.05, "min": 1, "max": 1},
+		{"item_id": "smoke_bomb", "chance": 0.08, "min": 1, "max": 1},
 	]

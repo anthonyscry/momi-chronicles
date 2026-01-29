@@ -35,9 +35,10 @@ func _ready() -> void:
 		sprite.scale = Vector2(0.8, 0.8)
 
 
-## Rat drops: 60% chance for 1 coin, 10% chance for health pickup
+## Rat drops: 60% coins, 10% health, 15% antidote (thematic — they poison you)
 func _init_default_drops() -> void:
 	drop_table = [
 		{"scene": COIN_PICKUP_SCENE, "chance": 0.6, "min": 1, "max": 1},
 		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.1, "min": 1, "max": 1},
+		{"item_id": "antidote", "chance": 0.15, "min": 1, "max": 1},
 	]

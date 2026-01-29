@@ -16,9 +16,10 @@ func _ready() -> void:
 	super._ready()
 
 
-## Raccoon drops: 80% chance for 1-2 coins, 25% chance for health
+## Raccoon drops: 80% coins, 25% health, 10% acorn
 func _init_default_drops() -> void:
 	drop_table = [
 		{"scene": COIN_PICKUP_SCENE, "chance": 0.8, "min": 1, "max": 2},
 		{"scene": HEALTH_PICKUP_SCENE, "chance": 0.25, "min": 1, "max": 1},
+		{"item_id": "acorn", "chance": 0.10, "min": 1, "max": 2},
 	]

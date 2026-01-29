@@ -30,5 +30,13 @@ func play() -> void:
 	particles.emitting = false
 
 
-func setup(_params: Dictionary) -> void:
-	pass
+func setup(params: Dictionary) -> void:
+	# Customize death poof per enemy type
+	if params.has("color") and particles:
+		particles.color = params["color"]
+	if params.has("scale"):
+		scale = Vector2.ONE * params["scale"]
+	if params.has("amount") and particles:
+		particles.amount = params["amount"]
+	if params.has("flash_color") and flash:
+		flash.color = params["flash_color"]

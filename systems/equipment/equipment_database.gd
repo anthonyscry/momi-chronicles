@@ -33,6 +33,7 @@ const SLOT_NAMES: Dictionary = {
 ## All equipment definitions
 const EQUIPMENT: Dictionary = {
 	# === COLLARS ===
+	# Tier 1 (Level 1)
 	"basic_collar": {
 		"id": "basic_collar",
 		"name": "Basic Collar",
@@ -40,8 +41,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COLLAR,
 		"stats": {StatType.MAX_HEALTH: 5},
+		"min_level": 1,
 		"color": Color(0.8, 0.4, 0.2),  # Brown leather
 	},
+	# Tier 2 (Level 3)
 	"spiked_collar": {
 		"id": "spiked_collar",
 		"name": "Spiked Collar",
@@ -49,8 +52,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COLLAR,
 		"stats": {StatType.ATTACK_DAMAGE: 3},
+		"min_level": 3,
 		"color": Color(0.3, 0.3, 0.3),  # Dark metal
 	},
+	# Tier 3 (Level 5)
 	"lucky_collar": {
 		"id": "lucky_collar",
 		"name": "Lucky Collar",
@@ -58,10 +63,12 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COLLAR,
 		"stats": {StatType.EXP_BONUS: 10},
+		"min_level": 5,
 		"color": Color(1.0, 0.84, 0.0),  # Gold
 	},
 	
 	# === HARNESSES ===
+	# Tier 1 (Level 1)
 	"training_harness": {
 		"id": "training_harness",
 		"name": "Training Harness",
@@ -69,17 +76,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HARNESS,
 		"stats": {StatType.MAX_HEALTH: 10},
+		"min_level": 1,
 		"color": Color(0.2, 0.5, 0.8),  # Blue
 	},
-	"tactical_harness": {
-		"id": "tactical_harness",
-		"name": "Tactical Harness",
-		"desc": "Military grade. +5 Attack, +5 HP",
-		"type": "equipment",
-		"slot": Slot.HARNESS,
-		"stats": {StatType.ATTACK_DAMAGE: 5, StatType.MAX_HEALTH: 5},
-		"color": Color(0.3, 0.35, 0.3),  # Olive
-	},
+	# Tier 2 (Level 3)
 	"padded_harness": {
 		"id": "padded_harness",
 		"name": "Padded Harness",
@@ -87,10 +87,23 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HARNESS,
 		"stats": {StatType.DEFENSE: 10},
+		"min_level": 3,
 		"color": Color(0.6, 0.4, 0.6),  # Purple
+	},
+	# Tier 3 (Level 5)
+	"tactical_harness": {
+		"id": "tactical_harness",
+		"name": "Tactical Harness",
+		"desc": "Military grade. +5 Attack, +5 HP",
+		"type": "equipment",
+		"slot": Slot.HARNESS,
+		"stats": {StatType.ATTACK_DAMAGE: 5, StatType.MAX_HEALTH: 5},
+		"min_level": 5,
+		"color": Color(0.3, 0.35, 0.3),  # Olive
 	},
 	
 	# === LEASHES ===
+	# Tier 1 (Level 1)
 	"retractable_leash": {
 		"id": "retractable_leash",
 		"name": "Retractable Leash",
@@ -98,8 +111,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.LEASH,
 		"stats": {StatType.MOVE_SPEED: 5},
+		"min_level": 1,
 		"color": Color(0.9, 0.1, 0.1),  # Red
 	},
+	# Tier 2 (Level 3)
 	"chain_leash": {
 		"id": "chain_leash",
 		"name": "Chain Leash",
@@ -107,8 +122,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.LEASH,
 		"stats": {StatType.ATTACK_DAMAGE: 5},
+		"min_level": 3,
 		"color": Color(0.7, 0.7, 0.75),  # Silver
 	},
+	# Tier 3 (Level 5)
 	"bungee_leash": {
 		"id": "bungee_leash",
 		"name": "Bungee Leash",
@@ -116,10 +133,12 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.LEASH,
 		"stats": {StatType.MOVE_SPEED: 8},
+		"min_level": 5,
 		"color": Color(0.0, 0.8, 0.4),  # Green
 	},
 	
 	# === COATS ===
+	# Tier 1 (Level 1)
 	"raincoat": {
 		"id": "raincoat",
 		"name": "Raincoat",
@@ -127,8 +146,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COAT,
 		"stats": {StatType.MAX_HEALTH: 15},
+		"min_level": 1,
 		"color": Color(1.0, 0.9, 0.2),  # Yellow
 	},
+	# Tier 2 (Level 3)
 	"sweater": {
 		"id": "sweater",
 		"name": "Cozy Sweater",
@@ -136,8 +157,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COAT,
 		"stats": {StatType.DEFENSE: 5, StatType.MAX_HEALTH: 5},
+		"min_level": 3,
 		"color": Color(0.9, 0.5, 0.5),  # Pink
 	},
+	# Tier 3 (Level 5)
 	"leather_jacket": {
 		"id": "leather_jacket",
 		"name": "Leather Jacket",
@@ -145,10 +168,12 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COAT,
 		"stats": {StatType.ATTACK_DAMAGE: 8},
+		"min_level": 5,
 		"color": Color(0.15, 0.1, 0.1),  # Black
 	},
 	
 	# === HATS ===
+	# Tier 1 (Level 1)
 	"baseball_cap": {
 		"id": "baseball_cap",
 		"name": "Baseball Cap",
@@ -156,8 +181,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HAT,
 		"stats": {StatType.MOVE_SPEED: 3},
+		"min_level": 1,
 		"color": Color(0.8, 0.2, 0.2),  # Red
 	},
+	# Tier 2 (Level 3)
 	"bandana": {
 		"id": "bandana",
 		"name": "Bandana",
@@ -165,8 +192,10 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HAT,
 		"stats": {StatType.ATTACK_DAMAGE: 2, StatType.MOVE_SPEED: 2},
+		"min_level": 3,
 		"color": Color(0.1, 0.3, 0.6),  # Navy
 	},
+	# Tier 3 (Level 5)
 	"guard_helmet": {
 		"id": "guard_helmet",
 		"name": "Guard Helmet",
@@ -174,10 +203,11 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HAT,
 		"stats": {StatType.DEFENSE: 10, StatType.GUARD_REGEN: 5},
+		"min_level": 5,
 		"color": Color(0.5, 0.5, 0.55),  # Steel
 	},
 	
-	# === MINI-BOSS LOOT (RARE) ===
+	# === MINI-BOSS LOOT (RARE — no level requirement, earned through combat) ===
 	"raccoon_crown": {
 		"id": "raccoon_crown",
 		"name": "Raccoon Crown",
@@ -185,6 +215,7 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.HAT,
 		"stats": {StatType.MAX_HEALTH: 15, StatType.ATTACK_DAMAGE: 5},
+		"min_level": 1,
 		"color": Color(1.0, 0.85, 0.2),  # Gold crown
 	},
 	"crow_feather_coat": {
@@ -194,6 +225,7 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COAT,
 		"stats": {StatType.MOVE_SPEED: 10, StatType.DEFENSE: 10},
+		"min_level": 1,
 		"color": Color(0.1, 0.08, 0.15),  # Dark purple-black
 	},
 	"rat_king_collar": {
@@ -203,7 +235,20 @@ const EQUIPMENT: Dictionary = {
 		"type": "equipment",
 		"slot": Slot.COLLAR,
 		"stats": {StatType.ATTACK_DAMAGE: 8, StatType.GUARD_REGEN: 5},
+		"min_level": 1,
 		"color": Color(0.4, 0.35, 0.2),  # Dirty brown
+	},
+	
+	# === BOSS LOOT (LEGENDARY — earned from final boss) ===
+	"kings_mantle": {
+		"id": "kings_mantle",
+		"name": "King's Mantle",
+		"desc": "The Raccoon King's royal cape. +12 ATK, +20 HP, +10% DEF",
+		"type": "equipment",
+		"slot": Slot.COAT,
+		"stats": {StatType.ATTACK_DAMAGE: 12, StatType.MAX_HEALTH: 20, StatType.DEFENSE: 10},
+		"min_level": 1,
+		"color": Color(0.6, 0.1, 0.8),  # Royal purple
 	},
 }
 

@@ -21,6 +21,11 @@ func play() -> void:
 	particles.emitting = false
 
 
-func setup(_params: Dictionary) -> void:
-	# No special setup needed for hit sparks
-	pass
+func setup(params: Dictionary) -> void:
+	# Adjust color based on damage intensity
+	if params.has("color") and particles:
+		particles.color = params["color"]
+	if params.has("scale"):
+		scale = Vector2.ONE * params["scale"]
+	if params.has("amount") and particles:
+		particles.amount = params["amount"]
