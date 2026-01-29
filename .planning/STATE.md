@@ -3,27 +3,27 @@
 ## Current Position
 
 Phase: 20 of 20 (Mini-Boss System)
-Plan: 1 of 4 in current phase
-Status: In progress
-Last activity: 2026-01-29 - Completed 20-01-PLAN.md (Mini-Boss Foundation)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-01-29 - Completed 20-04-PLAN.md (Rat King)
 
-Progress: ████████████████████░░░░░░░░░░░░░░░░░░░░ 48%
+Progress: ████████████████████████░░░░░░░░░░░░░░░░░░ 55%
 
 ## Current Status
 - **Version**: v1.3 Content & Variety (IN PROGRESS)
 - **Last Updated**: 2026-01-29
 - **Godot Files**: 109+ scripts
-- **Status**: Phase 20 IN PROGRESS — Mini-boss foundation complete (MiniBossBase, Events, Save, GameManager, Equipment, HealthBar). Ready for Plans 02-04 (individual mini-bosses).
+- **Status**: Phase 20 COMPLETE — All 4 plans done (Foundation, Alpha Raccoon, Crow Matriarch, Rat King). 3 zone mini-bosses with unique mechanics + rare loot.
 
 ## v1.3 Progress
 - [x] Phase 17: New Enemy Types (COMPLETE — 17-01 Stray Cat, 17-02 Sewer Rat, 17-03 Shadow Creature)
 - [x] Phase 18: Shop System (COMPLETE — 18-01 Catalog & NPC, 18-02 Shop UI, 18-03 Sell Tab & Restock)
 - [x] Phase 19: The Sewers Zone (COMPLETE — 19-01 Toxic Puddles, 19-02 Zone Layout, 19-03 Manhole & Integration)
-- [ ] Phase 20: Mini-Boss System
+- [x] Phase 20: Mini-Boss System (COMPLETE — 20-01 Foundation, 20-02 Alpha Raccoon, 20-03 Crow Matriarch, 20-04 Rat King)
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Completed 20-01-PLAN.md (Mini-Boss Foundation)
+Stopped at: Completed 20-04-PLAN.md (Rat King) — Phase 20 complete
 Resume file: None
 
 ## v1.3 Decisions
@@ -60,6 +60,10 @@ Resume file: None
 | Separate mini-boss signals from boss | mini_boss_spawned/defeated avoid conflicts with existing boss flow |
 | Orange health bar for mini-bosses | Color(0.9, 0.6, 0.2) visually distinguishes from red boss bar |
 | 2s auto-save delay after mini-boss defeat | Shorter than 3s boss delay — lighter celebration |
+| AoE slam via distance check (not hitbox) | Cleaner circular area damage, simpler than rotating hitbox |
+| Summon cap of 3 alive minions | Prevents raccoon flood overwhelming player |
+| Zone trigger at park_center (150, 480) | Open space for fight, matches existing spawn point |
+| Warning ground decor fades on spawn | Telegraphs danger zone, cleans up after encounter starts |
 
 ---
 
@@ -121,6 +125,8 @@ Resume file: None
 | Sewer Rat | 15 | 65 | 5+poison | Swarm packs, poison bite DoT |
 | Shadow Creature | 35 | 35 | 12 (ranged) | Phase in/out, shadow bolt, teleport evasion |
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
+| Mini: Alpha Raccoon | 120 | 70 | 20 | Ground slam AoE + raccoon summon, drops Raccoon Crown |
+| Mini: Crow Matriarch | 80 | 90 | 15 (22 dive) | Dive bomb + crow swarm, drops Crow Feather Coat |
 
 ### NPCs
 
