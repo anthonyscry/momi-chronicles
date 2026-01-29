@@ -127,6 +127,7 @@ Resume file: None
 | Boss Raccoon King | 200 | 60 | 25 | 3 patterns, enrage at 50% |
 | Mini: Alpha Raccoon | 120 | 70 | 20 | Ground slam AoE + raccoon summon, drops Raccoon Crown |
 | Mini: Crow Matriarch | 80 | 90 | 15 (22 dive) | Dive bomb + crow swarm, drops Crow Feather Coat |
+| Mini: Rat King | 150 | 55 (70 post-split) | 18 + poison | Poison AoE cloud, 50% HP splits into 4 rats, drops Rat King's Collar |
 
 ### NPCs
 
@@ -139,7 +140,7 @@ Resume file: None
 | Zone | Enemies | Features |
 |------|---------|----------|
 | Neighborhood | Raccoons, Crows, Stray Cats, Shadow Creature | Houses, fences, paths, Nutkin's shop, manhole to sewers |
-| Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature | Shed, trees, bushes |
+| Backyard | Raccoons, Crows, Sewer Rats, Shadow Creature, Crow Matriarch (mini-boss) | Shed, trees, bushes, mini-boss trigger at center |
 | Sewers | Sewer Rats, Shadow Creatures | Dark dungeon, PointLight2D, toxic puddles, water channels, boss door |
 | Boss Arena | Raccoon King | Locked doors, victory rewards |
 
