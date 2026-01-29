@@ -73,6 +73,24 @@ const CRITICAL_HEALTH_THRESHOLD: float = 0.2  # Below this, retreat
 const DEFENSIVE_DODGE_CHANCE: float = 0.4  # Dodge chance when low health
 const RETREAT_DISTANCE: float = 150.0      # How far to retreat
 
+## Smart healing thresholds
+const LIGHT_DAMAGE_THRESHOLD: float = 0.9   # Above 70% HP = light damage (use acorn/seed)
+const MODERATE_DAMAGE_THRESHOLD: float = 0.5 # 40-70% HP = moderate (use health_potion)
+const HEAVY_DAMAGE_THRESHOLD: float = 0.4    # Below 40% HP = heavy (use mega_potion/full_heal)
+
+## Guard snack usage
+const GUARD_SNACK_THRESHOLD: float = 0.2  # Use guard snack below 20% guard
+
+## Buff treat settings
+const BUFF_ENEMY_THRESHOLD: int = 3       # Use buffs when 3+ enemies nearby
+const BUFF_COOLDOWN: float = 35.0          # Don't re-buff within 35s (buff lasts 30s + 5s grace)
+
+## Companion revival
+const REVIVAL_CHECK_INTERVAL: float = 5.0  # Check for knocked-out companions every 5s
+
+## Equipment optimization
+const EQUIP_CHECK_INTERVAL: float = 30.0  # Check equipment every 30s
+
 ## Hazard avoidance settings
 const HAZARD_DETECTION_RANGE: float = 120.0   # How far to detect hazards
 const HAZARD_AVOIDANCE_STRENGTH: float = 0.8  # How strongly to steer away (0-1)
@@ -163,6 +181,12 @@ var _zone_size_detected: bool = false
 var nearby_hazards: Array[Node] = []
 var hazard_avoidance_vector: Vector2 = Vector2.ZERO
 var is_in_dark_zone: bool = false
+
+# Smart item management state
+var last_guard_snack_time: float = 0.0  # Prevent guard snack spam
+var last_buff_use_time: float = 0.0      # Prevent buff spam
+var revival_check_timer: float = 3.0     # First check after 3 seconds
+var equip_check_timer: float = 10.0      # First equipment check after 10 seconds
 
 # Debug info
 var debug_state: String = "INIT"
@@ -1275,14 +1299,38 @@ func _update_phase16_systems(delta: float) -> void:
 	# Update timers
 	companion_cycle_timer -= delta
 	ring_menu_test_timer -= delta
+	revival_check_timer -= delta
+	equip_check_timer -= delta
 	
-	# Don't do Phase 16 actions while in combat or low health (focus on survival)
+	# Allow critical healing even in combat
+	if is_critical_health:
+		_try_use_smart_healing()
+	
+	# Combat-specific item actions
+	if nearby_enemy_count > 0:
+		# Use guard snack when guard is low in combat
+		_try_use_guard_snack()
+		# Use buff treats before tough encounters
+		if target_enemy != null:
+			_try_use_buff_treats()
+	
+	# Don't do non-combat Phase 16 actions while in close combat
 	if nearby_enemy_count > 0 and nearest_enemy_dist < 100:
 		return
 	
-	# Use healing item if low health and not in combat
-	if is_low_health and nearby_enemy_count == 0:
-		_try_use_healing_item()
+	# Smart healing when safe (tiered by damage severity)
+	if player_health_percent < LIGHT_DAMAGE_THRESHOLD and nearby_enemy_count == 0:
+		_try_use_smart_healing()
+	
+	# Check for companion revival
+	if revival_check_timer <= 0:
+		revival_check_timer = REVIVAL_CHECK_INTERVAL
+		_try_revive_companion()
+	
+	# Optimize equipment periodically (when safe)
+	if equip_check_timer <= 0 and nearby_enemy_count == 0:
+		equip_check_timer = EQUIP_CHECK_INTERVAL
+		_optimize_equipment()
 	
 	# Cycle companions periodically
 	if companion_cycle_timer <= 0:
@@ -1295,26 +1343,209 @@ func _update_phase16_systems(delta: float) -> void:
 		_test_ring_menu()
 
 
-## Try to use a healing item from inventory
-func _try_use_healing_item() -> void:
+## Smart tiered healing — picks items based on damage severity
+func _try_use_smart_healing() -> void:
 	# Don't spam item usage
 	var current_time = Time.get_ticks_msec() / 1000.0
 	if current_time - last_item_use_time < 3.0:
 		return
 	
-	# Check if inventory exists and has healing items
+	# Check if inventory exists
 	if not GameManager.inventory:
 		return
 	
-	# Try to use health potion first, then acorn
-	var items_to_try = ["health_potion", "mega_potion", "full_heal", "acorn", "bird_seed"]
+	# Determine item tier based on HP level
+	var items_to_try: Array[String] = []
+	
+	if player_health_percent < HEAVY_DAMAGE_THRESHOLD:
+		# Critical/heavy damage — use strongest available
+		items_to_try = ["full_heal", "mega_potion", "health_potion", "acorn", "bird_seed"]
+	elif player_health_percent < MODERATE_DAMAGE_THRESHOLD:
+		# Moderate damage — use potions, don't waste full_heal
+		items_to_try = ["health_potion", "mega_potion", "acorn", "bird_seed"]
+	elif player_health_percent < LIGHT_DAMAGE_THRESHOLD:
+		# Light damage — use snacks, save potions
+		items_to_try = ["acorn", "bird_seed"]
+	else:
+		return  # HP is above 90%, no healing needed
 	
 	for item_id in items_to_try:
 		if GameManager.inventory.has_item(item_id):
 			if GameManager.inventory.use_item(item_id):
 				last_item_use_time = current_time
-				print("[AutoBot] Used item: %s" % item_id)
+				print("[AutoBot] Smart heal (%d%% HP): used %s" % [int(player_health_percent * 100), item_id])
 				return
+
+
+## Use guard_snack when guard meter is low during combat
+func _try_use_guard_snack() -> void:
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - last_guard_snack_time < 5.0:
+		return
+	
+	if not GameManager.inventory:
+		return
+	
+	# Only use in combat when guard is low
+	if player_ref == null or not player_ref.guard:
+		return
+	
+	if player_ref.guard.get_guard_percent() >= GUARD_SNACK_THRESHOLD:
+		return
+	
+	if nearby_enemy_count == 0:
+		return
+	
+	if GameManager.inventory.has_item("guard_snack"):
+		if GameManager.inventory.use_item("guard_snack"):
+			last_guard_snack_time = current_time
+			print("[AutoBot] Used guard_snack (guard was %.0f%%)" % (player_ref.guard.get_guard_percent() * 100))
+
+
+## Use buff treats before tough encounters
+func _try_use_buff_treats() -> void:
+	var current_time = Time.get_ticks_msec() / 1000.0
+	if current_time - last_buff_use_time < BUFF_COOLDOWN:
+		return
+	
+	if not GameManager.inventory:
+		return
+	
+	# Determine if situation warrants buffs
+	var is_tough_fight = nearby_enemy_count >= BUFF_ENEMY_THRESHOLD
+	if not is_tough_fight and target_enemy != null and is_instance_valid(target_enemy):
+		is_tough_fight = _is_tough_enemy(target_enemy)
+	
+	# Speed treat is always available at critical health (retreat buff)
+	if is_critical_health and not GameManager.inventory.has_buff(ItemDatabase.EffectType.BUFF_SPEED):
+		if GameManager.inventory.has_item("speed_treat"):
+			if GameManager.inventory.use_item("speed_treat"):
+				last_buff_use_time = current_time
+				print("[AutoBot] Used speed_treat (critical HP escape)")
+				return
+	
+	if not is_tough_fight:
+		return
+	
+	# Power treat — boost damage for tough fights
+	if not GameManager.inventory.has_buff(ItemDatabase.EffectType.BUFF_ATTACK):
+		if GameManager.inventory.has_item("power_treat"):
+			if GameManager.inventory.use_item("power_treat"):
+				last_buff_use_time = current_time
+				print("[AutoBot] Used power_treat (tough fight)")
+				return
+	
+	# Tough treat — reduce incoming damage
+	if not GameManager.inventory.has_buff(ItemDatabase.EffectType.BUFF_DEFENSE):
+		if GameManager.inventory.has_item("tough_treat"):
+			if GameManager.inventory.use_item("tough_treat"):
+				last_buff_use_time = current_time
+				print("[AutoBot] Used tough_treat (tough fight)")
+				return
+
+
+## Check if an enemy is a tough opponent (mini-boss or high HP)
+func _is_tough_enemy(enemy: Node) -> bool:
+	if enemy == null or not is_instance_valid(enemy):
+		return false
+	# Check if mini-boss (high HP enemies — 80+ max health)
+	if enemy.has_node("HealthComponent"):
+		var health = enemy.get_node("HealthComponent")
+		if health.max_health >= 80:
+			return true
+	return false
+
+
+## Revive knocked-out companions with revival_bone
+func _try_revive_companion() -> void:
+	# Only revive when safe (no nearby enemies)
+	if nearby_enemy_count > 0:
+		return
+	
+	if not GameManager.inventory or not GameManager.party_manager:
+		return
+	
+	# Check if any companions are knocked out
+	var knocked_out = GameManager.party_manager.knocked_out
+	if knocked_out.is_empty():
+		return
+	
+	# Check if we have revival bone
+	if not GameManager.inventory.has_item("revival_bone"):
+		return
+	
+	# Find first knocked-out companion and revive
+	for companion_id in knocked_out:
+		if GameManager.inventory.use_item("revival_bone"):
+			GameManager.party_manager.revive_companion(companion_id, 0.5)
+			print("[AutoBot] Used revival_bone to revive %s" % companion_id)
+			return
+
+
+## Optimize equipment — auto-equip best gear per slot
+func _optimize_equipment() -> void:
+	if not GameManager.equipment_manager:
+		return
+	
+	var em = GameManager.equipment_manager
+	
+	# Check each slot for upgrades
+	for slot in EquipmentDatabase.Slot.values():
+		var current_id = em.get_equipped(slot)
+		var current_score = _get_equipment_score(current_id)
+		
+		# Check all unequipped equipment that fits this slot
+		var best_id = current_id
+		var best_score = current_score
+		
+		for equip_id in em.equipment_inventory:
+			var equip_data = EquipmentDatabase.get_equipment(equip_id)
+			if equip_data.is_empty():
+				continue
+			if equip_data.slot != slot:
+				continue
+			
+			var score = _get_equipment_score(equip_id)
+			if score > best_score:
+				best_score = score
+				best_id = equip_id
+		
+		# Equip if better option found
+		if best_id != current_id and best_id != "":
+			em.equip(best_id)
+			print("[AutoBot] Equipped %s (score: %.0f > %.0f)" % [best_id, best_score, current_score])
+
+
+## Score equipment by weighted stat totals
+func _get_equipment_score(equip_id: String) -> float:
+	if equip_id == "":
+		return 0.0
+	
+	var equip_data = EquipmentDatabase.get_equipment(equip_id)
+	if equip_data.is_empty():
+		return 0.0
+	
+	var score: float = 0.0
+	var stats = equip_data.get("stats", {})
+	
+	# Weight each stat type (attack and HP most valuable for bot)
+	for stat_type in stats:
+		var value = stats[stat_type]
+		match stat_type:
+			EquipmentDatabase.StatType.ATTACK_DAMAGE:
+				score += value * 3.0    # Attack is king (kills faster = less damage taken)
+			EquipmentDatabase.StatType.MAX_HEALTH:
+				score += value * 1.5    # HP is survival
+			EquipmentDatabase.StatType.DEFENSE:
+				score += value * 2.0    # Defense percentage is strong
+			EquipmentDatabase.StatType.MOVE_SPEED:
+				score += value * 1.0    # Speed helps kiting
+			EquipmentDatabase.StatType.GUARD_REGEN:
+				score += value * 1.5    # Guard regen for blocking bot
+			EquipmentDatabase.StatType.EXP_BONUS:
+				score += value * 0.5    # EXP is nice but not survival
+	
+	return score
 
 
 ## Cycle to next companion using Q key
