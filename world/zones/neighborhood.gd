@@ -2,6 +2,8 @@ extends BaseZone
 ## The main neighborhood zone - Momi's home territory.
 ## A vibrant area with houses, stores, a park, and patrolling enemies.
 
+const ALPHA_RACCOON_SCENE = preload("res://characters/enemies/alpha_raccoon.tscn")
+
 # =============================================================================
 # SPAWN POINTS
 # =============================================================================
@@ -28,6 +30,9 @@ func _setup_zone() -> void:
 	
 	# Build manhole entrance to sewers
 	_build_manhole()
+	
+	# Build mini-boss trigger (Alpha Raccoon)
+	_build_mini_boss_trigger()
 	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
@@ -99,3 +104,77 @@ func _build_manhole() -> void:
 	exit.target_spawn = "from_neighborhood"
 	exit.require_interaction = true
 	add_child(exit)
+
+
+# =============================================================================
+# MINI-BOSS TRIGGER (Alpha Raccoon)
+# =============================================================================
+
+## Mini-boss spawn tracking (once per zone load)
+var _alpha_raccoon_spawned: bool = false
+
+func _build_mini_boss_trigger() -> void:
+	# Check if already defeated in save
+	if GameManager.mini_bosses_defeated.get("alpha_raccoon", false):
+		return  # Don't build trigger — already defeated
+	
+	var trigger_pos = Vector2(150, 480)  # Park area — open space for fight
+	
+	# Warning decor — skull-like marking on ground
+	var warning = Polygon2D.new()
+	warning.name = "MiniBossWarning"
+	var points: PackedVector2Array = []
+	for i in range(8):
+		var angle = i * TAU / 8.0
+		points.append(Vector2(cos(angle), sin(angle)) * 20.0)
+	warning.polygon = points
+	warning.color = Color(0.6, 0.2, 0.2, 0.3)  # Faint red circle
+	warning.position = trigger_pos
+	warning.z_index = 0
+	add_child(warning)
+	
+	# Trigger Area2D
+	var trigger = Area2D.new()
+	trigger.name = "AlphaRaccoonTrigger"
+	trigger.collision_layer = 0
+	trigger.collision_mask = 2  # Player layer
+	trigger.position = trigger_pos
+	add_child(trigger)
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = Vector2(80, 60)
+	shape.shape = rect
+	trigger.add_child(shape)
+	
+	trigger.body_entered.connect(_on_alpha_raccoon_trigger)
+
+func _on_alpha_raccoon_trigger(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+	if _alpha_raccoon_spawned:
+		return
+	if GameManager.mini_bosses_defeated.get("alpha_raccoon", false):
+		return
+	
+	_alpha_raccoon_spawned = true
+	
+	# Spawn Alpha Raccoon
+	var boss = ALPHA_RACCOON_SCENE.instantiate()
+	boss.global_position = Vector2(150, 460)  # Slightly above trigger center
+	add_child(boss)
+	
+	# Remove trigger and warning after spawn
+	var trigger_node = get_node_or_null("AlphaRaccoonTrigger")
+	if trigger_node:
+		trigger_node.queue_free()
+	var warning_node = get_node_or_null("MiniBossWarning")
+	if warning_node:
+		# Fade warning out
+		var tween = create_tween()
+		tween.tween_property(warning_node, "modulate:a", 0.0, 0.5)
+		tween.tween_callback(warning_node.queue_free)
+	
+	# Play boss music
+	if AudioManager.has_method("play_music"):
+		AudioManager.play_music("boss_fight_b")
