@@ -11,6 +11,7 @@ const SEWER_RAT_SCENE = preload("res://characters/enemies/sewer_rat.tscn")
 const SHADOW_CREATURE_SCENE = preload("res://characters/enemies/shadow_creature.tscn")
 const ZONE_EXIT_SCENE = preload("res://components/zone_exit/zone_exit.tscn")
 const TOXIC_PUDDLE_SCRIPT = preload("res://components/hazards/toxic_puddle.gd")
+const RAT_KING_SCENE = preload("res://characters/enemies/rat_king.tscn")
 
 ## Color palette
 const COLOR_BACKGROUND := Color(0.06, 0.04, 0.1)
@@ -96,6 +97,7 @@ var side_rooms: Array[Dictionary] = [
 
 func _setup_zone() -> void:
 	zone_id = "sewers"
+	_build_mini_boss_trigger()
 	
 	# Build the entire dungeon programmatically
 	_build_background()
@@ -823,3 +825,75 @@ func _build_boundaries() -> void:
 	right.shape = right_shape
 	right.position = Vector2(zone_size.x + 8, zone_size.y / 2)
 	boundaries.add_child(right)
+
+
+# =============================================================================
+# MINI-BOSS TRIGGER (Rat King)
+# =============================================================================
+
+var _rat_king_spawned: bool = false
+
+func _build_mini_boss_trigger() -> void:
+	# Check if already defeated
+	if GameManager.mini_bosses_defeated.get("rat_king", false):
+		return
+	
+	# Place trigger in the lower corridor area (wide enough for fight)
+	var trigger_pos = Vector2(325, 445)  # Lower horizontal corridor center
+	
+	# Warning decor — sickly green marking
+	var warning = Polygon2D.new()
+	warning.name = "MiniBossWarning"
+	var points: PackedVector2Array = []
+	for i in range(8):
+		var angle = i * TAU / 8.0
+		points.append(Vector2(cos(angle), sin(angle)) * 18.0)
+	warning.polygon = points
+	warning.color = Color(0.3, 0.5, 0.15, 0.3)  # Faint sickly green
+	warning.position = trigger_pos
+	warning.z_index = 1
+	add_child(warning)
+	
+	# Trigger Area2D
+	var trigger = Area2D.new()
+	trigger.name = "RatKingTrigger"
+	trigger.collision_layer = 0
+	trigger.collision_mask = 2
+	trigger.position = trigger_pos
+	add_child(trigger)
+	
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = Vector2(60, 50)  # Slightly smaller — sewer corridors
+	shape.shape = rect
+	trigger.add_child(shape)
+	
+	trigger.body_entered.connect(_on_rat_king_trigger)
+
+func _on_rat_king_trigger(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+	if _rat_king_spawned:
+		return
+	if GameManager.mini_bosses_defeated.get("rat_king", false):
+		return
+	
+	_rat_king_spawned = true
+	
+	var boss = RAT_KING_SCENE.instantiate()
+	boss.global_position = Vector2(325, 430)  # Slightly above trigger
+	add_child(boss)
+	
+	# Remove trigger and warning
+	var trigger_node = get_node_or_null("RatKingTrigger")
+	if trigger_node:
+		trigger_node.queue_free()
+	var warning_node = get_node_or_null("MiniBossWarning")
+	if warning_node:
+		var tween = create_tween()
+		tween.tween_property(warning_node, "modulate:a", 0.0, 0.5)
+		tween.tween_callback(warning_node.queue_free)
+	
+	# Play boss music
+	if AudioManager.has_method("play_music"):
+		AudioManager.play_music("boss_fight_b")

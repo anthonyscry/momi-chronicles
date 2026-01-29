@@ -1,0 +1,93 @@
+[gd_scene load_steps=13 format=3 uid="uid://rat_king_001"]
+
+[ext_resource type="Script" path="res://characters/enemies/rat_king.gd" id="1_rat"]
+[ext_resource type="Script" path="res://components/state_machine/state_machine.gd" id="2_sm"]
+[ext_resource type="Script" path="res://characters/enemies/states/mini_boss_idle.gd" id="3_idle"]
+[ext_resource type="Script" path="res://characters/enemies/states/rat_king_poison_cloud.gd" id="4_poison"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_chase.gd" id="5_chase"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_hurt.gd" id="6_hurt"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_death.gd" id="7_death"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="8_hitbox"]
+[ext_resource type="Script" path="res://components/hurtbox/hurtbox.gd" id="9_hurtbox"]
+[ext_resource type="Script" path="res://components/health/health_component.gd" id="10_health"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 12.0
+height = 28.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 100.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(22, 18)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurtbox"]
+radius = 14.0
+height = 30.0
+
+[node name="RatKing" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_rat")
+
+[node name="Sprite2D" type="Polygon2D" parent="."]
+color = Color(0.3, 0.28, 0.2, 1)
+polygon = PackedVector2Array(-7, -7, 7, -7, 7, 7, -7, 7)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_sm")
+initial_state_path = NodePath("MiniBossIdle")
+
+[node name="MiniBossIdle" type="Node" parent="StateMachine"]
+script = ExtResource("3_idle")
+
+[node name="RatKingPoisonCloud" type="Node" parent="StateMachine"]
+script = ExtResource("4_poison")
+
+[node name="Chase" type="Node" parent="StateMachine"]
+script = ExtResource("5_chase")
+
+[node name="Hurt" type="Node" parent="StateMachine"]
+script = ExtResource("6_hurt")
+
+[node name="Death" type="Node" parent="StateMachine"]
+script = ExtResource("7_death")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_detection")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("8_hitbox")
+damage = 18
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(18, 0)
+shape = SubResource("RectangleShape2D_hitbox")
+disabled = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("9_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, 4)
+shape = SubResource("CapsuleShape2D_hurtbox")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("10_health")
+max_health = 150
