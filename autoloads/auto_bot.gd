@@ -57,8 +57,8 @@ const RING_MENU_BROWSE_TIME: float = 2.0      # How long to browse ring menu
 ## Zone boundaries to stay within
 const ZONE_PADDING: float = 40.0
 
-## Zone size (neighborhood is 800x600)
-const ZONE_SIZE: Vector2 = Vector2(800, 600)
+## Default zone size fallback (used if BaseZone detection fails)
+const DEFAULT_ZONE_SIZE: Vector2 = Vector2(800, 600)
 
 ## Human-like behavior settings
 const REACTION_TIME_MIN: float = 0.05  # Minimum reaction delay
@@ -72,6 +72,11 @@ const LOW_HEALTH_THRESHOLD: float = 0.4   # Below this, play defensively
 const CRITICAL_HEALTH_THRESHOLD: float = 0.2  # Below this, retreat
 const DEFENSIVE_DODGE_CHANCE: float = 0.4  # Dodge chance when low health
 const RETREAT_DISTANCE: float = 150.0      # How far to retreat
+
+## Hazard avoidance settings
+const HAZARD_DETECTION_RANGE: float = 120.0   # How far to detect hazards
+const HAZARD_AVOIDANCE_STRENGTH: float = 0.8  # How strongly to steer away (0-1)
+const HAZARD_AVOID_RADIUS: float = 50.0       # Extra padding around hazards
 
 ## Kiting and crowd control settings
 const KITE_AFTER_ATTACK: bool = true      # Back off after attacking
@@ -149,6 +154,16 @@ var ring_menu_browse_timer: float = 0.0   # Time spent browsing ring menu
 var in_ring_menu: bool = false            # Currently in ring menu
 var last_item_use_time: float = 0.0       # When we last used an item
 
+# Zone awareness
+var current_zone_size: Vector2 = Vector2(800, 600)
+var current_zone_ref: Node = null  # Cached BaseZone reference
+var _zone_size_detected: bool = false
+
+# Hazard awareness
+var nearby_hazards: Array[Node] = []
+var hazard_avoidance_vector: Vector2 = Vector2.ZERO
+var is_in_dark_zone: bool = false
+
 # Debug info
 var debug_state: String = "INIT"
 var enemies_found: int = 0
@@ -216,8 +231,14 @@ func _physics_process(delta: float) -> void:
 	# Update health status
 	_update_health_status()
 	
+	# Update zone awareness
+	_update_zone_awareness()
+	
 	# Update crowd awareness
 	_update_crowd_awareness()
+	
+	# Update hazard awareness
+	_update_hazard_awareness()
 	
 	# Update kiting
 	if is_kiting:
@@ -287,6 +308,7 @@ func _ensure_player_reference() -> void:
 		if player_ref != null:
 			print("[AutoBot] Found player")
 			auto_start_attempted = false  # Reset for next title screen visit
+			_zone_size_detected = false  # Re-detect zone on new player
 			_update_player_control()
 
 
@@ -548,16 +570,21 @@ func _apply_boundary_avoidance(direction: Vector2) -> Vector2:
 	var pos = player_ref.global_position
 	var adjusted = direction
 	
-	# Push away from boundaries
+	# Push away from boundaries (using dynamic zone size)
 	if pos.x < ZONE_PADDING:
 		adjusted.x = max(adjusted.x, 0.5)
-	elif pos.x > ZONE_SIZE.x - ZONE_PADDING:
+	elif pos.x > current_zone_size.x - ZONE_PADDING:
 		adjusted.x = min(adjusted.x, -0.5)
 	
 	if pos.y < ZONE_PADDING:
 		adjusted.y = max(adjusted.y, 0.5)
-	elif pos.y > ZONE_SIZE.y - ZONE_PADDING:
+	elif pos.y > current_zone_size.y - ZONE_PADDING:
 		adjusted.y = min(adjusted.y, -0.5)
+	
+	# Apply hazard avoidance steering
+	if hazard_avoidance_vector != Vector2.ZERO:
+		adjusted += hazard_avoidance_vector
+		adjusted = adjusted.normalized()
 	
 	return adjusted
 
@@ -854,25 +881,27 @@ func _pick_wander_direction() -> void:
 				closest_dist = dist
 				closest_enemy = e
 	
-	# If enemies exist, aggressively hunt them (70% chance)
-	if closest_enemy != null and randf() < 0.7:
+	# Hunt threshold: more aggressive in dark zones (always hunt if visible)
+	var hunt_chance = 0.85 if is_in_dark_zone else 0.7
+	if closest_enemy != null and randf() < hunt_chance:
 		var dir_to_enemy = (closest_enemy.global_position - pos).normalized()
-		# Human-like: don't go directly, add some variation
-		desired_direction = dir_to_enemy.rotated(randf_range(-0.2, 0.2))
+		# Less aim variance in dark (focused) vs open zones (casual)
+		var aim_var = 0.1 if is_in_dark_zone else 0.2
+		desired_direction = dir_to_enemy.rotated(randf_range(-aim_var, aim_var))
 		# Run toward enemies more often when there are fewer left
 		var run_chance = 0.5 if living_enemy_count > 3 else 0.8
+		# Always run in dark zones (dangerous environment)
+		if is_in_dark_zone:
+			run_chance = 0.9
 		player_ref.bot_running = randf() < run_chance
 		return
 	
-	# Otherwise, use patrol pattern across zone
-	var patrol_points = [
-		Vector2(150, 200),  # Near Momi's house
-		Vector2(400, 200),  # Top center  
-		Vector2(650, 200),  # Top right
-		Vector2(150, 480),  # Park area
-		Vector2(400, 400),  # Center
-		Vector2(600, 500),  # Near stores
-	]
+	# Generate patrol points proportional to current zone
+	var patrol_points = _generate_patrol_points()
+	
+	# In dark zones, reduce wander duration (stay alert, move more purposefully)
+	if is_in_dark_zone:
+		direction_timer = DIRECTION_CHANGE_TIME * 0.6  # Shorter wander legs in darkness
 	
 	# Pick a random patrol point we're not too close to
 	var target_point = patrol_points[randi() % patrol_points.size()]
@@ -883,6 +912,10 @@ func _pick_wander_direction() -> void:
 	
 	var to_target = (target_point - pos).normalized()
 	desired_direction = to_target.rotated(randf_range(-0.2, 0.2))
+	
+	# Avoid hazards during patrol
+	if hazard_avoidance_vector != Vector2.ZERO:
+		desired_direction = (desired_direction + hazard_avoidance_vector).normalized()
 	
 	# Usually run when patrolling
 	player_ref.bot_running = randf() < 0.6
@@ -896,6 +929,42 @@ func _pick_wander_direction() -> void:
 # =============================================================================
 # HELPERS
 # =============================================================================
+
+func _update_zone_awareness() -> void:
+	# Only re-detect when zone ref is lost (zone transition) or not yet detected
+	if _zone_size_detected and is_instance_valid(current_zone_ref):
+		return
+	
+	if player_ref == null:
+		return
+	
+	# Walk up the player's ancestor tree to find BaseZone
+	var node = player_ref.get_parent()
+	while node != null:
+		if node is BaseZone:
+			current_zone_ref = node
+			current_zone_size = node.zone_size
+			_zone_size_detected = true
+			print("[AutoBot] Zone detected: %s (size: %s)" % [node.zone_id, current_zone_size])
+			return
+		node = node.get_parent()
+	
+	# Fallback: read camera limits from player if BaseZone not found
+	if player_ref.has_node("Camera2D"):
+		var cam = player_ref.get_node("Camera2D")
+		var w = cam.limit_right - cam.limit_left
+		var h = cam.limit_bottom - cam.limit_top
+		if w > 0 and h > 0:
+			current_zone_size = Vector2(w, h)
+			_zone_size_detected = true
+			print("[AutoBot] Zone size from camera: %s" % current_zone_size)
+			return
+	
+	# Ultimate fallback
+	current_zone_size = DEFAULT_ZONE_SIZE
+	_zone_size_detected = true
+	print("[AutoBot] Using default zone size: %s" % current_zone_size)
+
 
 func _update_health_status() -> void:
 	if player_ref == null:
@@ -958,6 +1027,46 @@ func _update_crowd_awareness() -> void:
 	
 	# Check if surrounded (enemies on multiple sides)
 	is_surrounded = _check_if_surrounded(threat_vectors)
+
+
+func _update_hazard_awareness() -> void:
+	if player_ref == null:
+		return
+	
+	var player_pos = player_ref.global_position
+	nearby_hazards.clear()
+	hazard_avoidance_vector = Vector2.ZERO
+	
+	# Scan for toxic puddles — they are Area2D children in the zone's Hazards container
+	var hazard_repulsion = Vector2.ZERO
+	var hazard_count = 0
+	
+	# Find hazards via zone tree (puddles aren't in a group — they're children of Hazards container)
+	if is_instance_valid(current_zone_ref) and current_zone_ref.has_node("Hazards"):
+		var hazards_node = current_zone_ref.get_node("Hazards")
+		for hazard in hazards_node.get_children():
+			var dist = player_pos.distance_to(hazard.global_position)
+			if dist < HAZARD_DETECTION_RANGE:
+				nearby_hazards.append(hazard)
+				# Stronger repulsion when closer (inverse distance weighting)
+				var strength = 1.0 - (dist / HAZARD_DETECTION_RANGE)
+				var away_dir = (player_pos - hazard.global_position).normalized()
+				hazard_repulsion += away_dir * strength
+				hazard_count += 1
+	
+	# Amplify avoidance when already poisoned (reactive learning)
+	if player_ref.has_node("HealthComponent"):
+		var health = player_ref.get_node("HealthComponent")
+		if health.is_poisoned and hazard_count > 0:
+			hazard_repulsion *= 1.5
+	
+	if hazard_count > 0:
+		hazard_avoidance_vector = (hazard_repulsion / hazard_count).normalized() * HAZARD_AVOIDANCE_STRENGTH
+	
+	# Detect darkness zones (sewers has CanvasModulate named "Darkness")
+	is_in_dark_zone = false
+	if is_instance_valid(current_zone_ref):
+		is_in_dark_zone = current_zone_ref.has_node("Darkness")
 
 
 func _find_nearest_enemy() -> Node:
@@ -1081,6 +1190,56 @@ func _log_debug_status() -> void:
 	print("[AutoBot] State: %s | Pos: %s | HP: %s | Guard: %s | Enemies: %d | Nearest: %.0fpx%s" % [
 		debug_state, pos_str, hp_str, guard_str, living_enemies, nearest_enemy_dist, block_str
 	])
+
+
+## Generate patrol points proportional to current zone dimensions
+func _generate_patrol_points() -> Array[Vector2]:
+	# For corridor-based zones (sewers), generate points along walkable corridors
+	if is_instance_valid(current_zone_ref):
+		# Check if zone has corridor_segments (sewers-style layout)
+		if "corridor_segments" in current_zone_ref:
+			return _generate_corridor_patrol_points()
+	
+	# Default: grid-based patrol for open zones
+	var zs = current_zone_size
+	var pad = ZONE_PADDING * 2  # Stay well inside boundaries
+	var points: Array[Vector2] = []
+	
+	# Generate a grid of patrol points covering the zone
+	# 3 columns x 2 rows = 6 points, proportional to zone size
+	var cols = 3
+	var rows = 2
+	for row in range(rows):
+		for col in range(cols):
+			var x = pad + (zs.x - pad * 2) * (float(col) / float(cols - 1)) if cols > 1 else zs.x / 2.0
+			var y = pad + (zs.y - pad * 2) * (float(row) / float(rows - 1)) if rows > 1 else zs.y / 2.0
+			points.append(Vector2(x, y))
+	
+	# Add center point
+	points.append(Vector2(zs.x / 2.0, zs.y / 2.0))
+	
+	return points
+
+
+## Generate patrol points at the center of each corridor segment and side room
+func _generate_corridor_patrol_points() -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	
+	# Sample center points from each corridor segment
+	var segments: Array = current_zone_ref.corridor_segments
+	for seg in segments:
+		# Center of each corridor segment
+		var center = seg.position + seg.size / 2.0
+		points.append(center)
+	
+	# Also sample side room centers (exploration)
+	if "side_rooms" in current_zone_ref:
+		var rooms: Array = current_zone_ref.side_rooms
+		for room in rooms:
+			var rect: Rect2 = room.rect
+			points.append(rect.position + rect.size / 2.0)
+	
+	return points
 
 
 ## Check if enemies are on multiple sides (surrounded)
