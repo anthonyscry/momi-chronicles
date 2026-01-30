@@ -41,8 +41,8 @@ Progress: ██████░░░░░░░░░░░░░░░░░�
 
 ## Session Continuity
 Last session: 2026-01-29
-Stopped at: Phase 30 complete, Phase 31 is user-driven checkpoint
-Resume file: None
+Stopped at: Phase 31 — API generator script fixed, need to switch to Imagen 4 Fast + enable billing
+Resume file: .planning/CONVERSATION_SUMMARY.md
 
 ---
 
