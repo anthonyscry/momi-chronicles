@@ -10,7 +10,7 @@ Usage:
     python gemini_api_generate.py --category characters # One category only
     python gemini_api_generate.py --single 5            # One prompt by index
     python gemini_api_generate.py --list                # Show all prompts
-    python gemini_api_generate.py --model gemini-2.5-flash-image   # Use Gemini 2.5 Flash
+    python gemini_api_generate.py --model imagen-4.0-generate-001  # Use Imagen 4 Standard
 
 Requirements:
     pip install google-genai Pillow
@@ -43,13 +43,13 @@ PROMPTS_FILE = PROJECT_ROOT / "art" / "prompts.json"
 GENERATED_DIR = PROJECT_ROOT / "art" / "generated"
 
 # Defaults
-# Image generation models (in preference order):
-#   gemini-2.0-flash-exp-image-generation  - uses TEXT+IMAGE modalities
-#   gemini-2.5-flash-image                 - uses IMAGE modality
-#   gemini-3-pro-image-preview             - uses IMAGE modality
-DEFAULT_MODEL = "gemini-2.0-flash-exp-image-generation"
-RATE_LIMIT_DELAY = 6.0   # seconds between requests (free tier: ~10/min for image gen)
-RETRY_DELAY = 40.0       # seconds to wait on rate limit error
+# Imagen 4 models (require billing):
+#   imagen-4.0-fast-generate-001   - $0.02/image (fastest, cheapest)
+#   imagen-4.0-generate-001        - $0.04/image (standard quality)
+#   imagen-4.0-ultra-generate-001  - $0.06/image (highest quality)
+DEFAULT_MODEL = "imagen-4.0-fast-generate-001"
+RATE_LIMIT_DELAY = 4.0   # seconds between requests
+RETRY_DELAY = 30.0       # seconds to wait on rate limit error
 MAX_RETRIES = 3
 
 
@@ -128,36 +128,27 @@ def generate_image(
     output_path: pathlib.Path,
     model: str = DEFAULT_MODEL,
 ) -> bool:
-    """Generate a single image via the Gemini API and save to disk.
+    """Generate a single image via the Imagen API and save to disk.
     
-    Uses generate_content with response_modalities=['IMAGE'] for Gemini models.
+    Uses generate_images() for Imagen models.
     Returns True on success, False on failure.
     """
-    # Determine response modalities based on model
-    if "exp" in model or "2.0-flash" in model:
-        modalities = ["TEXT", "IMAGE"]
-    else:
-        modalities = ["IMAGE"]
-
     for attempt in range(MAX_RETRIES):
         try:
-            # Use generate_content API with IMAGE modality
-            response = client.models.generate_content(
+            response = client.models.generate_images(
                 model=model,
-                contents=f"Generate an image: {prompt}. Output only the image, no text.",
-                config=types.GenerateContentConfig(
-                    response_modalities=modalities,
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio="1:1",
+                    output_mime_type="image/png",
                 ),
             )
 
-            # Extract image from response parts
-            if response.candidates and response.candidates[0].content.parts:
-                for part in response.candidates[0].content.parts:
-                    if part.inline_data is not None:
-                        img_data = part.inline_data.data
-                        output_path.parent.mkdir(parents=True, exist_ok=True)
-                        output_path.write_bytes(img_data)
-                        return True
+            if response.generated_images:
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                response.generated_images[0].image.save(str(output_path))
+                return True
 
             print(f"    ! No image returned (may be blocked by safety filter)")
             return False
@@ -276,7 +267,7 @@ Examples:
   python gemini_api_generate.py --category enemies  Generate only enemy sprites
   python gemini_api_generate.py --single 5          Generate prompt index 5
   python gemini_api_generate.py --dry-run           Preview without generating
-  python gemini_api_generate.py --model gemini-2.5-flash-image   Use Gemini 2.5 Flash
+  python gemini_api_generate.py --model imagen-4.0-generate-001  Use Imagen 4 Standard
         """,
     )
     parser.add_argument("--list", "-l", action="store_true",

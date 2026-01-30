@@ -1,0 +1,153 @@
+{
+  "global_suffix": "64x64 pixel art sprite, 3/4 top-down perspective RPG style, clean 1px black outline, cel-shading with 2-3 value steps, transparent background PNG, consistent lighting from top-left, high-quality pixel art",
+  "categories": [
+    {
+      "name": "characters",
+      "folder": "characters",
+      "prompts": [
+        {
+          "id": "momi_idle",
+          "filename": "momi_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle coat (#1a1a1a charcoal base with #8b6914 tan streaks), white chest shield and chin goatee (#ffffff), large bat ears, flat muzzle, stubby tail nub. ANIMATION: Idle breathing cycle facing down. Frame 1: Standing alert. Frame 2: Slight ear twitch. Frame 3: Chest rises (inhale). Frame 4: Ears perk. Frame 5: Chest falls (exhale). Frame 6: Tail nub wiggles. Frame 7: Head tilt. Frame 8: Return to start. Clean 1px black outline, cel-shading, expressive eyes."
+        },
+        {
+          "id": "momi_walk",
+          "filename": "momi_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle with white chest (#ffffff) and chin. ANIMATION: Walk cycle facing down. Frame 1: Right front paw forward. Frame 2: Mid-stride right. Frame 3: Left back paw pushes. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Mid-stride left. Frame 7: Right back paw pushes. Frame 8: Return to start. Determined expression, ears perked. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_run",
+          "filename": "momi_run.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle with white chest. ANIMATION: Run cycle facing down (zoomies energy). Frame 1: Leap start. Frame 2: Airborne legs tucked. Frame 3: Front paws land. Frame 4: Body stretches fully. Frame 5: Back paws push off. Frame 6: Full extension. Frame 7: Airborne again. Frame 8: Landing. Ears pinned back slightly from speed. Clean 1px outline, cel-shaded."
+        },
+        {
+          "id": "momi_chomp",
+          "filename": "momi_chomp.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Chomp/bite attack facing down. Frame 1: Wind up lean back. Frame 2: Anticipation pose. Frame 3: Quick bite lunge forward, jaws open. Frame 4: Teeth clench impact. Frame 5: Hold impact. Frame 6: Recovery start. Frame 7: Jaws close halfway. Frame 8: Return to stance. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_bark",
+          "filename": "momi_bark.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Bark attack facing down. Frame 1: Standing alert. Frame 2: Crouch inhale. Frame 3: Deep inhale. Frame 4: Bark burst mouth wide, sound waves. Frame 5: Bark echo. Frame 6: Recovery start. Frame 7: Mouth closing. Frame 8: Return to stance. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_dig",
+          "filename": "momi_dig.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Digging facing down. Frame 1: Crouch ready. Frame 2: Front paws lift. Frame 3: Paws scratch down. Frame 4: Dirt particles small. Frame 5: Rapid scratching. Frame 6: More dirt flying. Frame 7: Paws alternate. Frame 8: Intense digging. Clean 1px outline, dust effects."
+        },
+        {
+          "id": "momi_hurt",
+          "filename": "momi_hurt.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Hurt/damaged and knockback. Frame 1: Impact flash, eyes squint. Frame 2: Recoil backward. Frame 3: Tumbling start. Frame 4: Mid-tumble. Frame 5: Hit ground. Frame 6: Bounce. Frame 7: Getting up. Frame 8: Recovery stance dazed. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_death",
+          "filename": "momi_death.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: KO collapse. Frame 1: Final hit stagger. Frame 2: Wobble left. Frame 3: Wobble right. Frame 4: Eyes go X-shaped dizzy. Frame 5: Falling over start. Frame 6: Collapsing on side. Frame 7: Landed on ground. Frame 8: Tongue out fully KO'd. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_happy",
+          "filename": "momi_happy.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Happy tail wag and excitement. Frame 1: Standing alert. Frame 2: Tail nub wiggles. Frame 3: Tail wiggles faster. Frame 4: Head tilts. Frame 5: Mouth open smile. Frame 6: Small hop. Frame 7: Paws lift excited. Frame 8: Full happy bounce. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "cinnamon_idle",
+          "filename": "cinnamon_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, black and tan with points (#1a1a1a black base, #c4884a tan points on eyebrows, cheeks, legs, chest), white blaze on face and chest, wrinkly face, pronounced underbite showing bottom teeth, stocky tank build. ANIMATION: Idle breathing standing alert. Frame 1: Standing guard, jowls droop. Frame 2: Weight shift left. Frame 3: Chest rises (inhale), wrinkles shift. Frame 4: Hold breath. Frame 5: Chest falls (exhale), slight drool. Frame 6: Weight shift right. Frame 7: Jaw shift. Frame 8: Return to center. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_walk",
+          "filename": "cinnamon_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, black and tan with points, white blaze, stocky body. ANIMATION: Waddle walk heavy gait. Frame 1: Right front paw forward. Frame 2: Body sways right. Frame 3: Left back paw pushes. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Body sways left. Frame 7: Right back paw pushes. Frame 8: Return to start. Lumbering determined expression. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_overheat",
+          "filename": "cinnamon_overheat.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, black and tan with points. Overheated state (combat mechanic). Frame 1: Heavy panting tongue out. Frame 2: Panting harder. Frame 3: Face flushed red-orange. Frame 4: Steam wisps left. Frame 5: Deep pant. Frame 6: Steam wisps right. Frame 7: Body sags. Frame 8: Exhausted collapse. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_slam",
+          "filename": "cinnamon_slam.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, black and tan. Body slam attack. Frame 1: Lower head brace legs. Frame 2: Wind up. Frame 3: Charge start. Frame 4: Charge forward head down. Frame 5: Headbutt impact. Frame 6: Impact hold. Frame 7: Shove push. Frame 8: Follow-through. Clean 1px outline."
+        },
+        {
+          "id": "philo_idle_lazy",
+          "filename": "philo_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#1a1a1a black body, #ffffff white chest and blaze on face), buggy eyes, small pointed ears, grey muzzle (old), blue bandana, slim compact build. ANIMATION: Lazy idle (default state). Frame 1: Slumped standing. Frame 2: Eyes drooping. Frame 3: Half-closed lids. Frame 4: Yawn start. Frame 5: Yawn opening wide. Frame 6: Yawn closing. Frame 7: Head droops sleepy. Frame 8: Eyes closed briefly. Clean 1px outline."
+        },
+        {
+          "id": "philo_walk_lazy",
+          "filename": "philo_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern, blue bandana. ANIMATION: Lazy slow shuffle walk. Frame 1: Right front paw drag. Frame 2: Slow step right. Frame 3: Left back paw push reluctant. Frame 4: Feet passing. Frame 5: Left front paw drag. Frame 6: Slow step left. Frame 7: Right back paw push. Frame 8: Return to start. Droopy eyes, low energy. Clean 1px outline."
+        },
+        {
+          "id": "philo_run_motivated",
+          "filename": "philo_motivated_run.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern, blue bandana. ANIMATION: Motivated eager run (active state). Frame 1: Ears perked alert. Frame 2: Quick light step. Frame 3: Paws forward eager. Frame 4: Full stretch run. Frame 5: Back push energetic. Frame 6: Airborne happy. Frame 7: Landing. Frame 8: Next stride. Eyes bright, tail up. Clean 1px outline."
+        },
+        {
+          "id": "philo_bark_heal",
+          "filename": "philo_bark.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern, blue bandana. ANIMATION: Support bark with healing sparkles. Frame 1: Standing alert. Frame 2: Crouch inhale. Frame 3: Deep inhale. Frame 4: Bark burst sound waves. Frame 5: Green sparkles emanate. Frame 6: Healing aura pulse outward. Frame 7: Sparkles fade. Frame 8: Recovery stance. Clean 1px outline."
+        },
+        {
+          "id": "philo_jealous",
+          "filename": "philo_jealous.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern, blue bandana. ANIMATION: Jealous angry fast run with red tint. Frame 1: Eyes narrowed angry. Frame 2: Red aura starts. Frame 3: Dash start. Frame 4: Fast run legs blur. Frame 5: Angry teeth showing. Frame 6: Red energy trail. Frame 7: Determined push. Frame 8: Full speed. Slight red-orange glow around body. Clean 1px outline."
+        }
+      ]
+    },
+    {
+      "name": "enemies",
+      "folder": "enemies",
+      "prompts": [
+        {
+          "id": "roomba_cranky",
+          "filename": "roomba_cranky.png",
+          "prompt": "64x64 pixel art. Cranky malfunctioning Roomba enemy. Round grey robot with angry red LED eyes, bristles spinning, top-down 3/4 view. 1px black outline, transparent bg."
+        },
+        {
+          "id": "gnome_possessed",
+          "filename": "gnome_possessed.png",
+          "prompt": "64x64 pixel art. Possessed garden gnome enemy. Red pointy hat, white beard, glowing purple evil eyes, menacing stance, top-down 3/4 view. 1px outline."
+        },
+        {
+          "id": "goose_angry",
+          "filename": "goose_angry.png",
+          "prompt": "64x64 pixel art. Angry Canada Goose enemy. White cheek patches, black neck, wings spread aggressive, hissing, top-down 3/4 view. 1px outline."
+        },
+        {
+          "id": "squirrel_evil",
+          "filename": "squirrel_evil.png",
+          "prompt": "64x64 pixel art. Evil squirrel enemy. Grey fur, bushy tail, glowing red eyes, holding acorn like weapon, top-down 3/4 view. 1px outline."
+        }
+      ]
+    },
+    {
+      "name": "tiles",
+      "folder": "zones",
+      "prompts": [
+        {
+          "id": "grass_seamless",
+          "filename": "grass.png",
+          "prompt": "64x64 seamless tileable pixel art grass texture. Green base with subtle grass blade details. Must tile seamlessly in all directions. Solid texture, no transparency."
+        },
+        {
+          "id": "sidewalk_seamless",
+          "filename": "sidewalk.png",
+          "prompt": "64x64 seamless tileable pixel art concrete sidewalk texture. Light grey with subtle cracks and texture. Tiles seamlessly. Solid texture."
+        },
+        {
+          "id": "street_asphalt",
+          "filename": "street.png",
+          "prompt": "64x64 seamless tileable pixel art asphalt road texture. Dark grey with subtle texture. Tiles seamlessly. Solid texture."
+        },
+        {
+          "id": "wood_floor",
+          "filename": "wood_floor.png",
+          "prompt": "64x64 seamless tileable pixel art hardwood floor texture. Brown planks with wood grain. Tiles seamlessly. Solid texture."
+        }
+      ]
+    }
+  ]
+}
