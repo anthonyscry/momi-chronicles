@@ -39,7 +39,7 @@ except ImportError:
 # Paths
 SCRIPT_DIR = pathlib.Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-PROMPTS_FILE = PROJECT_ROOT / "art" / "prompts.json"
+PROMPTS_FILE = PROJECT_ROOT / "art" / "prompts_v2_pixel_art.json"
 GENERATED_DIR = PROJECT_ROOT / "art" / "generated"
 
 # Defaults
@@ -111,7 +111,7 @@ def list_prompts(data: dict) -> None:
             mark = "[x]" if exists else "[ ]"
             if exists:
                 existing += 1
-            print(f"  {mark} {idx:>3}  {p['id']:<35} → {p['filename']}")
+            print(f"  {mark} {idx:>3}  {p['id']:<35} -> {p['filename']}")
             idx += 1
             total += 1
 

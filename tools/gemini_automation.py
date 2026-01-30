@@ -45,7 +45,7 @@ except ImportError:
 # === Paths ===
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-PROMPTS_FILE = PROJECT_ROOT / "art" / "prompts.json"
+PROMPTS_FILE = PROJECT_ROOT / "art" / "prompts_v2_pixel_art.json"
 GENERATED_DIR = PROJECT_ROOT / "art" / "generated"
 
 
