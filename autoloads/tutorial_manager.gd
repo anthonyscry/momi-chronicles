@@ -44,6 +44,10 @@ const MOVEMENT_TUTORIAL_DURATION: float = 3.0
 var ready_timer: float = 0.0
 const READY_DELAY: float = 0.5  # Wait for player to spawn
 
+## Combat tutorial tracking
+var attack_tutorial_triggered: bool = false
+var defensive_tutorials_triggered: bool = false
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -87,6 +91,7 @@ func _connect_event_signals() -> void:
 	Events.player_attacked.connect(_on_player_attacked)
 	Events.player_dodged.connect(_on_player_dodged)
 	Events.player_blocked.connect(_on_player_blocked)
+	Events.player_damaged.connect(_on_player_damaged)
 	Events.combo_completed.connect(_on_combo_completed)
 	Events.ring_menu_opened.connect(_on_ring_menu_opened)
 	Events.item_used.connect(_on_item_used)
@@ -146,10 +151,29 @@ func _on_pickup_collected(item_id: String) -> void:
 	pass
 
 func _on_enemy_spawned(enemy_id: String) -> void:
-	## Track enemy spawns to potentially trigger combat tutorials
-	# Attack tutorial should trigger on first enemy encounter
-	# This is a placeholder - actual logic will be implemented in trigger phase
-	pass
+	## Trigger attack tutorial on first enemy encounter
+	if not attack_tutorial_triggered and should_show_tutorial(TUTORIAL_ATTACK):
+		Events.tutorial_triggered.emit(TUTORIAL_ATTACK)
+		mark_tutorial_shown(TUTORIAL_ATTACK)
+		attack_tutorial_triggered = true
+		DebugLogger.log_system("Attack tutorial triggered on enemy spawn: %s" % enemy_id)
+
+func _on_player_damaged() -> void:
+	## Trigger dodge and block tutorials when player takes damage for the first time
+	if not defensive_tutorials_triggered:
+		# Trigger dodge tutorial
+		if should_show_tutorial(TUTORIAL_DODGE):
+			Events.tutorial_triggered.emit(TUTORIAL_DODGE)
+			mark_tutorial_shown(TUTORIAL_DODGE)
+			DebugLogger.log_system("Dodge tutorial triggered on player damage")
+
+		# Trigger block tutorial
+		if should_show_tutorial(TUTORIAL_BLOCK):
+			Events.tutorial_triggered.emit(TUTORIAL_BLOCK)
+			mark_tutorial_shown(TUTORIAL_BLOCK)
+			DebugLogger.log_system("Block tutorial triggered on player damage")
+
+		defensive_tutorials_triggered = true
 
 # =============================================================================
 # MOVEMENT TUTORIAL LOGIC
@@ -237,6 +261,8 @@ func reset_all_tutorials() -> void:
 	movement_tutorial_triggered = false
 	movement_time = 0.0
 	ready_timer = 0.0
+	attack_tutorial_triggered = false
+	defensive_tutorials_triggered = false
 	_initialize_tutorial_state()
 	DebugLogger.log_system("All tutorials reset")
 
@@ -258,5 +284,7 @@ func load_save_data(data: Dictionary) -> void:
 	movement_tutorial_triggered = false
 	movement_time = 0.0
 	ready_timer = 0.0
+	attack_tutorial_triggered = false
+	defensive_tutorials_triggered = false
 	_initialize_tutorial_state()
 	DebugLogger.log_system("Tutorial progress loaded from save")
