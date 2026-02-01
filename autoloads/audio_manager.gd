@@ -452,6 +452,24 @@ func _cache_bus_indices() -> void:
 		push_warning("AudioManager: '%s' bus not found — SFX volume control disabled" % BUS_SFX)
 
 
+## Re-validate a single bus index on cache miss. Attempts to re-acquire from AudioServer.
+## Returns the refreshed index (>= 0 on success, -1 if bus still not found).
+## This handles cases where audio buses are added after _ready() (e.g. dynamic bus layout).
+func _get_valid_bus_idx(cached_idx: int, bus_name: String) -> int:
+	if cached_idx >= 0:
+		return cached_idx
+	# Cache miss — attempt to re-acquire
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx >= 0:
+		DebugLogger.log_custom("AUDIO", "Bus '%s' recovered on re-validate (index %d)" % [bus_name, idx])
+		# Update the cached value for future calls
+		match bus_name:
+			BUS_MASTER: _master_bus_idx = idx
+			BUS_MUSIC: _music_bus_idx = idx
+			BUS_SFX: _sfx_bus_idx = idx
+	return idx
+
+
 ## Heartbeat system for low HP
 var _heartbeat_active: bool = false
 var _heartbeat_timer: float = 0.0
@@ -781,50 +799,57 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 ## Set master volume (0.0 to 1.0)
 func set_master_volume(volume: float) -> void:
 	volume = clamp(volume, 0.0, 1.0)
-	if _master_bus_idx >= 0:
-		AudioServer.set_bus_volume_db(_master_bus_idx, linear_to_db(volume))
+	var idx := _get_valid_bus_idx(_master_bus_idx, BUS_MASTER)
+	if idx >= 0:
+		AudioServer.set_bus_volume_db(idx, linear_to_db(volume))
 
 
 ## Set music volume (0.0 to 1.0)
 func set_music_volume(volume: float) -> void:
 	volume = clamp(volume, 0.0, 1.0)
-	if _music_bus_idx >= 0:
-		AudioServer.set_bus_volume_db(_music_bus_idx, linear_to_db(volume))
+	var idx := _get_valid_bus_idx(_music_bus_idx, BUS_MUSIC)
+	if idx >= 0:
+		AudioServer.set_bus_volume_db(idx, linear_to_db(volume))
 
 
 ## Set SFX volume (0.0 to 1.0)
 func set_sfx_volume(volume: float) -> void:
 	volume = clamp(volume, 0.0, 1.0)
-	if _sfx_bus_idx >= 0:
-		AudioServer.set_bus_volume_db(_sfx_bus_idx, linear_to_db(volume))
+	var idx := _get_valid_bus_idx(_sfx_bus_idx, BUS_SFX)
+	if idx >= 0:
+		AudioServer.set_bus_volume_db(idx, linear_to_db(volume))
 
 
 ## Get current master volume (0.0 to 1.0)
 func get_master_volume() -> float:
-	if _master_bus_idx >= 0:
-		return db_to_linear(AudioServer.get_bus_volume_db(_master_bus_idx))
+	var idx := _get_valid_bus_idx(_master_bus_idx, BUS_MASTER)
+	if idx >= 0:
+		return db_to_linear(AudioServer.get_bus_volume_db(idx))
 	return DEFAULT_MASTER_VOLUME
 
 
 ## Get current music volume (0.0 to 1.0)
 func get_music_volume() -> float:
-	if _music_bus_idx >= 0:
-		return db_to_linear(AudioServer.get_bus_volume_db(_music_bus_idx))
+	var idx := _get_valid_bus_idx(_music_bus_idx, BUS_MUSIC)
+	if idx >= 0:
+		return db_to_linear(AudioServer.get_bus_volume_db(idx))
 	return DEFAULT_MUSIC_VOLUME
 
 
 ## Get current SFX volume (0.0 to 1.0)
 func get_sfx_volume() -> float:
-	if _sfx_bus_idx >= 0:
-		return db_to_linear(AudioServer.get_bus_volume_db(_sfx_bus_idx))
+	var idx := _get_valid_bus_idx(_sfx_bus_idx, BUS_SFX)
+	if idx >= 0:
+		return db_to_linear(AudioServer.get_bus_volume_db(idx))
 	return DEFAULT_SFX_VOLUME
 
 
 ## Toggle all audio on/off
 func toggle_audio() -> void:
 	audio_enabled = not audio_enabled
-	if _master_bus_idx >= 0:
-		AudioServer.set_bus_mute(_master_bus_idx, not audio_enabled)
+	var idx := _get_valid_bus_idx(_master_bus_idx, BUS_MASTER)
+	if idx >= 0:
+		AudioServer.set_bus_mute(idx, not audio_enabled)
 
 # =============================================================================
 # EVENT HANDLERS - Automatic audio triggers

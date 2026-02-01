@@ -673,7 +673,7 @@ func _create_expanding_ring_particles(
 		tween.set_parallel(true)
 		tween.tween_property(particle, "global_position", end_pos, duration).set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "modulate:a", 0.0, duration).set_delay(fade_delay)
-		tween.chain().tween_callback(particle.queue_free)
+		tween.chain().tween_callback(_safe_free.bind(particle))
 
 
 ## Create a styled Label node with font size, color, and outline.
@@ -701,6 +701,14 @@ func _create_canvas_overlay(layer: int) -> CanvasLayer:
 	canvas.layer = layer
 	get_tree().current_scene.add_child(canvas)
 	return canvas
+
+
+## Safely queue_free a node if it's still valid (guards against zone-transition crashes).
+## During zone changes, tweens on EffectsManager (autoload) persist but their target nodes
+## may be freed — this prevents "previously freed" errors in tween callbacks.
+func _safe_free(node: Node) -> void:
+	if is_instance_valid(node):
+		node.queue_free()
 
 
 ## Animate a slam-in scale effect (scale from initial to 1.0 with TRANS_BACK).
@@ -943,7 +951,7 @@ func _get_or_create_effect(effect_name: String) -> Node:
 
 	# Try to find an available effect in pool
 	for effect in pool:
-		if effect != null and not effect.visible:
+		if is_instance_valid(effect) and not effect.visible:
 			return effect
 
 	# Create new effect if pool not full
@@ -954,8 +962,8 @@ func _get_or_create_effect(effect_name: String) -> Node:
 		effect_pools[effect_name] = pool
 		return new_effect
 
-	# Pool full, reuse oldest (first in array)
-	if pool.size() > 0:
+	# Pool full, reuse oldest valid entry
+	if pool.size() > 0 and is_instance_valid(pool[0]):
 		return pool[0]
 
 	return null
@@ -964,7 +972,7 @@ func _get_or_create_effect(effect_name: String) -> Node:
 func _get_effects_container() -> Node:
 	# Get or create a container for effects in the current scene
 	var root = get_tree().current_scene
-	if root == null:
+	if not is_instance_valid(root):
 		return self
 
 	var container = root.get_node_or_null("EffectsContainer")
@@ -1142,6 +1150,8 @@ func _create_level_up_celebration(target: Node2D, new_level: int) -> void:
 
 	# 5. Stat increase popups (delayed)
 	await get_tree().create_timer(LEVEL_UP_CELEBRATION_DELAY).timeout
+	if not is_instance_valid(target):
+		return
 	_create_stat_popups(pos)
 
 
@@ -1159,13 +1169,15 @@ func _create_level_up_aura(target: Node2D) -> void:
 	var tween = create_tween()
 	tween.tween_property(aura, "scale", LEVEL_UP_AURA_SCALE_TARGET, LEVEL_UP_AURA_DURATION).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(aura, "modulate:a", 0.0, LEVEL_UP_AURA_DURATION)
-	tween.tween_callback(aura.queue_free)
+	tween.tween_callback(_safe_free.bind(aura))
 
 
 func _create_level_up_rings(pos: Vector2) -> void:
 	# Multiple expanding rings with delay
 	for ring_idx in range(LEVEL_UP_RING_COUNT):
 		await get_tree().create_timer(LEVEL_UP_RING_DELAY * ring_idx).timeout
+		if not is_instance_valid(get_tree().current_scene):
+			return
 
 		var particle_count = LEVEL_UP_RING_BASE_PARTICLES + ring_idx * LEVEL_UP_RING_PARTICLE_INCREMENT
 		var ring_radius = LEVEL_UP_RING_BASE_RADIUS + ring_idx * LEVEL_UP_RING_RADIUS_INCREMENT
@@ -1201,7 +1213,7 @@ func _create_level_up_sparkles(pos: Vector2) -> void:
 		tween.tween_property(sparkle, "global_position:y", end_y, randf_range(LEVEL_UP_SPARKLE_Y_DURATION_MIN, LEVEL_UP_SPARKLE_Y_DURATION_MAX)).set_ease(Tween.EASE_OUT)
 		tween.tween_property(sparkle, "global_position:x", sparkle.global_position.x + drift_x, LEVEL_UP_SPARKLE_DRIFT_DURATION)
 		tween.tween_property(sparkle, "modulate:a", 0.0, LEVEL_UP_SPARKLE_DRIFT_DURATION).set_delay(LEVEL_UP_SPARKLE_FADE_DELAY)
-		tween.chain().tween_callback(sparkle.queue_free)
+		tween.chain().tween_callback(_safe_free.bind(sparkle))
 
 
 func _create_level_up_text(pos: Vector2, new_level: int) -> void:
@@ -1245,7 +1257,7 @@ func _create_level_up_text(pos: Vector2, new_level: int) -> void:
 	tween.tween_interval(LEVEL_UP_TEXT_HOLD)
 	tween.tween_property(container, "global_position:y", container.global_position.y - LEVEL_UP_TEXT_FLOAT_Y, LEVEL_UP_TEXT_FADE_DURATION)
 	tween.parallel().tween_property(container, "modulate:a", 0.0, LEVEL_UP_TEXT_FADE_DURATION)
-	tween.tween_callback(container.queue_free)
+	tween.tween_callback(_safe_free.bind(container))
 
 
 func _create_stat_popups(pos: Vector2) -> void:
@@ -1258,6 +1270,8 @@ func _create_stat_popups(pos: Vector2) -> void:
 
 	for i in range(stats.size()):
 		await get_tree().create_timer(STAT_POPUP_DELAY).timeout
+		if not is_instance_valid(get_tree().current_scene):
+			return
 
 		var stat = stats[i]
 		var label = _create_styled_label(
@@ -1276,7 +1290,7 @@ func _create_stat_popups(pos: Vector2) -> void:
 		tween.tween_property(label, "modulate:a", 1.0, STAT_POPUP_FADE_IN)
 		tween.tween_property(label, "global_position:y", label.global_position.y - STAT_POPUP_FLOAT_Y, STAT_POPUP_FLOAT_DURATION).set_ease(Tween.EASE_OUT)
 		tween.parallel().tween_property(label, "modulate:a", 0.0, STAT_POPUP_FADE_DURATION).set_delay(STAT_POPUP_HOLD_DELAY)
-		tween.tween_callback(label.queue_free)
+		tween.tween_callback(_safe_free.bind(label))
 
 
 func _flash_screen(color: Color, duration: float) -> void:
@@ -1292,7 +1306,7 @@ func _flash_screen(color: Color, duration: float) -> void:
 
 	var tween = create_tween()
 	tween.tween_property(flash, "modulate:a", 0.0, duration)
-	tween.tween_callback(canvas.queue_free)
+	tween.tween_callback(_safe_free.bind(canvas))
 
 
 func _on_exp_gained(amount: int, _level: int, _current: int, _to_next: int) -> void:
@@ -1322,7 +1336,7 @@ func _create_exp_popup(pos: Vector2, amount: int) -> void:
 	tween.set_parallel(true)
 	tween.tween_property(label, "global_position:y", label.global_position.y - EXP_POPUP_FLOAT_Y, EXP_POPUP_DURATION)
 	tween.tween_property(label, "modulate:a", 0.0, EXP_POPUP_DURATION).set_delay(EXP_POPUP_FADE_DELAY)
-	tween.chain().tween_callback(label.queue_free)
+	tween.chain().tween_callback(_safe_free.bind(label))
 
 
 # =============================================================================
@@ -1347,7 +1361,7 @@ func spawn_pickup_effect(pos: Vector2, color: Color) -> void:
 		tween.set_parallel(true)
 		tween.tween_property(particle, "position", end_pos, PICKUP_PARTICLE_DURATION)
 		tween.tween_property(particle, "modulate:a", 0.0, PICKUP_PARTICLE_DURATION)
-		tween.chain().tween_callback(particle.queue_free)
+		tween.chain().tween_callback(_safe_free.bind(particle))
 
 
 ## Quick flash at position (for emphasis)
@@ -1363,7 +1377,7 @@ func flash_pickup(pos: Vector2, color: Color) -> void:
 	tween.set_parallel(true)
 	tween.tween_property(flash, "scale", PICKUP_FLASH_SCALE, PICKUP_FLASH_DURATION)
 	tween.tween_property(flash, "modulate:a", 0.0, PICKUP_FLASH_DURATION)
-	tween.chain().tween_callback(flash.queue_free)
+	tween.chain().tween_callback(_safe_free.bind(flash))
 
 # =============================================================================
 # ATTACK SWOOSH EFFECT
@@ -1420,7 +1434,7 @@ func _create_attack_swoosh(attacker: Node2D) -> void:
 		var tween = create_tween()
 		tween.tween_property(particle, "modulate:a", 1.0, SWOOSH_APPEAR_DURATION).set_delay(t * SWOOSH_STAGGER_DELAY)
 		tween.tween_property(particle, "modulate:a", 0.0, SWOOSH_FADE_DURATION)
-		tween.tween_callback(particle.queue_free)
+		tween.tween_callback(_safe_free.bind(particle))
 
 # =============================================================================
 # DODGE AFTERIMAGE EFFECT
@@ -1461,7 +1475,7 @@ func _create_dodge_afterimages(player_node: Node2D) -> void:
 		# Fade out
 		var tween = create_tween()
 		tween.tween_property(ghost, "modulate:a", 0.0, AFTERIMAGE_FADE_DURATION)
-		tween.tween_callback(ghost.queue_free)
+		tween.tween_callback(_safe_free.bind(ghost))
 
 # =============================================================================
 # ENHANCED ENEMY DEATH EXPLOSION
@@ -1494,7 +1508,7 @@ func _create_death_explosion(pos: Vector2) -> void:
 		tween.tween_property(particle, "global_position:y", end_pos.y - DEATH_ARC_UP_Y, DEATH_ARC_UP_DURATION).set_ease(Tween.EASE_OUT)
 		tween.chain().tween_property(particle, "global_position:y", end_pos.y + DEATH_ARC_DOWN_Y, DEATH_ARC_DOWN_DURATION).set_ease(Tween.EASE_IN)
 		tween.tween_property(particle, "modulate:a", 0.0, DEATH_FADE_DURATION)
-		tween.tween_callback(particle.queue_free)
+		tween.tween_callback(_safe_free.bind(particle))
 
 # =============================================================================
 # COMBAT JUICE - SPECIAL ABILITIES
@@ -1547,7 +1561,7 @@ func _create_shockwave(pos: Vector2, radius: float) -> void:
 		tween.tween_property(ring, "scale", Vector2(target_scale, target_scale), SHOCKWAVE_DURATION)\
 			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD).set_delay(delay)
 		tween.parallel().tween_property(ring, "modulate:a", 0.0, SHOCKWAVE_DURATION).set_delay(delay)
-		tween.tween_callback(ring.queue_free)
+		tween.tween_callback(_safe_free.bind(ring))
 
 
 ## Create a ring sprite for shockwave
@@ -1589,7 +1603,7 @@ func _create_ground_crack_particles(pos: Vector2) -> void:
 		tween.tween_property(particle, "global_position", end_pos, GROUND_CRACK_MOVE_DURATION)\
 			.set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "modulate:a", 0.0, GROUND_CRACK_FADE_DURATION)
-		tween.tween_callback(particle.queue_free)
+		tween.tween_callback(_safe_free.bind(particle))
 
 
 ## Charge attack started - show charging glow
@@ -1689,7 +1703,7 @@ func _create_charge_release_burst(pos: Vector2, charge_percent: float) -> void:
 		tween.tween_property(particle, "global_position", end_pos, CHARGE_BURST_MOVE_DURATION)\
 			.set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "modulate:a", 0.0, CHARGE_BURST_FADE_DURATION)
-		tween.tween_callback(particle.queue_free)
+		tween.tween_callback(_safe_free.bind(particle))
 
 
 ## Parry success - satisfying feedback
@@ -1740,7 +1754,7 @@ func _create_parry_sparks(pos: Vector2) -> void:
 		tween.tween_property(spark, "global_position", end_pos, PARRY_SPARK_MOVE_DURATION)\
 			.set_ease(Tween.EASE_OUT)
 		tween.tween_property(spark, "modulate:a", 0.0, PARRY_SPARK_FADE_DURATION)
-		tween.tween_callback(spark.queue_free)
+		tween.tween_callback(_safe_free.bind(spark))
 
 
 func _create_parry_text(pos: Vector2) -> void:
@@ -1762,7 +1776,7 @@ func _create_parry_text(pos: Vector2) -> void:
 	tween.tween_property(label, "scale", PARRY_TEXT_SETTLE_SCALE, PARRY_TEXT_POP_DURATION)
 	tween.parallel().tween_property(label, "global_position:y", pos.y + PARRY_TEXT_FLOAT_Y, PARRY_TEXT_FLOAT_DURATION)
 	tween.tween_property(label, "modulate:a", 0.0, PARRY_TEXT_FADE_DURATION)
-	tween.tween_callback(label.queue_free)
+	tween.tween_callback(_safe_free.bind(label))
 
 
 # =============================================================================
@@ -1874,7 +1888,7 @@ func _spawn_directional_flash(angle: float) -> void:
 	var tween = create_tween()
 	tween.tween_property(flash, "color:a", 0.0, DAMAGE_DIR_FADE_DURATION)\
 		.set_ease(Tween.EASE_OUT)
-	tween.tween_callback(canvas.queue_free)
+	tween.tween_callback(_safe_free.bind(canvas))
 
 # =============================================================================
 # BOSS INTRO & VICTORY (Phase P6)
@@ -1944,7 +1958,7 @@ func _create_boss_title(boss: Node) -> void:
 	tween.tween_interval(BOSS_TITLE_HOLD)
 	# Fade out
 	tween.tween_property(canvas, "modulate:a", 0.0, BOSS_TITLE_FADE_OUT)
-	tween.tween_callback(canvas.queue_free)
+	tween.tween_callback(_safe_free.bind(canvas))
 
 
 ## Boss victory celebration
@@ -1988,7 +2002,7 @@ func _create_victory_text() -> void:
 	tween.tween_interval(VICTORY_HOLD)
 	tween.tween_property(label, "global_position:y", label.global_position.y - VICTORY_FLOAT_Y, VICTORY_FADE_DURATION)
 	tween.parallel().tween_property(canvas, "modulate:a", 0.0, VICTORY_FADE_DURATION)
-	tween.tween_callback(canvas.queue_free)
+	tween.tween_callback(_safe_free.bind(canvas))
 
 
 func _create_victory_fireworks() -> void:
@@ -1999,6 +2013,8 @@ func _create_victory_fireworks() -> void:
 	# 3 waves of firework bursts
 	for wave in range(FIREWORK_WAVE_COUNT):
 		await get_tree().create_timer(FIREWORK_WAVE_DELAY * wave).timeout
+		if not is_instance_valid(get_tree().current_scene):
+			return
 
 		var burst_pos = center + Vector2(
 			randf_range(-FIREWORK_X_SPREAD, FIREWORK_X_SPREAD),
@@ -2027,4 +2043,4 @@ func _create_victory_fireworks() -> void:
 			tween.chain().tween_property(particle, "global_position:y", end_pos.y + FIREWORK_ARC_DOWN, FIREWORK_ARC_DOWN_DURATION)\
 				.set_ease(Tween.EASE_IN)
 			tween.tween_property(particle, "modulate:a", 0.0, FIREWORK_FADE_DURATION).set_delay(FIREWORK_FADE_DELAY)
-			tween.chain().tween_callback(particle.queue_free)
+			tween.chain().tween_callback(_safe_free.bind(particle))
