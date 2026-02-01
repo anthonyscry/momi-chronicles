@@ -8,11 +8,19 @@ const PARRY_WINDOW: float = 0.15  # First 150ms = perfect parry
 var block_timer: float = 0.0
 var parry_available: bool = true
 
+# Denial feedback spam prevention (shared across instances)
+static var denial_cooldown: float = 0.0
+
 func enter() -> void:
 	block_timer = 0.0
 	parry_available = true
-	
+
 	if not player.guard or not player.guard.can_block():
+		# Guard depleted - denial feedback (throttled)
+		if denial_cooldown <= 0:
+			AudioManager.play_sfx("menu_navigate")
+			Events.permission_denied.emit("guard", "Guard meter depleted")
+			denial_cooldown = 0.3
 		state_machine.transition_to("Idle")
 		return
 	
@@ -34,6 +42,11 @@ func exit() -> void:
 		player.sprite.color = Color(0.85, 0.7, 0.45, 1.0)
 	
 	Events.player_block_ended.emit()
+
+func _process(delta: float) -> void:
+	# Update static denial cooldown (runs even when not in this state)
+	if denial_cooldown > 0:
+		denial_cooldown -= delta
 
 func physics_update(delta: float) -> void:
 	block_timer += delta
