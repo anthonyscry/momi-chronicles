@@ -35,6 +35,7 @@ UITester="*res://autoloads/ui_tester.gd"
 RingMenu="*res://ui/ring_menu/ring_menu.tscn"
 ShopCatalog="*res://systems/shop/shop_catalog.gd"
 ShopUI="*res://ui/shop/shop_ui.tscn"
+PauseMenu="*res://ui/menus/pause_menu.tscn"
 
 [display]
 

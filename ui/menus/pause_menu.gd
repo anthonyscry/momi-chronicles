@@ -1,163 +1,139 @@
 extends CanvasLayer
 class_name PauseMenu
-## Pause menu with resume, audio controls, and quit options.
+## Pause menu overlay with Resume, Change Difficulty, Options, and Quit buttons.
+## Toggles with ESC key, pauses game tree when visible.
 
-@onready var overlay: ColorRect = $Overlay
-@onready var panel: Panel = $Panel
-@onready var resume_button: Button = $Panel/VBoxContainer/ResumeButton
-@onready var save_button: Button = $Panel/VBoxContainer/SaveButton
-@onready var quit_button: Button = $Panel/VBoxContainer/QuitButton
-@onready var music_slider: HSlider = $Panel/VBoxContainer/MusicContainer/MusicSlider
-@onready var sfx_slider: HSlider = $Panel/VBoxContainer/SFXContainer/SFXSlider
+# =============================================================================
+# SIGNALS
+# =============================================================================
 
-var panel_start_y: float = 0.0
+## Emitted when resume is clicked
+signal resumed()
+
+# =============================================================================
+# NODE REFERENCES
+# =============================================================================
+
+@onready var panel: PanelContainer = $PausePanel
+@onready var resume_button: Button = $PausePanel/MarginContainer/VBoxContainer/ResumeButton
+@onready var change_difficulty_button: Button = $PausePanel/MarginContainer/VBoxContainer/ChangeDifficultyButton
+@onready var options_button: Button = $PausePanel/MarginContainer/VBoxContainer/OptionsButton
+@onready var quit_button: Button = $PausePanel/MarginContainer/VBoxContainer/QuitButton
+@onready var difficulty_selection: DifficultySelection = $DifficultySelection
+
+# =============================================================================
+# STATE
+# =============================================================================
+
+var is_paused: bool = false
+
+# =============================================================================
+# LIFECYCLE
+# =============================================================================
 
 func _ready() -> void:
 	# Start hidden
-	hide()
-	process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	# Store original position
-	panel_start_y = panel.position.y
-	
-	# Connect buttons
+	visible = false
+	is_paused = false
+
+	# Connect button signals
 	resume_button.pressed.connect(_on_resume_pressed)
-	save_button.pressed.connect(_on_save_pressed)
+	change_difficulty_button.pressed.connect(_on_change_difficulty_pressed)
+	options_button.pressed.connect(_on_options_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
-	
-	# Connect focus for sounds
-	resume_button.focus_entered.connect(_on_button_focused)
-	save_button.focus_entered.connect(_on_button_focused)
-	quit_button.focus_entered.connect(_on_button_focused)
-	
-	# Connect sliders
-	music_slider.value_changed.connect(_on_music_volume_changed)
-	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
-	
-	# Connect to game events
-	Events.game_paused.connect(_on_game_paused)
-	Events.game_resumed.connect(_on_game_resumed)
 
+	# Connect difficulty selection signal
+	difficulty_selection.difficulty_selected.connect(_on_difficulty_selected)
 
-func _on_button_focused() -> void:
-	AudioManager.play_sfx("menu_navigate")
+	# Hide difficulty selection initially
+	difficulty_selection.visible = false
 
+	# Focus resume button when menu opens
+	visibility_changed.connect(_on_visibility_changed)
 
-## Screen shake toggle (created dynamically)
-var shake_toggle: CheckButton = null
+func _unhandled_input(event: InputEvent) -> void:
+	# Toggle pause with ESC key
+	if event.is_action_pressed("pause"):
+		if difficulty_selection.visible:
+			# If difficulty selection is open, close it instead
+			_close_difficulty_selection()
+			get_viewport().set_input_as_handled()
+		else:
+			toggle_pause()
+			get_viewport().set_input_as_handled()
 
-func _setup_shake_toggle() -> void:
-	# Add screen shake toggle to the VBox after sliders
-	var vbox = $Panel/VBoxContainer
-	if not vbox:
-		return
-	
-	var container = HBoxContainer.new()
-	container.name = "ShakeContainer"
-	
-	var label = Label.new()
-	label.text = "Screen Shake"
-	label.add_theme_font_size_override("font_size", 9)
-	container.add_child(label)
-	
-	shake_toggle = CheckButton.new()
-	shake_toggle.name = "ShakeToggle"
-	shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
-	shake_toggle.toggled.connect(_on_shake_toggled)
-	shake_toggle.focus_entered.connect(_on_button_focused)
-	container.add_child(shake_toggle)
-	
-	# Insert before quit button
-	var quit_idx = quit_button.get_index()
-	vbox.add_child(container)
-	vbox.move_child(container, quit_idx)
+# =============================================================================
+# PUBLIC METHODS
+# =============================================================================
 
+## Toggle pause menu on/off
+func toggle_pause() -> void:
+	if is_paused:
+		unpause()
+	else:
+		pause()
 
-func _on_shake_toggled(enabled: bool) -> void:
-	EffectsManager.screen_shake_enabled = enabled
+## Show pause menu and pause game
+func pause() -> void:
+	is_paused = true
+	visible = true
+	get_tree().paused = true
 
-
-func _on_game_paused() -> void:
-	# Don't show pause menu if ring menu is open (it has its own pause)
-	if RingMenu and RingMenu.is_open:
-		return
-	
-	# Create shake toggle on first open (lazy init)
-	if shake_toggle == null:
-		_setup_shake_toggle()
-	
-	# Update sliders to current values
-	music_slider.value = AudioManager.get_music_volume()
-	sfx_slider.value = AudioManager.get_sfx_volume()
-	
-	# Update shake toggle
-	if shake_toggle:
-		shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
-	
-	show()
-	_animate_in()
+	# Focus resume button
 	resume_button.grab_focus()
 
+## Hide pause menu and unpause game
+func unpause() -> void:
+	is_paused = false
+	visible = false
+	difficulty_selection.visible = false
+	get_tree().paused = false
+	resumed.emit()
 
-func _on_game_resumed() -> void:
-	# Save audio settings when closing menu
-	AudioManager.save_settings()
-	_animate_out()
-
-
-func _animate_in() -> void:
-	# Fade in overlay
-	overlay.modulate.a = 0.0
-	var tween = create_tween()
-	tween.tween_property(overlay, "modulate:a", 1.0, 0.15)
-	
-	# Slide panel down from above
-	panel.position.y = panel_start_y - 30
-	panel.modulate.a = 0.0
-	tween.parallel().tween_property(panel, "position:y", panel_start_y, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	tween.parallel().tween_property(panel, "modulate:a", 1.0, 0.15)
-
-
-func _animate_out() -> void:
-	var tween = create_tween()
-	tween.tween_property(overlay, "modulate:a", 0.0, 0.1)
-	tween.parallel().tween_property(panel, "position:y", panel_start_y - 20, 0.1).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(panel, "modulate:a", 0.0, 0.1)
-	tween.tween_callback(hide)
-
+# =============================================================================
+# SIGNAL HANDLERS
+# =============================================================================
 
 func _on_resume_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	GameManager.resume_game()
+	unpause()
 
+func _on_change_difficulty_pressed() -> void:
+	# Show difficulty selection overlay
+	difficulty_selection.visible = true
+	difficulty_selection.set_current_difficulty(DifficultyManager.current_difficulty)
 
-func _on_save_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	if SaveManager.save_game():
-		# Visual feedback - flash button text briefly
-		var original_text = save_button.text
-		save_button.text = "Saved!"
-		save_button.disabled = true
-		await get_tree().create_timer(1.0).timeout
-		save_button.text = original_text
-		save_button.disabled = false
-	else:
-		save_button.text = "Save Failed"
-		await get_tree().create_timer(1.0).timeout
-		save_button.text = "Save Game"
+	# Hide main pause menu buttons (but keep pause menu layer active)
+	panel.visible = false
 
+func _on_options_pressed() -> void:
+	# TODO: Implement options menu
+	DebugLogger.log_ui("Options menu not yet implemented")
 
 func _on_quit_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	AudioManager.save_settings()
-	GameManager.quit_game()
+	# Quit to title screen
+	unpause()
+	# Reset game state
+	GameManager.reset_game()
+	# Load title screen
+	get_tree().change_scene_to_file("res://ui/menus/title_screen.tscn")
 
+func _on_difficulty_selected(level: DifficultySettings.Difficulty) -> void:
+	# Apply new difficulty
+	DifficultyManager.set_difficulty(level)
+	DebugLogger.log_ui("Difficulty changed to: %s" % DifficultySettings.get_difficulty_name(level))
 
-func _on_music_volume_changed(value: float) -> void:
-	AudioManager.set_music_volume(value)
+	# Close difficulty selection and return to pause menu
+	_close_difficulty_selection()
 
+func _on_visibility_changed() -> void:
+	if visible and resume_button:
+		resume_button.grab_focus()
 
-func _on_sfx_volume_changed(value: float) -> void:
-	AudioManager.set_sfx_volume(value)
-	# Play a test sound so user can hear the new volume
-	AudioManager.play_sfx("menu_navigate")
+# =============================================================================
+# PRIVATE METHODS
+# =============================================================================
+
+func _close_difficulty_selection() -> void:
+	difficulty_selection.visible = false
+	panel.visible = true
+	resume_button.grab_focus()
