@@ -665,6 +665,11 @@ This is a human-driven checkpoint, not a Claude-built phase. The user:
 
 **Dependencies**: Phase 31 (art assets must exist)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 32-01-PLAN.md — Replace Momi Polygon2D with AnimatedSprite2D, wire all 12 states
+
 **Success Criteria**:
 1. Momi displays as an animated sprite in all 8 states (idle, walk, run, attack, dodge, block, hurt, death) — no colored polygons visible
 2. Sprite animations play at correct frame rates and transition smoothly between states via the existing state machine
@@ -683,6 +688,11 @@ This is a human-driven checkpoint, not a Claude-built phase. The user:
 
 **Dependencies**: Phase 32 (player sprite pattern established)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 33-01-PLAN.md — Replace companion Polygon2Ds with AnimatedSprite2D, wire mechanic states
+
 **Success Criteria**:
 1. Cinnamon displays as animated sprite in all 4 states (idle, walk, attack, overheat) — no colored polygon visible
 2. Philo displays as animated sprite in all 5 states (idle, walk, attack, motivated, lazy) — no colored polygon visible
@@ -699,6 +709,12 @@ This is a human-driven checkpoint, not a Claude-built phase. The user:
 **Requirements Covered**: ENEM-01, ENEM-02, ENEM-03
 
 **Dependencies**: Phase 32 (sprite integration pattern established)
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 34-01-PLAN.md — Replace all 5 regular enemy Polygon2Ds, fix enemy_base.gd (Wave 2)
+- [ ] 34-02-PLAN.md — Replace 3 mini-boss + Raccoon King boss sprites, handle enrage (Wave 3)
 
 **Success Criteria**:
 1. All 5 regular enemy types display as sprites with idle/attack/hurt/death animations (raccoon, crow, stray cat, sewer rat, shadow creature)
@@ -717,6 +733,12 @@ This is a human-driven checkpoint, not a Claude-built phase. The user:
 **Requirements Covered**: WRLD-01, WRLD-02, FX-01, FX-02, INTG-01, INTG-02
 
 **Dependencies**: Phase 32 (sprite integration pattern); Phase 34 (enemy sprites done)
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 35-01-PLAN.md — Nutkin NPC sprite + item/equipment pixel art icons in ring menu & shop (Wave 3)
+- [ ] 35-02-PLAN.md — Particle effect textures + pickup sprites + integration sweep (Wave 4)
 
 **Success Criteria**:
 1. Nutkin shop NPC displays as a sprite with idle animation — no colored polygon
