@@ -386,6 +386,39 @@ def crop_to_content(img: Image.Image, padding: int = 2) -> Image.Image:
     return img.crop((left, upper, right, lower))
 
 
+def split_frames(img: Image.Image, num_frames: int) -> Optional[list[Image.Image]]:
+    """
+    Split a horizontal sprite strip into N equal-width individual frames.
+
+    Validates that the image width is evenly divisible by num_frames and
+    that each resulting frame is at least 4px wide. Returns None with a
+    warning if validation fails.
+
+    Returns a list of N cropped frame Images, or None on validation failure.
+    """
+    w, h = img.size
+    frame_width = w // num_frames
+
+    # Validate: image width must be evenly divisible by N
+    if w % num_frames != 0:
+        print(f"  WARN: Image width {w} not evenly divisible by {num_frames} — skipping split")
+        return None
+
+    # Validate: result frames must be >= 4px wide
+    if frame_width < 4:
+        print(f"  WARN: Frame width {frame_width}px too small (min 4px) — skipping split")
+        return None
+
+    frames: list[Image.Image] = []
+    for i in range(num_frames):
+        left = i * frame_width
+        right = left + frame_width
+        frame = img.crop((left, 0, right, h))
+        frames.append(frame)
+
+    return frames
+
+
 def downscale_nearest(img: Image.Image, target_size: int) -> Image.Image:
     """Downscale using nearest-neighbor to preserve pixel art crispness."""
     w, h = img.size
@@ -409,7 +442,8 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     3. Clean semi-transparent fringe pixels
     4. Crop to content bounding box (if --crop enabled)
     5. Optionally downscale with nearest-neighbor
-    6. Save with transparency
+    6. Split into individual frames (if --split-frames N specified)
+    7. Save with transparency
 
     Returns True if background was successfully removed.
     """
@@ -464,7 +498,20 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
         img = downscale_nearest(img, target_size)
         print(f"  SCALE: {w}x{h} -> {img.size[0]}x{img.size[1]}")
 
-    # Step 6: Save
+    # Step 6: Split into individual frames (if --split-frames N specified)
+    num_frames: Optional[int] = getattr(args, "split_frames", None)
+    if num_frames is not None:
+        frames = split_frames(img, num_frames)
+        if frames is not None:
+            stem = image_path.stem
+            parent = image_path.parent
+            for idx, frame in enumerate(frames, start=1):
+                frame_name = f"{stem}_frame_{idx:02d}.png"
+                frame_path = parent / frame_name
+                frame.save(frame_path, "PNG")
+            print(f"  SPLIT: {len(frames)} frames ({frames[0].size[0]}x{frames[0].size[1]} each)")
+
+    # Step 7: Save
     img.save(image_path, "PNG")
 
     # Save preview with checkerboard
@@ -611,8 +658,6 @@ Examples:
 
     # Warn about not-yet-implemented flags (only when user explicitly sets them)
     _stub_flags: list[str] = []
-    if args.split_frames is not None:
-        _stub_flags.append("--split-frames")
     if args.output_dir is not None:
         _stub_flags.append("--output-dir")
     if args.backup:
