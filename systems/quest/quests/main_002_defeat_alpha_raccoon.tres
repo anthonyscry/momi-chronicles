@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://d2n9q5s6p7r8t9u0"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "main_002"
+title = "Defeat the Alpha Raccoon"
+description = "A massive Alpha Raccoon has been spotted leading the raids on the neighborhood. This clever beast is the key to stopping the invasion. Track down and defeat the Alpha Raccoon to restore peace to the streets."
+objective_descriptions = Array[String](["Locate the Alpha Raccoon's territory", "Defeat the Alpha Raccoon boss", "Secure the neighborhood perimeter"])
+optional_objectives = Array[bool]([false, false, false])
+rewards = {
+"coins": 150,
+"exp": 300,
+"item": "sewer_key"
+}
+is_main_quest = true
+prerequisite_quest_ids = Array[String](["main_001"])

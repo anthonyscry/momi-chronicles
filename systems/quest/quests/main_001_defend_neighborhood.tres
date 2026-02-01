@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://c1m8p4r5n6q7s8t9"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "main_001"
+title = "Defend the Neighborhood"
+description = "The neighborhood is under attack by aggressive strays! Patrol the streets and protect your territory from the invading raccoons. Momi and Mimi are counting on you to keep everyone safe."
+objective_descriptions = Array[String](["Patrol the neighborhood streets", "Defeat 5 stray raccoons", "Report back to Momi"])
+optional_objectives = Array[bool]([false, false, false])
+rewards = {
+"coins": 50,
+"exp": 100
+}
+is_main_quest = true
+prerequisite_quest_ids = Array[String]([])

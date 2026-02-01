@@ -28,8 +28,7 @@ func _ready() -> void:
 ## Pause menu overlay with Resume, Change Difficulty, Options, and Quit buttons.
 ## Toggles with ESC key, pauses game tree when visible.
 
-# =============================================================================
-# SIGNALS
+# ======================================================================# SIGNALS
 # =============================================================================
 
 ## Emitted when resume is clicked
@@ -66,12 +65,41 @@ func _ready() -> void:
 	change_difficulty_button.pressed.connect(_on_change_difficulty_pressed)
 	options_button.pressed.connect(_on_options_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
+=======
+## Pause menu overlay with tabs for quest log and other pause menu features.
+## Press ESC to open/close. Pauses game tree when visible.
+
+## Container for tab content
+@onready var panel: PanelContainer = $CenterContainer/PanelContainer
+@onready var tab_container: TabContainer = $CenterContainer/PanelContainer/MarginContainer/TabContainer
+@onready var resume_button: Button = $CenterContainer/PanelContainer/MarginContainer/TabContainer/General/VBoxContainer/ResumeButton
+
+## Whether menu is currently visible
+var is_paused: bool = false
+
+
+func _ready() -> void:
+	# Hide menu by default
+	visible = false
+	is_paused = false
+
+	# Set process mode to always process even when paused
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
+	# Connect resume button
+	if resume_button:
+		resume_button.pressed.connect(_on_resume_pressed)
 
 	# Connect difficulty selection signal
 	difficulty_selection.difficulty_selected.connect(_on_difficulty_selected)
 
 	# Hide difficulty selection initially
 	difficulty_selection.visible = false
+func _unhandled_input(event: InputEvent) -> void:
+	# Toggle pause menu with ESC key
+	if event.is_action_pressed("pause"):
+		_toggle_pause()
+		get_viewport().set_input_as_handled()
 
 	# Focus resume button when menu opens
 	visibility_changed.connect(_on_visibility_changed)
@@ -87,9 +115,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			toggle_pause()
 			get_viewport().set_input_as_handled()
 
+# ======================================================================# PUBLIC METHODS
 # =============================================================================
-# PUBLIC METHODS
-# =============================================================================
+=======
+func _toggle_pause() -> void:
+	is_paused = not is_paused
+
+	if is_paused:
+		_open_menu()
+	else:
+		_close_menu()
 
 ## Toggle pause menu on/off
 func toggle_pause() -> void:
@@ -122,6 +157,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		if settings_menu_instance == null or not is_instance_valid(settings_menu_instance):
 			_resume_game()
 			get_viewport().set_input_as_handled()
+func _open_menu() -> void:
+	visible = true
+	is_paused = true
+	get_tree().paused = true
+
+	# Focus resume button for keyboard navigation
+	if resume_button:
+		resume_button.grab_focus()
+
+
+func _close_menu() -> void:
+	visible = false
+	is_paused = false
+	get_tree().paused = false
 
 # =============================================================================
 # SIGNAL HANDLERS
@@ -194,11 +243,12 @@ func _resume_game() -> void:
 
 	# Remove the pause menu
 	queue_free()
-# =============================================================================
-# PRIVATE METHODS
+# ======================================================================# PRIVATE METHODS
 # =============================================================================
 
 func _close_difficulty_selection() -> void:
 	difficulty_selection.visible = false
 	panel.visible = true
 	resume_button.grab_focus()
+=======
+	_close_menu()

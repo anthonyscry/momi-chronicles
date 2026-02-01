@@ -39,6 +39,7 @@ ShopCatalog="*res://systems/shop/shop_catalog.gd"
 ShopUI="*res://ui/shop/shop_ui.tscn"
 DialogueManager="*res://autoloads/dialogue_manager.gd"
 PauseMenu="*res://ui/menus/pause_menu.tscn"
+QuestManager="*res://autoloads/quest_manager.gd"
 
 [display]
 

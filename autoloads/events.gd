@@ -4,6 +4,7 @@ extends Node
 
 # ======================================================================# PLAYER EVENTS
 # ======================================================================
+# Player events
 signal player_health_changed(current: int, max_health: int)
 signal player_leveled_up(new_level: int)
 signal exp_gained(amount: int, current_level: int, current_exp: int, exp_to_next: int)
@@ -13,8 +14,7 @@ signal player_dodged()
 signal player_damaged()
 signal player_blocked()
 
-# =============================================================================
-# COMBAT EVENTS
+# ======================================================================# COMBAT EVENTS
 # =============================================================================
 
 signal enemy_defeated(enemy_id: String)
@@ -232,6 +232,10 @@ signal buff_expired(buff_type: String)
 
 # UI events
 signal ring_menu_opened()
+=======
+
+# Economy events
+signal coins_changed(new_amount: int)
 
 # Save/Load events
 signal game_saved()
@@ -247,8 +251,7 @@ signal companion_meter_changed(companion_id: String, meter_value: float)
 signal companion_meter_changed(companion_id: String, current: float, max_val: float)
 
 # ======================================================================# TUTORIAL SIGNALS
-# =============================================================================
-
+# ======================================================================
 ## Emitted when a tutorial should be triggered
 signal tutorial_triggered(tutorial_id: String)
 
@@ -280,3 +283,10 @@ signal permission_denied(system: String, reason: String)
 # Difficulty events
 signal difficulty_changed(new_difficulty: int)
 signal difficulty_system_ready()
+=======
+# Quest events
+signal quest_started(quest_id: String)
+signal quest_updated(quest_id: String)
+signal quest_completed(quest_id: String)
+signal quest_failed(quest_id: String)
+signal active_quest_changed(quest_id: String)
