@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://e3o0r6t7q8s9u0v1"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "main_003"
+title = "Explore the Sewers"
+description = "With the Alpha Raccoon defeated, you've discovered a key to the old sewer system. Mimi suspects the raccoons have been using the sewers as their base of operations. Venture into the dark sewers to uncover the truth and eliminate the threat at its source."
+objective_descriptions = Array[String](["Enter the sewer system", "Investigate the raccoon nest", "Defeat the remaining raccoon forces", "Find the source of the invasion"])
+optional_objectives = Array[bool]([false, false, false, false])
+rewards = {
+"coins": 250,
+"exp": 500
+}
+is_main_quest = true
+prerequisite_quest_ids = Array[String](["main_002"])
