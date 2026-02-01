@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://e3o0r6t7q8s9u0v1"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "side_001"
+title = "Find the Lost Collar"
+description = "Mrs. Whiskers' precious collar with her bell has gone missing somewhere in the neighborhood! She thinks it might have fallen off during her morning patrol. Search the hidden corners and help reunite Mrs. Whiskers with her treasured possession."
+objective_descriptions = Array[String](["Search the backyard gardens", "Check behind the old toolshed", "Look near the garden fountain", "Return the collar to Mrs. Whiskers"])
+optional_objectives = Array[bool]([false, false, false, false])
+rewards = {
+"coins": 75,
+"exp": 150,
+"item": "shiny_bell"
+}
+is_main_quest = false
+prerequisite_quest_ids = Array[String]([])

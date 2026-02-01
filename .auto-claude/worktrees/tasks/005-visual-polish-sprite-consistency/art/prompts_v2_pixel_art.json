@@ -1,0 +1,136 @@
+{
+  "global_suffix": "64x64 pixel art sprite, 3/4 top-down perspective RPG style, clean 1px black outline, cel-shading with 2-3 value steps, transparent background PNG, consistent lighting from top-left, high-quality pixel art",
+  "categories": [
+    {
+      "name": "characters",
+      "folder": "characters",
+      "prompts": [
+        {
+          "id": "momi_idle",
+          "filename": "momi_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle coat (#1a1a1a charcoal base with #8b6914 tan streaks), white chest shield and chin goatee (#ffffff), large bat ears, flat muzzle, stubby tail nub. ANIMATION: Idle breathing cycle facing down. Frame 1: Standing alert. Frame 2: Slight ear twitch. Frame 3: Chest rises (inhale). Frame 4: Ears perk. Frame 5: Chest falls (exhale). Frame 6: Tail nub wiggles. Frame 7: Head tilt. Frame 8: Return to start. Clean 1px black outline, cel-shading, expressive eyes."
+        },
+        {
+          "id": "momi_walk",
+          "filename": "momi_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle with white chest (#ffffff) and chin. ANIMATION: Walk cycle facing down. Frame 1: Right front paw forward. Frame 2: Mid-stride right. Frame 3: Left back paw pushes. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Mid-stride left. Frame 7: Right back paw pushes. Frame 8: Return to start. Determined expression, ears perked. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_run",
+          "filename": "momi_run.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle with white chest. ANIMATION: Run cycle facing down (zoomies energy). Frame 1: Leap start. Frame 2: Airborne legs tucked. Frame 3: Front paws land. Frame 4: Body stretches fully. Frame 5: Back paws push off. Frame 6: Full extension. Frame 7: Airborne again. Frame 8: Landing. Ears pinned back slightly from speed. Clean 1px outline, cel-shaded."
+        },
+        {
+          "id": "momi_attack",
+          "filename": "momi_attack.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Bite attack facing down. Frame 1: Wind up lean back. Frame 2: Anticipation pose. Frame 3: Quick lunge forward, jaws open. Frame 4: Teeth clench impact. Frame 5: Hold impact. Frame 6: Recovery start. Frame 7: Jaws close. Frame 8: Return to stance. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_hurt",
+          "filename": "momi_hurt.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Hurt/damaged reaction. Frame 1: Impact flash, eyes squint. Frame 2: Recoil backward. Frame 3: Stumble. Frame 4: Regain balance. Frame 5: Shake off damage. Frame 6: Getting steady. Frame 7: Recovery stance. Frame 8: Ready again. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_death",
+          "filename": "momi_death.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: KO collapse. Frame 1: Final hit stagger. Frame 2: Wobble left. Frame 3: Wobble right. Frame 4: Eyes go dizzy. Frame 5: Falling over start. Frame 6: Collapsing on side. Frame 7: Landed on ground. Frame 8: Tongue out fully KO'd. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_dodge",
+          "filename": "momi_dodge.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Dodge roll. Frame 1: Crouch ready. Frame 2: Roll start. Frame 3: Mid-roll tucked. Frame 4: Rolling. Frame 5: Roll continuing. Frame 6: Uncurling. Frame 7: Landing. Frame 8: Ready stance. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_block",
+          "filename": "momi_block.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Block/defend pose. Frame 1: Brace stance. Frame 2: Shield ready. Frame 3: Block hold. Frame 4: Deflect left. Frame 5: Deflect right. Frame 6: Shield steady. Frame 7: Maintaining block. Frame 8: Guard up. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_charge",
+          "filename": "momi_charge.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Charge attack power-up. Frame 1: Crouch low. Frame 2: Energy gathering. Frame 3: Power building. Frame 4: Glow effect. Frame 5: Charge ready. Frame 6: Full power. Frame 7: Release. Frame 8: Follow-through. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "momi_ground_pound",
+          "filename": "momi_ground_pound.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. MOMI: French Bulldog, black brindle. ANIMATION: Ground pound AoE. Frame 1: Leap up. Frame 2: Airborne. Frame 3: Peak height. Frame 4: Descending. Frame 5: Impact. Frame 6: Shockwave. Frame 7: Crater effect. Frame 8: Recovery. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "cinnamon_idle",
+          "filename": "cinnamon_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D tan-brown), white blaze on face and chest, wrinkly face, stocky tank build, red tactical harness. ANIMATION: Idle breathing standing alert. Frame 1: Standing guard, jowls droop. Frame 2: Weight shift left. Frame 3: Chest rises (inhale), wrinkles shift. Frame 4: Hold breath. Frame 5: Chest falls (exhale). Frame 6: Weight shift right. Frame 7: Jaw shift. Frame 8: Return to center. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_walk",
+          "filename": "cinnamon_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), white blaze, red harness, stocky body. ANIMATION: Heavy walk cycle. Frame 1: Right front paw forward. Frame 2: Body sways right. Frame 3: Left back paw pushes. Frame 4: Both feet passing. Frame 5: Left front paw forward. Frame 6: Body sways left. Frame 7: Right back paw pushes. Frame 8: Return to start. Determined expression. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_run",
+          "filename": "cinnamon_run.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), white blaze, red harness, stocky tank build. ANIMATION: Run cycle facing down (heavy but determined). Frame 1: Push off start. Frame 2: Front legs extend. Frame 3: Back legs push hard. Frame 4: Brief airborne moment. Frame 5: Front paws land. Frame 6: Body forward momentum. Frame 7: Back legs catch up. Frame 8: Next stride. Focused expression, jowls slightly flapping. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "cinnamon_attack",
+          "filename": "cinnamon_attack.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), red harness. ANIMATION: Body slam attack. Frame 1: Lower head brace. Frame 2: Wind up. Frame 3: Charge start. Frame 4: Full charge. Frame 5: Impact. Frame 6: Shove. Frame 7: Follow-through. Frame 8: Recovery. Clean 1px outline."
+        },
+        {
+          "id": "cinnamon_hurt",
+          "filename": "cinnamon_hurt.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), white blaze, red harness. ANIMATION: Hurt/damage reaction. Frame 1: Impact flash, eyes wince. Frame 2: Stumble backward. Frame 3: Jowls shake from impact. Frame 4: Wrinkles scrunch in pain. Frame 5: Regaining footing. Frame 6: Shake head. Frame 7: Jowls settle. Frame 8: Back to guard stance. Tough tank enduring damage. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "cinnamon_death",
+          "filename": "cinnamon_death.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), white blaze, red harness. ANIMATION: KO collapse (tank goes down). Frame 1: Final hit recoil. Frame 2: Legs buckle. Frame 3: Stumble forward. Frame 4: Losing balance. Frame 5: Tipping over. Frame 6: Falling on side. Frame 7: Heavy thud on ground. Frame 8: Lying flat, eyes closed, tongue lolling out. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "cinnamon_overheat",
+          "filename": "cinnamon_overheat.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. CINNAMON: English Bulldog, brown coat (#BF804D), red harness. ANIMATION: Overheated state (combat mechanic). Frame 1: Heavy panting tongue out. Frame 2: Panting harder. Frame 3: Face flushed. Frame 4: Steam wisps. Frame 5: Deep pant. Frame 6: More steam. Frame 7: Body sags. Frame 8: Exhausted. Clean 1px outline."
+        },
+        {
+          "id": "philo_idle",
+          "filename": "philo_idle.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59 grey-black body, #ffffff white chest and face blaze), pointed ears, grey muzzle (old), blue bandana, slim build. ANIMATION: Lazy idle (default state). Frame 1: Slumped standing. Frame 2: Eyes drooping. Frame 3: Half-closed lids. Frame 4: Yawn start. Frame 5: Yawn wide. Frame 6: Yawn closing. Frame 7: Head droops sleepy. Frame 8: Eyes close briefly. Clean 1px outline."
+        },
+        {
+          "id": "philo_walk",
+          "filename": "philo_walk.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59 grey-black, white chest/blaze), blue bandana, slim. ANIMATION: Lazy slow shuffle walk. Frame 1: Right front paw drag. Frame 2: Slow step right. Frame 3: Left back paw reluctant. Frame 4: Feet passing. Frame 5: Left front paw drag. Frame 6: Slow step left. Frame 7: Right back paw. Frame 8: Return. Droopy eyes, low energy. Clean 1px outline."
+        },
+        {
+          "id": "philo_run",
+          "filename": "philo_run.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59 grey-black, white chest/blaze), blue bandana, slim build. ANIMATION: Run cycle facing down (when motivated by injured allies). Frame 1: Quick step start, ears up. Frame 2: Light stride forward. Frame 3: Both front paws reach. Frame 4: Mid-flight moment. Frame 5: Back paws push eagerly. Frame 6: Full extension. Frame 7: Landing graceful. Frame 8: Next stride. Eyes focused, tail up, motivated expression. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "philo_attack",
+          "filename": "philo_attack.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59), blue bandana. ANIMATION: Support bark heal. Frame 1: Alert. Frame 2: Inhale. Frame 3: Deep breath. Frame 4: Bark burst. Frame 5: Green sparkles. Frame 6: Healing aura. Frame 7: Sparkles fade. Frame 8: Recovery. Clean 1px outline."
+        },
+        {
+          "id": "philo_hurt",
+          "filename": "philo_hurt.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59 grey-black, white chest/blaze), blue bandana, slim build. ANIMATION: Hurt/damage reaction. Frame 1: Impact flash, yelp expression. Frame 2: Knocked back. Frame 3: Stumble, ears flatten. Frame 4: Regain footing shakily. Frame 5: Wince in pain. Frame 6: Shake it off. Frame 7: Ears perk back up. Frame 8: Ready stance but cautious. Support dog getting hurt. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "philo_death",
+          "filename": "philo_death.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59 grey-black, white chest/blaze), blue bandana. ANIMATION: KO collapse (support goes down). Frame 1: Final hit impact. Frame 2: Stagger back. Frame 3: Legs give out. Frame 4: Eyes close. Frame 5: Slump forward. Frame 6: Collapse to ground. Frame 7: Lying on side. Frame 8: Bandana askew, unconscious, small sad pose. Clean 1px outline, transparent bg."
+        },
+        {
+          "id": "philo_lazy",
+          "filename": "philo_lazy.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59), blue bandana. ANIMATION: Lazy low-energy state. Frame 1: Slouched. Frame 2: Yawn. Frame 3: Eyes half-closed. Frame 4: Head bob sleepy. Frame 5: Almost asleep. Frame 6: Wake up slightly. Frame 7: Stretch lazy. Frame 8: Return slouch. Clean 1px outline."
+        },
+        {
+          "id": "philo_motivated",
+          "filename": "philo_motivated.png",
+          "prompt": "Horizontal sprite strip, 8 frames, 64x64 pixels each. PHILO: Boston Terrier, tuxedo pattern (#4D4D59), blue bandana. ANIMATION: Motivated buffed state (when allies hurt). Frame 1: Alert stance. Frame 2: Eyes bright. Frame 3: Ears fully perked. Frame 4: Tail up. Frame 5: Focused. Frame 6: Energy aura. Frame 7: Ready to help. Frame 8: Determined. Clean 1px outline."
+        }
+      ]
+    }
+  ]
+}

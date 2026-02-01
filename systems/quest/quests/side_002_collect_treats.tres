@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://f4p1s7u8r9t0v1w2"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "side_002"
+title = "Gourmet Treat Collection"
+description = "The neighborhood cats are holding a feast, but they need help gathering the finest treats! Explore the area to find hidden delicacies scattered by friendly neighbors. The more variety you collect, the better the celebration will be!"
+objective_descriptions = Array[String](["Find the tuna can in the alley", "Collect the salmon treats from rooftops", "Discover the catnip stash", "Gather the premium kibble (optional)", "Deliver all treats to the feast"])
+optional_objectives = Array[bool]([false, false, false, true, false])
+rewards = {
+"coins": 100,
+"exp": 200,
+"item": "feast_badge"
+}
+is_main_quest = false
+prerequisite_quest_ids = Array[String]([])

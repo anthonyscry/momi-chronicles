@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3 uid="uid://g5q2t8v9s0u1w2x3"]
+
+[ext_resource type="Script" path="res://systems/quest/quest_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "side_003"
+title = "Elite Stray Hunter"
+description = "Think you've got what it takes to be a legendary guardian? This challenge is for the bravest cats only! Track down and defeat every stray invader lurking in the neighborhood's darkest corners. Glory and great rewards await those who succeed!"
+objective_descriptions = Array[String](["Defeat 10 stray raccoons", "Defeat 5 elite stray raccoons", "Clear the abandoned warehouse", "Find and defeat the hidden mini-boss (optional)"])
+optional_objectives = Array[bool]([false, false, false, true])
+rewards = {
+"coins": 200,
+"exp": 400,
+"item": "hunter_badge"
+}
+is_main_quest = false
+prerequisite_quest_ids = Array[String](["main_001"])
