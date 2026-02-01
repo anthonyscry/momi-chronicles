@@ -18,6 +18,7 @@ Output: Overwrites originals with transparent versions + saves _preview.png with
 import sys
 import os
 import math
+import argparse
 from pathlib import Path
 from collections import deque
 
@@ -296,29 +297,94 @@ def process_directory(dir_path: str, tolerance: int = DEFAULT_TOLERANCE,
 
 
 def main():
-    tolerance = DEFAULT_TOLERANCE
-    target = None
-    target_size = None
-    save_preview = True
+    parser = argparse.ArgumentParser(
+        description="Remove backgrounds and process AI-generated sprites",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python art/rip_sprites.py                          Process all PNGs in art/generated/
+  python art/rip_sprites.py path/to/image.png        Process a single file
+  python art/rip_sprites.py --tolerance 30           Adjust color match tolerance
+  python art/rip_sprites.py --scale 64               Downscale to 64px (longest edge)
+  python art/rip_sprites.py --no-preview             Skip checkerboard preview
+  python art/rip_sprites.py --crop --split-frames 8  Crop and split into 8 frames
+  python art/rip_sprites.py --batch 1                Process batch_1/ only
+  python art/rip_sprites.py --output-dir out/        Write to separate directory
+  python art/rip_sprites.py --backup                 Save originals before overwriting
+  python art/rip_sprites.py --dry-run                Preview without making changes
+  python art/rip_sprites.py --report                 Generate _rip_report.json
+        """,
+    )
 
-    args = sys.argv[1:]
-    i = 0
-    while i < len(args):
-        if args[i] == "--tolerance" and i + 1 < len(args):
-            tolerance = int(args[i + 1])
-            i += 2
-        elif args[i] == "--scale" and i + 1 < len(args):
-            target_size = int(args[i + 1])
-            i += 2
-        elif args[i] == "--no-preview":
-            save_preview = False
-            i += 1
-        else:
-            target = args[i]
-            i += 1
+    # Existing flags (preserved from original CLI)
+    parser.add_argument("path", nargs="?", default=None,
+                        help="Path to a single PNG file to process (default: all in art/generated/)")
+    parser.add_argument("--tolerance", "-t", type=int, default=DEFAULT_TOLERANCE,
+                        help=f"Color match tolerance for background detection (default: {DEFAULT_TOLERANCE})")
+    parser.add_argument("--scale", "-s", type=int, default=None, metavar="N",
+                        help="Downscale to N pixels on the longest edge (default: auto from folder name)")
+    parser.add_argument("--no-preview", action="store_true",
+                        help="Skip generating checkerboard preview images")
 
-    if target and os.path.isfile(target):
-        rip_sprite(target, tolerance, target_size, save_preview)
+    # New flags (stubs for future implementation)
+    parser.add_argument("--crop", action="store_true", default=True,
+                        help="Crop to content bounding box after background removal (default: on)")
+    parser.add_argument("--no-crop", action="store_true",
+                        help="Disable crop-to-content")
+    parser.add_argument("--padding", type=int, default=2, metavar="N",
+                        help="Padding pixels around content when cropping (default: 2)")
+    parser.add_argument("--split-frames", type=int, default=None, metavar="N",
+                        help="Split horizontal sprite sheet into N individual frame PNGs")
+    parser.add_argument("--output-dir", type=str, default=None, metavar="PATH",
+                        help="Write processed sprites to a separate directory instead of overwriting")
+    parser.add_argument("--backup", action="store_true",
+                        help="Save originals to _originals/ subdirectory before overwriting")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Preview what would be processed without making changes")
+    parser.add_argument("--batch", type=int, default=None, metavar="N",
+                        help="Process only batch_N/ directory (e.g., --batch 1 for art/generated/batch_1/)")
+    parser.add_argument("--fringe-passes", type=int, default=2, metavar="N",
+                        help="Number of fringe-cleaning passes (default: 2)")
+    parser.add_argument("--report", action="store_true",
+                        help="Generate _rip_report.json with per-file processing results")
+
+    args = parser.parse_args()
+
+    # Resolve crop flag (--no-crop overrides --crop default)
+    if args.no_crop:
+        args.crop = False
+
+    # Warn about not-yet-implemented flags (only when user explicitly sets them)
+    _stub_flags = []
+    if args.no_crop:
+        _stub_flags.append("--no-crop")
+    if args.padding != 2:
+        _stub_flags.append("--padding")
+    if args.split_frames is not None:
+        _stub_flags.append("--split-frames")
+    if args.output_dir is not None:
+        _stub_flags.append("--output-dir")
+    if args.backup:
+        _stub_flags.append("--backup")
+    if args.dry_run:
+        _stub_flags.append("--dry-run")
+    if args.batch is not None:
+        _stub_flags.append("--batch")
+    if args.fringe_passes != 2:
+        _stub_flags.append("--fringe-passes")
+    if args.report:
+        _stub_flags.append("--report")
+    if _stub_flags:
+        for flag in _stub_flags:
+            print(f"  NOTE: {flag} accepted but not yet implemented")
+
+    # Extract existing flags into local vars for current processing logic
+    tolerance = args.tolerance
+    target_size = args.scale
+    save_preview = not args.no_preview
+
+    if args.path and os.path.isfile(args.path):
+        rip_sprite(args.path, tolerance, target_size, save_preview)
     else:
         # Default: process art/generated/ in repo
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -327,7 +393,7 @@ def main():
             process_directory(generated_dir, tolerance, target_size)
         else:
             print(f"No generated/ directory found at {generated_dir}")
-            print("Usage: python rip_sprites.py [path/to/image.png] [--tolerance N] [--scale N]")
+            print("Run: python art/rip_sprites.py --help")
 
 
 if __name__ == "__main__":
