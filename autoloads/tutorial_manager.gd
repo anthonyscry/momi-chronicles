@@ -43,6 +43,7 @@ var action_counts: Dictionary = {}
 
 func _ready() -> void:
 	_initialize_tutorial_state()
+	_connect_event_signals()
 	DebugLogger.log_system("TutorialManager initialized")
 
 # =============================================================================
@@ -70,6 +71,75 @@ func _initialize_tutorial_state() -> void:
 			tutorials_completed[tutorial_id] = false
 		if not action_counts.has(tutorial_id):
 			action_counts[tutorial_id] = 0
+
+func _connect_event_signals() -> void:
+	## Connect to game events to track player actions for tutorials
+	Events.player_attacked.connect(_on_player_attacked)
+	Events.player_dodged.connect(_on_player_dodged)
+	Events.player_blocked.connect(_on_player_blocked)
+	Events.combo_completed.connect(_on_combo_completed)
+	Events.ring_menu_opened.connect(_on_ring_menu_opened)
+	Events.item_used.connect(_on_item_used)
+	Events.pickup_collected.connect(_on_pickup_collected)
+	Events.enemy_spawned.connect(_on_enemy_spawned)
+
+# =============================================================================
+# EVENT HANDLERS
+# =============================================================================
+
+func _on_player_attacked() -> void:
+	## Track attack actions for attack tutorial
+	if should_show_tutorial(TUTORIAL_ATTACK):
+		Events.tutorial_triggered.emit(TUTORIAL_ATTACK)
+		mark_tutorial_shown(TUTORIAL_ATTACK)
+	increment_action_count(TUTORIAL_ATTACK)
+
+func _on_player_dodged() -> void:
+	## Track dodge actions for dodge tutorial
+	if should_show_tutorial(TUTORIAL_DODGE):
+		Events.tutorial_triggered.emit(TUTORIAL_DODGE)
+		mark_tutorial_shown(TUTORIAL_DODGE)
+	increment_action_count(TUTORIAL_DODGE)
+
+func _on_player_blocked() -> void:
+	## Track block actions for block tutorial
+	if should_show_tutorial(TUTORIAL_BLOCK):
+		Events.tutorial_triggered.emit(TUTORIAL_BLOCK)
+		mark_tutorial_shown(TUTORIAL_BLOCK)
+	increment_action_count(TUTORIAL_BLOCK)
+
+func _on_combo_completed(count: int) -> void:
+	## Track combo completions for combo tutorial
+	if should_show_tutorial(TUTORIAL_COMBO):
+		Events.tutorial_triggered.emit(TUTORIAL_COMBO)
+		mark_tutorial_shown(TUTORIAL_COMBO)
+	increment_action_count(TUTORIAL_COMBO)
+
+func _on_ring_menu_opened() -> void:
+	## Track ring menu opening for ring menu tutorial
+	if should_show_tutorial(TUTORIAL_RING_MENU):
+		Events.tutorial_triggered.emit(TUTORIAL_RING_MENU)
+		mark_tutorial_shown(TUTORIAL_RING_MENU)
+		mark_tutorial_completed(TUTORIAL_RING_MENU)
+
+func _on_item_used(item_id: String) -> void:
+	## Track item usage for item usage tutorial
+	if should_show_tutorial(TUTORIAL_ITEM_USAGE):
+		Events.tutorial_triggered.emit(TUTORIAL_ITEM_USAGE)
+		mark_tutorial_shown(TUTORIAL_ITEM_USAGE)
+	increment_action_count(TUTORIAL_ITEM_USAGE)
+
+func _on_pickup_collected(item_id: String) -> void:
+	## Track item pickups to potentially trigger ring menu tutorial
+	# Ring menu tutorial should trigger on first consumable item pickup
+	# This is a placeholder - actual logic will be implemented in trigger phase
+	pass
+
+func _on_enemy_spawned(enemy_id: String) -> void:
+	## Track enemy spawns to potentially trigger combat tutorials
+	# Attack tutorial should trigger on first enemy encounter
+	# This is a placeholder - actual logic will be implemented in trigger phase
+	pass
 
 # =============================================================================
 # PUBLIC API
