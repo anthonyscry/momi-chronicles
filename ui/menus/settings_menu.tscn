@@ -1,0 +1,282 @@
+[gd_scene load_steps=2 format=3 uid="uid://settings_menu_001"]
+
+[ext_resource type="Script" path="res://ui/menus/settings_menu.gd" id="1_settings_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_bg"]
+bg_color = Color(0.1, 0.1, 0.12, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 4
+shadow_color = Color(0, 0, 0, 0.5)
+
+[node name="SettingsMenu" type="CanvasLayer"]
+script = ExtResource("1_settings_script")
+layer = 100
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_bg")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 24
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AudioSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AudioLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 18
+text = "Audio"
+
+[node name="MasterVolumeContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MasterVolumeLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MasterVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "Master Volume"
+
+[node name="MasterVolumeSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MasterVolumeContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MasterVolumeValue" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MasterVolumeContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "100%"
+horizontal_alignment = 2
+
+[node name="MusicVolumeContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MusicVolumeLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MusicVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "Music Volume"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MusicVolumeContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicVolumeValue" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/MusicVolumeContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SFXVolumeContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SFXVolumeLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/SFXVolumeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "SFX Volume"
+
+[node name="SFXVolumeSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/SFXVolumeContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="SFXVolumeValue" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/AudioSection/SFXVolumeContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "100%"
+horizontal_alignment = 2
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VideoSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VideoLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 18
+text = "Video"
+
+[node name="FullscreenContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FullscreenLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection/FullscreenContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "Fullscreen"
+
+[node name="FullscreenCheckBox" type="CheckBox" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection/FullscreenContainer"]
+layout_mode = 2
+
+[node name="ScreenShakeContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScreenShakeLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection/ScreenShakeContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "Screen Shake"
+
+[node name="ScreenShakeSlider" type="HSlider" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection/ScreenShakeContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.0
+max_value = 1.0
+step = 0.33
+value = 1.0
+
+[node name="ScreenShakeValue" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/VideoSection/ScreenShakeContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "High"
+horizontal_alignment = 2
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ControlsSection" type="VBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ControlsLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.85, 1)
+theme_override_font_sizes/font_size = 18
+text = "Controls"
+
+[node name="ControlsPanel" type="PanelContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection"]
+layout_mode = 2
+
+[node name="ControlsGrid" type="GridContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="MoveLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Move:"
+
+[node name="MoveKeys" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "WASD / Arrow Keys"
+
+[node name="AttackLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Attack:"
+
+[node name="AttackKeys" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "Space / Z / LMB"
+
+[node name="DashLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Dash:"
+
+[node name="DashKeys" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "Shift / X / RMB"
+
+[node name="PauseLabel" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pause:"
+
+[node name="PauseKeys" type="Label" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ControlsSection/ControlsPanel/ControlsGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "ESC"
+
+[node name="HSeparator4" type="HSeparator" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ButtonContainer" type="HBoxContainer" parent="CenterContainer/Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CloseButton" type="Button" parent="CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Close"
