@@ -18,6 +18,7 @@ Output: Overwrites originals with transparent versions + saves _preview.png with
 
 import sys
 import math
+import time
 import argparse
 import pathlib
 import shutil
@@ -109,6 +110,33 @@ def detect_background_color(img: Image.Image) -> tuple[tuple, float]:
     confidence = bg_count / total
 
     return bg_color, confidence
+
+
+def is_already_transparent(img: Image.Image, threshold: float = 0.3) -> bool:
+    """Check if an image already has significant transparency (>threshold fraction).
+
+    Used to skip images that have already been processed or were generated
+    with transparent backgrounds. Returns True if more than threshold fraction
+    of pixels are fully transparent (alpha == 0).
+    """
+    w, h = img.size
+    total_pixels = w * h
+    if total_pixels == 0:
+        return False
+
+    if HAS_NUMPY:
+        arr = np.array(img)
+        transparent_pixels = int(np.sum(arr[:, :, 3] == 0))
+        return (transparent_pixels / total_pixels) > threshold
+
+    # Pillow fallback
+    pixels = img.load()
+    transparent_count = 0
+    for y in range(h):
+        for x in range(w):
+            if pixels[x, y][3] == 0:
+                transparent_count += 1
+    return (transparent_count / total_pixels) > threshold
 
 
 def _flood_fill_remove_pillow(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
@@ -476,7 +504,40 @@ def _backup_original(image_path: Path) -> bool:
         return False
 
 
-def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
+def dry_run_file(image_path: Path, args: argparse.Namespace) -> str:
+    """Inspect a single file without modifying it (--dry-run mode).
+
+    Opens the image, detects background color and confidence, checks if
+    already transparent. Returns a status string describing what would
+    happen to this file during a real run.
+    """
+    try:
+        img = Image.open(image_path).convert("RGBA")
+    except PermissionError:
+        return "ERROR: Permission denied"
+    except Exception as e:
+        return f"ERROR: Cannot open — {e}"
+
+    w, h = img.size
+
+    # Check already transparent
+    if is_already_transparent(img):
+        return f"SKIP: already transparent ({w}x{h})"
+
+    # Detect background
+    bg_color, confidence = detect_background_color(img)
+
+    r, g, b = bg_color
+    confidence_str = f"{confidence:.0%}"
+    if confidence < 0.3:
+        confidence_str += " LOW"
+
+    return f"WOULD PROCESS: {w}x{h} — BG rgb({r},{g},{b}) ({confidence_str})"
+
+
+def rip_sprite(
+    image_path: Path, args: argparse.Namespace, progress_prefix: str = ""
+) -> str:
     """
     Remove background and optionally downscale a sprite.
 
@@ -489,27 +550,39 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     6. Split into individual frames (if --split-frames N specified)
     7. Save with transparency
 
-    Returns True if background was successfully removed.
+    Returns status string: "processed", "skipped", or "failed".
     """
     tolerance: int = args.tolerance
     target_size: Optional[int] = args.scale
     save_preview: bool = not args.no_preview
+    indent = "       " if progress_prefix else "  "
 
     try:
         img = Image.open(image_path).convert("RGBA")
     except Exception as e:
-        print(f"  SKIP {image_path}: {e}")
-        return False
+        if progress_prefix:
+            print(f"{progress_prefix} ERROR — {e}")
+        else:
+            print(f"  ERROR {image_path}: {e}")
+        return "failed"
 
     w, h = img.size
     total_pixels = w * h
 
+    # Check if image is already mostly transparent — skip processing
+    if is_already_transparent(img):
+        if progress_prefix:
+            print(f"{progress_prefix} SKIP — already transparent")
+        else:
+            print(f"  SKIP: already transparent — {image_path.name}")
+        return "skipped"
+
     # Step 1: Detect background
     bg_color, confidence = detect_background_color(img)
-    print(f"  BG detected: rgb{bg_color} (confidence: {confidence:.0%})")
-
+    r, g, b = bg_color
+    conf_str = f"{confidence:.0%}"
     if confidence < 0.3:
-        print(f"  WARN: Low confidence background detection — may be transparent already or complex scene")
+        conf_str += " LOW"
 
     # Step 2: Flood-fill remove from edges
     transparent_count = flood_fill_remove(img, bg_color, tolerance)
@@ -522,11 +595,27 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     if transparent_count == 0:
         # Check if image already has transparency
         has_alpha = any(img.getpixel((x, y))[3] < 255 for x in range(w) for y in range(min(3, h)))
-        if has_alpha:
-            print(f"  OK {image_path.name}: Already has transparency")
+        if progress_prefix:
+            if has_alpha:
+                print(f"{progress_prefix} SKIP — already has transparency")
+            else:
+                print(f"{progress_prefix} BG rgb({r},{g},{b}) ({conf_str}) → 0 removed (0.0%)")
         else:
-            print(f"  WARN {image_path.name}: No background removed — manual check needed")
-        return False
+            if has_alpha:
+                print(f"  OK {image_path.name}: Already has transparency")
+            else:
+                print(f"  WARN {image_path.name}: No background removed — manual check needed")
+        return "skipped"
+
+    # Print main progress line
+    pct = (transparent_count / total_pixels) * 100
+    if progress_prefix:
+        print(f"{progress_prefix} BG rgb({r},{g},{b}) ({conf_str}) → {transparent_count} removed ({pct:.1f}%)")
+    else:
+        status = "OK" if pct > 20 else "WARN (low removal — check manually)"
+        print(f"  {status} {image_path.name}: {transparent_count} pixels removed ({pct:.1f}%)")
+    if fringe_cleaned > 0:
+        print(f"{indent}+ {fringe_cleaned} fringe pixels cleaned")
 
     # Step 4: Crop to content bounding box
     do_crop: bool = getattr(args, "crop", True)
@@ -535,12 +624,13 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
         pre_crop_size = img.size
         img = crop_to_content(img, padding)
         if img.size != pre_crop_size:
-            print(f"  CROP: {pre_crop_size[0]}x{pre_crop_size[1]} -> {img.size[0]}x{img.size[1]} (padding={padding})")
+            print(f"{indent}CROP: {pre_crop_size[0]}x{pre_crop_size[1]} → {img.size[0]}x{img.size[1]} (padding={padding})")
 
     # Step 5: Downscale if target specified
     if target_size:
+        pre_scale_size = img.size
         img = downscale_nearest(img, target_size)
-        print(f"  SCALE: {w}x{h} -> {img.size[0]}x{img.size[1]}")
+        print(f"{indent}SCALE: {pre_scale_size[0]}x{pre_scale_size[1]} → {img.size[0]}x{img.size[1]}")
 
     # Determine output path (--output-dir or overwrite in place)
     output_path = _resolve_output_path(image_path, args)
@@ -550,8 +640,8 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
         try:
             output_path.parent.mkdir(parents=True, exist_ok=True)
         except (PermissionError, OSError) as e:
-            print(f"  ERROR: Cannot create output directory {output_path.parent}: {e}")
-            return False
+            print(f"{indent}ERROR: Cannot create output directory {output_path.parent}: {e}")
+            return "failed"
 
     # Backup original before overwriting (only when not using --output-dir)
     if getattr(args, "backup", False) and output_path == image_path:
@@ -570,15 +660,15 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
                 try:
                     frame.save(frame_path, "PNG")
                 except (PermissionError, OSError) as e:
-                    print(f"  ERROR: Failed to save frame {frame_path}: {e}")
-            print(f"  SPLIT: {len(frames)} frames ({frames[0].size[0]}x{frames[0].size[1]} each)")
+                    print(f"{indent}ERROR: Failed to save frame {frame_path}: {e}")
+            print(f"{indent}SPLIT: {len(frames)} frames ({frames[0].size[0]}x{frames[0].size[1]} each)")
 
     # Step 7: Save
     try:
         img.save(output_path, "PNG")
     except (PermissionError, OSError) as e:
-        print(f"  ERROR: Failed to save {output_path}: {e}")
-        return False
+        print(f"{indent}ERROR: Failed to save {output_path}: {e}")
+        return "failed"
 
     # Save preview with checkerboard
     if save_preview and transparent_count > 0:
@@ -588,14 +678,9 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
         try:
             preview.save(preview_path, "PNG")
         except (PermissionError, OSError) as e:
-            print(f"  ERROR: Failed to save preview {preview_path}: {e}")
+            print(f"{indent}ERROR: Failed to save preview {preview_path}: {e}")
 
-    pct = (transparent_count / total_pixels) * 100
-    status = "OK" if pct > 20 else "WARN (low removal — check manually)"
-    print(f"  {status} {image_path.name}: {transparent_count} pixels removed ({pct:.1f}%)")
-    if fringe_cleaned > 0:
-        print(f"       + {fringe_cleaned} fringe pixels cleaned")
-    return transparent_count > 0
+    return "processed"
 
 
 def _make_checkerboard(w: int, h: int, tile_size: int = 8) -> Image.Image:
@@ -635,23 +720,90 @@ def _make_checkerboard(w: int, h: int, tile_size: int = 8) -> Image.Image:
     return img
 
 
+def _print_banner(args: argparse.Namespace, file_count: int, dry_run: bool = False) -> None:
+    """Print config banner matching gemini_api_generate.py style."""
+    print("\n" + "=" * 70)
+    print("MOMI'S ADVENTURE — SPRITE RIPPER")
+    print("=" * 70)
+    print(f"\nTolerance: {args.tolerance}")
+    crop_on = getattr(args, "crop", True)
+    padding = getattr(args, "padding", 2)
+    print(f"Crop: {'on' if crop_on else 'off'} (padding={padding})")
+    fringe_passes = getattr(args, "fringe_passes", 2)
+    print(f"Fringe passes: {fringe_passes}")
+    print(f"Files: {file_count}")
+    output_dir = getattr(args, "output_dir", None)
+    if output_dir:
+        print(f"Output: {output_dir}")
+    else:
+        print(f"Output: overwrite in-place")
+    if args.scale:
+        print(f"Scale: {args.scale}px (longest edge)")
+    if getattr(args, "backup", False):
+        print("Backup: on")
+    split_frames_n = getattr(args, "split_frames", None)
+    if split_frames_n:
+        print(f"Split frames: {split_frames_n}")
+    if dry_run:
+        print("\nMode: DRY RUN — no files will be modified")
+    print("=" * 70)
+
+
 def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
     """Process all PNGs in a directory (recursively)."""
     pngs = sorted(dir_path.rglob("*.png"))
-    # Skip preview files
-    pngs = [p for p in pngs if "_preview" not in p.name]
+    # Skip preview files, frame files from previous splits, and backup originals
+    pngs = [p for p in pngs
+            if "_preview" not in p.name
+            and "_frame_" not in p.name
+            and "_originals" not in p.parts]
 
     if not pngs:
         print(f"No PNG files found in {dir_path}")
+        print("  Check the directory path and ensure it contains .png files.")
         return
 
-    print(f"Processing {len(pngs)} sprites (tolerance={args.tolerance})")
-    if args.scale:
-        print(f"Downscaling to {args.scale}px (longest edge)")
-    print("=" * 60)
+    is_dry_run = getattr(args, "dry_run", False)
 
-    success = 0
-    for png in pngs:
+    # Print config banner
+    _print_banner(args, len(pngs), dry_run=is_dry_run)
+
+    start_time = time.time()
+
+    # Dry-run mode: discover and report without modifying files
+    if is_dry_run:
+        skipped = 0
+        would_process = 0
+        errors = 0
+        for i, png in enumerate(pngs):
+            result = dry_run_file(png, args)
+            print(f"  [{i+1}/{len(pngs)}] {png.name}: {result}")
+            if "SKIP" in result:
+                skipped += 1
+            elif "ERROR" in result:
+                errors += 1
+            else:
+                would_process += 1
+
+        elapsed = time.time() - start_time
+        print("\n" + "=" * 70)
+        print("DRY RUN COMPLETE")
+        print("=" * 70)
+        print(f"  Would process: {would_process}")
+        print(f"  Would skip:    {skipped}")
+        if errors:
+            print(f"  Errors:        {errors}")
+        print(f"  Total files:   {len(pngs)}")
+        print(f"  Elapsed:       {elapsed:.1f}s")
+        print("=" * 70)
+        print("  No files were modified.")
+        return
+
+    processed = 0
+    skipped = 0
+    failed = 0
+
+    for i, png in enumerate(pngs):
         # Auto-detect target size from parent folder name
         folder_name = png.parent.name
         auto_size = args.scale or TARGET_SIZES.get(folder_name)
@@ -660,11 +812,31 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         file_args = argparse.Namespace(**vars(args))
         file_args.scale = auto_size
 
-        if rip_sprite(png, file_args):
-            success += 1
+        prefix = f"  [{i+1}/{len(pngs)}] {png.name}:"
 
-    print("=" * 60)
-    print(f"Done: {success}/{len(pngs)} sprites processed")
+        try:
+            result = rip_sprite(png, file_args, progress_prefix=prefix)
+            if result == "processed":
+                processed += 1
+            elif result == "failed":
+                failed += 1
+            else:
+                skipped += 1
+        except PermissionError as e:
+            print(f"{prefix} ERROR — Permission denied: {e}")
+            failed += 1
+
+    elapsed = time.time() - start_time
+
+    print("\n" + "=" * 70)
+    print("PROCESSING COMPLETE")
+    print("=" * 70)
+    print(f"  Processed: {processed}")
+    print(f"  Skipped:   {skipped}")
+    print(f"  Failed:    {failed}")
+    print(f"  Total:     {len(pngs)}")
+    print(f"  Elapsed:   {elapsed:.1f}s")
+    print("=" * 70)
 
 
 def main() -> None:
@@ -727,26 +899,46 @@ Examples:
 
     # Warn about not-yet-implemented flags (only when user explicitly sets them)
     _stub_flags: list[str] = []
-    if args.dry_run:
-        _stub_flags.append("--dry-run")
-    if args.batch is not None:
-        _stub_flags.append("--batch")
     if args.report:
         _stub_flags.append("--report")
     if _stub_flags:
         for flag in _stub_flags:
             print(f"  NOTE: {flag} accepted but not yet implemented")
 
-    if args.path and Path(args.path).is_file():
-        args._processing_root = Path(args.path).parent
-        rip_sprite(Path(args.path), args)
+    # Resolve processing directory (--batch overrides default)
+    if args.batch is not None:
+        batch_dir = GENERATED_DIR / f"batch_{args.batch}"
+        if not batch_dir.is_dir():
+            print(f"ERROR: Batch directory not found: {batch_dir}")
+            print(f"  Expected path: {batch_dir.resolve()}")
+            print(f"  Available batches in {GENERATED_DIR}:")
+            # List existing batch directories for helpful feedback
+            batch_dirs = sorted(GENERATED_DIR.glob("batch_*")) if GENERATED_DIR.is_dir() else []
+            if batch_dirs:
+                for bd in batch_dirs:
+                    print(f"    {bd.name}")
+            else:
+                print("    (none found)")
+            sys.exit(1)
+        target_dir = batch_dir
     else:
-        # Default: process art/generated/ in repo
-        if GENERATED_DIR.is_dir():
-            args._processing_root = GENERATED_DIR
-            process_directory(GENERATED_DIR, args)
+        target_dir = GENERATED_DIR
+
+    if args.path and Path(args.path).is_file():
+        image_path = Path(args.path)
+        args._processing_root = image_path.parent
+        if args.dry_run:
+            result = dry_run_file(image_path, args)
+            print(f"  {image_path.name}: {result}")
         else:
-            print(f"No generated/ directory found at {GENERATED_DIR}")
+            rip_sprite(image_path, args)
+    else:
+        # Default: process target directory recursively
+        if target_dir.is_dir():
+            args._processing_root = target_dir
+            process_directory(target_dir, args)
+        else:
+            print(f"No generated/ directory found at {target_dir}")
             print("Run: python art/rip_sprites.py --help")
 
 
