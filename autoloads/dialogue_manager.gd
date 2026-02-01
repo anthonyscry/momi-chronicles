@@ -76,8 +76,7 @@ func start_dialogue(dialogue_id: String) -> bool:
 		_enter_cutscene_mode()
 
 	# Emit signal that dialogue has started
-	# Note: Events signals will be added in subtask-2-2
-	# Events.dialogue_started.emit(dialogue)
+	Events.dialogue_started.emit(dialogue)
 
 	return true
 
@@ -115,7 +114,7 @@ func advance_dialogue() -> bool:
 		_enter_cutscene_mode()
 
 	# Emit signal that dialogue advanced
-	# Events.dialogue_advanced.emit(_current_dialogue)
+	Events.dialogue_advanced.emit(_current_dialogue)
 
 	return true
 
@@ -141,7 +140,7 @@ func make_choice(choice_index: int) -> bool:
 	var next_id = choice["next_id"]
 
 	# Emit signal that choice was made
-	# Events.dialogue_choice_made.emit(choice_index, choice)
+	Events.dialogue_choice_made.emit(choice_index, choice)
 
 	# If next_id is empty, end dialogue
 	if next_id.is_empty():
@@ -176,7 +175,7 @@ func end_dialogue() -> void:
 		_exit_cutscene_mode()
 
 	# Emit signal that dialogue ended
-	# Events.dialogue_ended.emit()
+	Events.dialogue_ended.emit()
 
 	_current_dialogue = null
 
@@ -209,7 +208,7 @@ func _enter_cutscene_mode() -> void:
 
 	_in_cutscene = true
 	# Emit signal that cutscene started
-	# Events.cutscene_started.emit()
+	Events.cutscene_started.emit()
 
 
 ## Exit cutscene mode (re-enables player input).
@@ -219,7 +218,7 @@ func _exit_cutscene_mode() -> void:
 
 	_in_cutscene = false
 	# Emit signal that cutscene ended
-	# Events.cutscene_ended.emit()
+	Events.cutscene_ended.emit()
 
 
 ## Clear all loaded dialogues (useful for cleanup or testing).
