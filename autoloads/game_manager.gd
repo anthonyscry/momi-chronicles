@@ -183,15 +183,30 @@ func spend_coins(amount: int) -> bool:
 # PRIVATE METHODS
 # =============================================================================
 
+## Check if all Phase 16 subsystems are initialized and valid
+func _are_subsystems_valid() -> bool:
+	if not inventory or not is_instance_valid(inventory):
+		DebugLogger.log_error("GameManager: inventory is null or freed")
+		return false
+	if not equipment_manager or not is_instance_valid(equipment_manager):
+		DebugLogger.log_error("GameManager: equipment_manager is null or freed")
+		return false
+	if not party_manager or not is_instance_valid(party_manager):
+		DebugLogger.log_error("GameManager: party_manager is null or freed")
+		return false
+	return true
+
 ## Clear temporary state that survives scene reload (autoload children).
 ## Combo counter, poison visuals, and guard meter are scene-tree nodes
 ## that reset naturally via reload_current_scene(). Only Inventory.active_buffs
 ## persists incorrectly since Inventory is an autoload child.
 func _clear_temporary_state() -> void:
-	if inventory:
+	if inventory and is_instance_valid(inventory):
 		for effect_type in inventory.active_buffs.keys():
 			Events.buff_expired.emit(effect_type)
 		inventory.active_buffs.clear()
+	else:
+		DebugLogger.log_error("GameManager: inventory not valid during state clear")
 
 ## Ensure the fade overlay exists (persistent across scenes)
 func _ensure_fade_overlay() -> void:
@@ -247,7 +262,7 @@ func _on_zone_entered(zone_name: String) -> void:
 ## Handle zone transition request with fade effect
 func _on_zone_transition_requested(target_zone: String, spawn_point: String) -> void:
 	if not zone_scenes.has(target_zone):
-		push_error("Unknown zone: " + target_zone)
+		DebugLogger.log_error("GameManager: Unknown zone requested: " + target_zone)
 		return
 
 	if _is_transitioning:
@@ -285,20 +300,26 @@ func _on_zone_entered_autosave(zone_name: String) -> void:
 	# Skip if this is initial game load (no player yet)
 	await get_tree().process_frame
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.progression and player.progression.current_level > 0:
-		SaveManager.save_game()
+	if player and is_instance_valid(player) and player.progression and player.progression.current_level > 0:
+		if not SaveManager.save_game():
+			DebugLogger.log_error("GameManager: Auto-save failed on zone entry: %s" % zone_name)
+			return
 		DebugLogger.log_zone("Auto-saved on zone entry: %s" % zone_name)
 
 ## Auto-save after boss defeat (delayed for celebration/rewards)
 func _on_boss_defeated_autosave(_boss: Node) -> void:
 	# Wait 3 seconds for victory celebration and rewards
 	await get_tree().create_timer(3.0).timeout
-	SaveManager.save_game()
+	if not SaveManager.save_game():
+		DebugLogger.log_error("GameManager: Auto-save failed after boss defeat")
+		return
 	DebugLogger.log_save("Auto-saved after boss defeat")
 
 ## Auto-save after mini-boss defeat (delayed for death animation)
 func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
 	# Wait 2 seconds for death animation + loot notification
 	await get_tree().create_timer(2.0).timeout
-	SaveManager.save_game()
+	if not SaveManager.save_game():
+		DebugLogger.log_error("GameManager: Auto-save failed after mini-boss defeat")
+		return
 	DebugLogger.log_save("Auto-saved after mini-boss defeat")

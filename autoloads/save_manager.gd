@@ -34,8 +34,12 @@ func save_game() -> bool:
 func load_game() -> bool:
 	var data = _read_save_file()
 	if data.is_empty():
+		DebugLogger.log_error("SaveManager: load_game failed — no valid save data found")
 		return false
-	return _apply_save_data(data)
+	var success = _apply_save_data(data)
+	if not success:
+		DebugLogger.log_error("SaveManager: load_game failed — could not apply save data")
+	return success
 
 ## Delete save file (for new game)
 func delete_save() -> void:
@@ -91,10 +95,21 @@ func _gather_save_data() -> Dictionary:
 	data.boss_defeated = GameManager.boss_defeated
 	data.mini_bosses_defeated = GameManager.mini_bosses_defeated.duplicate()
 
-	# Get sub-system state (helpers already exist on each manager)
-	data.equipment = GameManager.equipment_manager.get_save_data()
-	data.inventory = GameManager.inventory.get_save_data()
-	data.party = GameManager.party_manager.get_save_data()
+	# Get sub-system state (with null safety for Phase 16 managers)
+	if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
+		data.equipment = GameManager.equipment_manager.get_save_data()
+	else:
+		DebugLogger.log_error("SaveManager: equipment_manager not valid during save")
+
+	if GameManager.inventory and is_instance_valid(GameManager.inventory):
+		data.inventory = GameManager.inventory.get_save_data()
+	else:
+		DebugLogger.log_error("SaveManager: inventory not valid during save")
+
+	if GameManager.party_manager and is_instance_valid(GameManager.party_manager):
+		data.party = GameManager.party_manager.get_save_data()
+	else:
+		DebugLogger.log_error("SaveManager: party_manager not valid during save")
 
 	data.timestamp = Time.get_unix_time_from_system()
 
@@ -107,7 +122,7 @@ func _gather_save_data() -> Dictionary:
 func _apply_save_data(data: Dictionary) -> bool:
 	# Validate version
 	if not data.has("version") or data.version > SAVE_VERSION:
-		push_error("SaveManager: Incompatible save version")
+		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(data.get("version", "missing")), SAVE_VERSION])
 		return false
 
 	# Apply to GameManager
@@ -124,15 +139,24 @@ func _apply_save_data(data: Dictionary) -> bool:
 	# Restore sub-system state (v3+, graceful fallback for v2 saves)
 	var equipment_data = data.get("equipment", {})
 	if not equipment_data.is_empty():
-		GameManager.equipment_manager.load_save_data(equipment_data)
+		if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
+			GameManager.equipment_manager.load_save_data(equipment_data)
+		else:
+			DebugLogger.log_error("SaveManager: equipment_manager not valid during load")
 
 	var inventory_data = data.get("inventory", {})
 	if not inventory_data.is_empty():
-		GameManager.inventory.load_save_data(inventory_data)
+		if GameManager.inventory and is_instance_valid(GameManager.inventory):
+			GameManager.inventory.load_save_data(inventory_data)
+		else:
+			DebugLogger.log_error("SaveManager: inventory not valid during load")
 
 	var party_data = data.get("party", {})
 	if not party_data.is_empty():
-		GameManager.party_manager.load_save_data(party_data)
+		if GameManager.party_manager and is_instance_valid(GameManager.party_manager):
+			GameManager.party_manager.load_save_data(party_data)
+		else:
+			DebugLogger.log_error("SaveManager: party_manager not valid during load")
 
 	# Store zone for transition (GameManager handles zone loading)
 	var target_zone = data.get("current_zone", "neighborhood")
@@ -166,7 +190,7 @@ func _write_save_file(data: Dictionary) -> bool:
 	var temp_path = SAVE_PATH + ".tmp"
 	var file = FileAccess.open(temp_path, FileAccess.WRITE)
 	if not file:
-		push_error("SaveManager: Failed to open temp file for writing")
+		DebugLogger.log_error("SaveManager: Failed to open temp file for writing: %s" % temp_path)
 		return false
 
 	var json_string = JSON.stringify(data, "  ")
@@ -196,7 +220,7 @@ func _read_save_file() -> Dictionary:
 
 	var file = FileAccess.open(file_path, FileAccess.READ)
 	if not file:
-		push_error("SaveManager: Failed to open save file for reading")
+		DebugLogger.log_error("SaveManager: Failed to open save file for reading: %s" % file_path)
 		return {}
 
 	var json_string = file.get_as_text()
@@ -206,13 +230,13 @@ func _read_save_file() -> Dictionary:
 	var json = JSON.new()
 	var error = json.parse(json_string)
 	if error != OK:
-		push_error("SaveManager: Failed to parse save file - corrupt data")
+		DebugLogger.log_error("SaveManager: Failed to parse save file — corrupt data at %s" % file_path)
 		Events.save_corrupted.emit()
 		return {}
 
 	var data = json.get_data()
 	if not data is Dictionary:
-		push_error("SaveManager: Save file format invalid")
+		DebugLogger.log_error("SaveManager: Save file format invalid — expected Dictionary at %s" % file_path)
 		Events.save_corrupted.emit()
 		return {}
 
@@ -227,7 +251,7 @@ func _validate_save_data(data: Dictionary) -> bool:
 	var required_fields = ["version", "level", "total_exp", "coins", "current_zone"]
 	for field in required_fields:
 		if not data.has(field):
-			push_error("SaveManager: Missing required field: " + field)
+			DebugLogger.log_error("SaveManager: Missing required field: " + field)
 			return false
 	return true
 
@@ -241,15 +265,22 @@ func _on_zone_entered_after_load(_zone_name: String) -> void:
 	await get_tree().process_frame  # Extra frame for safety
 
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.progression:
-		player.progression.current_level = _pending_level
-		player.progression.total_exp = _pending_exp
-		player.progression.current_exp = player.progression.get_exp_progress()
-		player._apply_level_stats()
+	if not player or not is_instance_valid(player):
+		DebugLogger.log_error("SaveManager: Player not found after load — progression not restored")
+		return
+	if not player.progression:
+		DebugLogger.log_error("SaveManager: Player has no progression component — progression not restored")
+		return
 
-		# Emit signals so UI updates
-		player.progression.level_changed.emit(_pending_level)
-		player.progression.exp_changed.emit(
-			player.progression.get_exp_progress(),
-			player.progression.get_exp_to_next_level()
-		)
+	player.progression.current_level = _pending_level
+	player.progression.total_exp = _pending_exp
+	player.progression.current_exp = player.progression.get_exp_progress()
+	player._apply_level_stats()
+
+	# Emit signals so UI updates
+	player.progression.level_changed.emit(_pending_level)
+	player.progression.exp_changed.emit(
+		player.progression.get_exp_progress(),
+		player.progression.get_exp_to_next_level()
+	)
+	DebugLogger.log_save("Game loaded — level %d, exp %d restored" % [_pending_level, _pending_exp])
