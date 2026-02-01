@@ -231,37 +231,126 @@ def flood_fill_remove(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
     return _flood_fill_remove_pillow(img, bg_color, tolerance)
 
 
-def clean_semitransparent_fringe(img: Image.Image, bg_color: tuple, fringe_tolerance: int = 80) -> int:
+def _clean_fringe_pillow(
+    img: Image.Image, bg_color: tuple, fringe_tolerance: int = 80, passes: int = 2
+) -> int:
     """
-    Clean up semi-transparent fringe pixels at sprite edges.
-    These are anti-aliasing artifacts where the sprite blends into the background.
+    Pure-Pillow fringe cleaning fallback (used when numpy is not available).
+    Runs multiple passes — each pass expands the transparent boundary found
+    in the previous pass, catching deeper anti-aliasing artifacts.
+    Returns total count of pixels cleaned across all passes.
     """
     pixels = img.load()
     w, h = img.size
-    cleaned = 0
+    total_cleaned = 0
 
-    for y in range(h):
-        for x in range(w):
-            r, g, b, a = pixels[x, y]
-            if a == 0:
-                continue  # Already transparent
+    for _pass in range(passes):
+        cleaned = 0
+        for y in range(h):
+            for x in range(w):
+                r, g, b, a = pixels[x, y]
+                if a == 0:
+                    continue  # Already transparent
 
-            # Check if this pixel is adjacent to a transparent pixel
-            has_transparent_neighbor = False
-            for nx, ny in [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]:
-                if 0 <= nx < w and 0 <= ny < h:
-                    if pixels[nx, ny][3] == 0:
-                        has_transparent_neighbor = True
-                        break
+                # Check if this pixel is adjacent to a transparent pixel
+                has_transparent_neighbor = False
+                for nx, ny in [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
+                    if 0 <= nx < w and 0 <= ny < h:
+                        if pixels[nx, ny][3] == 0:
+                            has_transparent_neighbor = True
+                            break
 
-            if has_transparent_neighbor:
-                # If this edge pixel is close to background color, make it transparent too
-                dist = color_distance((r, g, b), bg_color)
-                if dist <= fringe_tolerance:
-                    pixels[x, y] = (0, 0, 0, 0)
-                    cleaned += 1
+                if has_transparent_neighbor:
+                    dist = color_distance((r, g, b), bg_color)
+                    if dist <= fringe_tolerance:
+                        pixels[x, y] = (0, 0, 0, 0)
+                        cleaned += 1
 
-    return cleaned
+        total_cleaned += cleaned
+        if cleaned == 0:
+            break  # No more fringe pixels to clean
+
+    return total_cleaned
+
+
+def _clean_fringe_numpy(
+    img: Image.Image, bg_color: tuple, fringe_tolerance: int = 80, passes: int = 2
+) -> int:
+    """
+    Numpy-optimized fringe cleaning with multi-pass support.
+    Uses numpy array shifts to find all pixels adjacent to transparent regions,
+    then batch-computes color distances to decide which to remove.
+    Each pass expands the transparent boundary found in the previous pass.
+    Returns total count of pixels cleaned across all passes.
+    """
+    # Use int32 to avoid overflow when squaring color differences (255^2 = 65025 > int16 max)
+    arr = np.array(img, dtype=np.int32)
+    bg_arr = np.array(bg_color[:3], dtype=np.int32)
+    tolerance_sq = fringe_tolerance * fringe_tolerance
+    total_cleaned = 0
+    h, w = arr.shape[:2]
+
+    for _pass in range(passes):
+        # Find transparent pixels (alpha == 0)
+        transparent = arr[:, :, 3] == 0
+
+        # Find pixels adjacent to transparent regions using array shifts
+        # Each shift checks one direction: up, down, left, right
+        has_transparent_neighbor = np.zeros((h, w), dtype=bool)
+
+        # Neighbor above is transparent (shift transparent down by 1)
+        has_transparent_neighbor[1:, :] |= transparent[:-1, :]
+        # Neighbor below is transparent (shift transparent up by 1)
+        has_transparent_neighbor[:-1, :] |= transparent[1:, :]
+        # Neighbor to the left is transparent (shift transparent right by 1)
+        has_transparent_neighbor[:, 1:] |= transparent[:, :-1]
+        # Neighbor to the right is transparent (shift transparent left by 1)
+        has_transparent_neighbor[:, :-1] |= transparent[:, 1:]
+
+        # Only consider non-transparent pixels that have a transparent neighbor
+        candidates = has_transparent_neighbor & ~transparent
+
+        if not np.any(candidates):
+            break
+
+        # Batch-compute squared color distance for all candidate pixels
+        diff = arr[:, :, :3] - bg_arr
+        dist_sq = np.sum(diff * diff, axis=2)
+
+        # Pixels to clean: candidates close to background color
+        to_clean = candidates & (dist_sq <= tolerance_sq)
+
+        cleaned_count = int(np.sum(to_clean))
+        if cleaned_count == 0:
+            break
+
+        # Make cleaned pixels fully transparent
+        arr[to_clean] = [0, 0, 0, 0]
+        total_cleaned += cleaned_count
+
+    # Write numpy array back to the image in-place
+    result = Image.fromarray(arr.astype(np.uint8), "RGBA")
+    img.paste(result)
+
+    return total_cleaned
+
+
+def clean_semitransparent_fringe(
+    img: Image.Image, bg_color: tuple, fringe_tolerance: int = 80, passes: int = 2
+) -> int:
+    """
+    Clean up semi-transparent fringe pixels at sprite edges.
+    These are anti-aliasing artifacts where the sprite blends into the background.
+
+    Runs multiple passes (default 2) — each pass expands the transparent boundary
+    found in the previous pass, catching deeper anti-aliasing artifacts.
+
+    Uses numpy-optimized implementation when available, falls back to
+    pure-Pillow implementation otherwise.
+    """
+    if HAS_NUMPY:
+        return _clean_fringe_numpy(img, bg_color, fringe_tolerance, passes)
+    return _clean_fringe_pillow(img, bg_color, fringe_tolerance, passes)
 
 
 def downscale_nearest(img: Image.Image, target_size: int) -> Image.Image:
@@ -313,8 +402,9 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     # Step 2: Flood-fill remove from edges
     transparent_count = flood_fill_remove(img, bg_color, tolerance)
 
-    # Step 3: Clean fringe
-    fringe_cleaned = clean_semitransparent_fringe(img, bg_color)
+    # Step 3: Clean fringe (multi-pass)
+    fringe_passes: int = getattr(args, "fringe_passes", 2)
+    fringe_cleaned = clean_semitransparent_fringe(img, bg_color, passes=fringe_passes)
     transparent_count += fringe_cleaned
 
     if transparent_count == 0:
@@ -470,8 +560,6 @@ Examples:
         _stub_flags.append("--dry-run")
     if args.batch is not None:
         _stub_flags.append("--batch")
-    if args.fringe_passes != 2:
-        _stub_flags.append("--fringe-passes")
     if args.report:
         _stub_flags.append("--report")
     if _stub_flags:
