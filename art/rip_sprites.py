@@ -19,6 +19,7 @@ Output: Overwrites originals with transparent versions + saves _preview.png with
 import sys
 import math
 import time
+import json
 import argparse
 import pathlib
 import shutil
@@ -504,24 +505,57 @@ def _backup_original(image_path: Path) -> bool:
         return False
 
 
-def dry_run_file(image_path: Path, args: argparse.Namespace) -> str:
+def dry_run_file(
+    image_path: Path,
+    args: argparse.Namespace,
+    report_entries: Optional[list] = None,
+) -> str:
     """Inspect a single file without modifying it (--dry-run mode).
 
     Opens the image, detects background color and confidence, checks if
     already transparent. Returns a status string describing what would
     happen to this file during a real run.
+    When report_entries is provided, appends a dict with per-file metadata.
     """
+    entry: Optional[dict] = None
+    if report_entries is not None:
+        entry = {
+            "input_path": str(image_path),
+            "output_path": None,
+            "status": None,
+            "background_color": None,
+            "confidence": None,
+            "pixels_removed": None,
+            "removal_percentage": None,
+            "crop_dimensions": None,
+            "split_frame_count": None,
+            "warnings": [],
+            "errors": [],
+        }
+
     try:
         img = Image.open(image_path).convert("RGBA")
     except PermissionError:
+        if entry is not None:
+            entry["status"] = "error"
+            entry["errors"].append("Permission denied")
+            report_entries.append(entry)
         return "ERROR: Permission denied"
     except Exception as e:
+        if entry is not None:
+            entry["status"] = "error"
+            entry["errors"].append(str(e))
+            report_entries.append(entry)
         return f"ERROR: Cannot open — {e}"
 
     w, h = img.size
 
     # Check already transparent
     if is_already_transparent(img):
+        if entry is not None:
+            entry["status"] = "skip"
+            entry["warnings"].append("already transparent")
+            report_entries.append(entry)
         return f"SKIP: already transparent ({w}x{h})"
 
     # Detect background
@@ -532,11 +566,20 @@ def dry_run_file(image_path: Path, args: argparse.Namespace) -> str:
     if confidence < 0.3:
         confidence_str += " LOW"
 
+    if entry is not None:
+        entry["status"] = "would_process"
+        entry["background_color"] = [r, g, b]
+        entry["confidence"] = round(confidence, 4)
+        report_entries.append(entry)
+
     return f"WOULD PROCESS: {w}x{h} — BG rgb({r},{g},{b}) ({confidence_str})"
 
 
 def rip_sprite(
-    image_path: Path, args: argparse.Namespace, progress_prefix: str = ""
+    image_path: Path,
+    args: argparse.Namespace,
+    progress_prefix: str = "",
+    report_entries: Optional[list] = None,
 ) -> str:
     """
     Remove background and optionally downscale a sprite.
@@ -551,11 +594,29 @@ def rip_sprite(
     7. Save with transparency
 
     Returns status string: "processed", "skipped", or "failed".
+    When report_entries is provided, appends a dict with per-file metadata.
     """
     tolerance: int = args.tolerance
     target_size: Optional[int] = args.scale
     save_preview: bool = not args.no_preview
     indent = "       " if progress_prefix else "  "
+
+    # Report entry — populated incrementally during processing
+    entry: Optional[dict] = None
+    if report_entries is not None:
+        entry = {
+            "input_path": str(image_path),
+            "output_path": None,
+            "status": None,
+            "background_color": None,
+            "confidence": None,
+            "pixels_removed": None,
+            "removal_percentage": None,
+            "crop_dimensions": None,
+            "split_frame_count": None,
+            "warnings": [],
+            "errors": [],
+        }
 
     try:
         img = Image.open(image_path).convert("RGBA")
@@ -564,6 +625,10 @@ def rip_sprite(
             print(f"{progress_prefix} ERROR — {e}")
         else:
             print(f"  ERROR {image_path}: {e}")
+        if entry is not None:
+            entry["status"] = "failed"
+            entry["errors"].append(str(e))
+            report_entries.append(entry)
         return "failed"
 
     w, h = img.size
@@ -575,6 +640,10 @@ def rip_sprite(
             print(f"{progress_prefix} SKIP — already transparent")
         else:
             print(f"  SKIP: already transparent — {image_path.name}")
+        if entry is not None:
+            entry["status"] = "skipped"
+            entry["warnings"].append("already transparent")
+            report_entries.append(entry)
         return "skipped"
 
     # Step 1: Detect background
@@ -583,6 +652,10 @@ def rip_sprite(
     conf_str = f"{confidence:.0%}"
     if confidence < 0.3:
         conf_str += " LOW"
+
+    if entry is not None:
+        entry["background_color"] = [r, g, b]
+        entry["confidence"] = round(confidence, 4)
 
     # Step 2: Flood-fill remove from edges
     transparent_count = flood_fill_remove(img, bg_color, tolerance)
@@ -605,6 +678,15 @@ def rip_sprite(
                 print(f"  OK {image_path.name}: Already has transparency")
             else:
                 print(f"  WARN {image_path.name}: No background removed — manual check needed")
+        if entry is not None:
+            entry["status"] = "skipped"
+            entry["pixels_removed"] = 0
+            entry["removal_percentage"] = 0.0
+            if has_alpha:
+                entry["warnings"].append("already has transparency")
+            else:
+                entry["warnings"].append("no background removed — manual check needed")
+            report_entries.append(entry)
         return "skipped"
 
     # Print main progress line
@@ -617,6 +699,12 @@ def rip_sprite(
     if fringe_cleaned > 0:
         print(f"{indent}+ {fringe_cleaned} fringe pixels cleaned")
 
+    if entry is not None:
+        entry["pixels_removed"] = transparent_count
+        entry["removal_percentage"] = round(pct, 2)
+        if pct <= 20:
+            entry["warnings"].append("low removal percentage — check manually")
+
     # Step 4: Crop to content bounding box
     do_crop: bool = getattr(args, "crop", True)
     padding: int = getattr(args, "padding", 2)
@@ -625,6 +713,11 @@ def rip_sprite(
         img = crop_to_content(img, padding)
         if img.size != pre_crop_size:
             print(f"{indent}CROP: {pre_crop_size[0]}x{pre_crop_size[1]} → {img.size[0]}x{img.size[1]} (padding={padding})")
+            if entry is not None:
+                entry["crop_dimensions"] = {
+                    "before": [pre_crop_size[0], pre_crop_size[1]],
+                    "after": [img.size[0], img.size[1]],
+                }
 
     # Step 5: Downscale if target specified
     if target_size:
@@ -635,12 +728,19 @@ def rip_sprite(
     # Determine output path (--output-dir or overwrite in place)
     output_path = _resolve_output_path(image_path, args)
 
+    if entry is not None:
+        entry["output_path"] = str(output_path)
+
     # Create output directory if needed (--output-dir)
     if output_path != image_path:
         try:
             output_path.parent.mkdir(parents=True, exist_ok=True)
         except (PermissionError, OSError) as e:
             print(f"{indent}ERROR: Cannot create output directory {output_path.parent}: {e}")
+            if entry is not None:
+                entry["status"] = "failed"
+                entry["errors"].append(f"Cannot create output directory: {e}")
+                report_entries.append(entry)
             return "failed"
 
     # Backup original before overwriting (only when not using --output-dir)
@@ -661,13 +761,24 @@ def rip_sprite(
                     frame.save(frame_path, "PNG")
                 except (PermissionError, OSError) as e:
                     print(f"{indent}ERROR: Failed to save frame {frame_path}: {e}")
+                    if entry is not None:
+                        entry["errors"].append(f"Failed to save frame {frame_name}: {e}")
             print(f"{indent}SPLIT: {len(frames)} frames ({frames[0].size[0]}x{frames[0].size[1]} each)")
+            if entry is not None:
+                entry["split_frame_count"] = len(frames)
+        else:
+            if entry is not None:
+                entry["warnings"].append(f"split-frames {num_frames} skipped — validation failed")
 
     # Step 7: Save
     try:
         img.save(output_path, "PNG")
     except (PermissionError, OSError) as e:
         print(f"{indent}ERROR: Failed to save {output_path}: {e}")
+        if entry is not None:
+            entry["status"] = "failed"
+            entry["errors"].append(f"Failed to save: {e}")
+            report_entries.append(entry)
         return "failed"
 
     # Save preview with checkerboard
@@ -679,6 +790,10 @@ def rip_sprite(
             preview.save(preview_path, "PNG")
         except (PermissionError, OSError) as e:
             print(f"{indent}ERROR: Failed to save preview {preview_path}: {e}")
+
+    if entry is not None:
+        entry["status"] = "processed"
+        report_entries.append(entry)
 
     return "processed"
 
@@ -744,9 +859,34 @@ def _print_banner(args: argparse.Namespace, file_count: int, dry_run: bool = Fal
     split_frames_n = getattr(args, "split_frames", None)
     if split_frames_n:
         print(f"Split frames: {split_frames_n}")
+    if getattr(args, "report", False):
+        print("Report: _rip_report.json")
     if dry_run:
         print("\nMode: DRY RUN — no files will be modified")
     print("=" * 70)
+
+
+def _write_report(
+    report_path: Path,
+    file_results: list[dict],
+    summary: dict,
+) -> None:
+    """Write _rip_report.json with per-file results and summary stats.
+
+    Uses json.dump with indent=2 for human-readable output. Converts
+    Path objects to POSIX strings for JSON serialization.
+    """
+    report = {
+        "summary": summary,
+        "files": file_results,
+    }
+    try:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(report_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        print(f"  Report: {report_path}")
+    except (PermissionError, OSError) as e:
+        print(f"  ERROR: Failed to write report {report_path}: {e}")
 
 
 def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
@@ -764,11 +904,15 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         return
 
     is_dry_run = getattr(args, "dry_run", False)
+    is_report = getattr(args, "report", False)
 
     # Print config banner
     _print_banner(args, len(pngs), dry_run=is_dry_run)
 
     start_time = time.time()
+
+    # Report collection — only when --report is active
+    report_entries: Optional[list] = [] if is_report else None
 
     # Dry-run mode: discover and report without modifying files
     if is_dry_run:
@@ -776,7 +920,7 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         would_process = 0
         errors = 0
         for i, png in enumerate(pngs):
-            result = dry_run_file(png, args)
+            result = dry_run_file(png, args, report_entries=report_entries)
             print(f"  [{i+1}/{len(pngs)}] {png.name}: {result}")
             if "SKIP" in result:
                 skipped += 1
@@ -797,6 +941,21 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         print(f"  Elapsed:       {elapsed:.1f}s")
         print("=" * 70)
         print("  No files were modified.")
+
+        # Write report if requested
+        if is_report and report_entries is not None:
+            output_dir = getattr(args, "output_dir", None)
+            report_root = Path(output_dir) if output_dir else dir_path
+            report_path = report_root / "_rip_report.json"
+            summary = {
+                "mode": "dry_run",
+                "total": len(pngs),
+                "would_process": would_process,
+                "skipped": skipped,
+                "errors": errors,
+                "elapsed_seconds": round(elapsed, 2),
+            }
+            _write_report(report_path, report_entries, summary)
         return
 
     processed = 0
@@ -815,7 +974,10 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         prefix = f"  [{i+1}/{len(pngs)}] {png.name}:"
 
         try:
-            result = rip_sprite(png, file_args, progress_prefix=prefix)
+            result = rip_sprite(
+                png, file_args, progress_prefix=prefix,
+                report_entries=report_entries,
+            )
             if result == "processed":
                 processed += 1
             elif result == "failed":
@@ -825,6 +987,20 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
         except PermissionError as e:
             print(f"{prefix} ERROR — Permission denied: {e}")
             failed += 1
+            if report_entries is not None:
+                report_entries.append({
+                    "input_path": str(png),
+                    "output_path": None,
+                    "status": "failed",
+                    "background_color": None,
+                    "confidence": None,
+                    "pixels_removed": None,
+                    "removal_percentage": None,
+                    "crop_dimensions": None,
+                    "split_frame_count": None,
+                    "warnings": [],
+                    "errors": [f"Permission denied: {e}"],
+                })
 
     elapsed = time.time() - start_time
 
@@ -837,6 +1013,21 @@ def process_directory(dir_path: Path, args: argparse.Namespace) -> None:
     print(f"  Total:     {len(pngs)}")
     print(f"  Elapsed:   {elapsed:.1f}s")
     print("=" * 70)
+
+    # Write report if requested
+    if is_report and report_entries is not None:
+        output_dir = getattr(args, "output_dir", None)
+        report_root = Path(output_dir) if output_dir else dir_path
+        report_path = report_root / "_rip_report.json"
+        summary = {
+            "mode": "normal",
+            "total": len(pngs),
+            "processed": processed,
+            "skipped": skipped,
+            "failed": failed,
+            "elapsed_seconds": round(elapsed, 2),
+        }
+        _write_report(report_path, report_entries, summary)
 
 
 def main() -> None:
@@ -869,7 +1060,7 @@ Examples:
     parser.add_argument("--no-preview", action="store_true",
                         help="Skip generating checkerboard preview images")
 
-    # New flags (stubs for future implementation)
+    # Additional processing flags
     parser.add_argument("--crop", action="store_true", default=True,
                         help="Crop to content bounding box after background removal (default: on)")
     parser.add_argument("--no-crop", action="store_true",
@@ -897,14 +1088,6 @@ Examples:
     if args.no_crop:
         args.crop = False
 
-    # Warn about not-yet-implemented flags (only when user explicitly sets them)
-    _stub_flags: list[str] = []
-    if args.report:
-        _stub_flags.append("--report")
-    if _stub_flags:
-        for flag in _stub_flags:
-            print(f"  NOTE: {flag} accepted but not yet implemented")
-
     # Resolve processing directory (--batch overrides default)
     if args.batch is not None:
         batch_dir = GENERATED_DIR / f"batch_{args.batch}"
@@ -927,11 +1110,33 @@ Examples:
     if args.path and Path(args.path).is_file():
         image_path = Path(args.path)
         args._processing_root = image_path.parent
+        is_report = getattr(args, "report", False)
+        report_entries: Optional[list] = [] if is_report else None
+
+        start_time = time.time()
         if args.dry_run:
-            result = dry_run_file(image_path, args)
+            result = dry_run_file(image_path, args, report_entries=report_entries)
             print(f"  {image_path.name}: {result}")
         else:
-            rip_sprite(image_path, args)
+            rip_sprite(image_path, args, report_entries=report_entries)
+        elapsed = time.time() - start_time
+
+        # Write report for single-file mode
+        if is_report and report_entries is not None:
+            output_dir = getattr(args, "output_dir", None)
+            report_root = Path(output_dir) if output_dir else image_path.parent
+            report_path = report_root / "_rip_report.json"
+            # Derive counts from report entries
+            statuses = [e.get("status", "") for e in report_entries]
+            summary = {
+                "mode": "dry_run" if args.dry_run else "normal",
+                "total": len(report_entries),
+                "processed": statuses.count("processed") + statuses.count("would_process"),
+                "skipped": statuses.count("skipped") + statuses.count("skip"),
+                "failed": statuses.count("failed") + statuses.count("error"),
+                "elapsed_seconds": round(elapsed, 2),
+            }
+            _write_report(report_path, report_entries, summary)
     else:
         # Default: process target directory recursively
         if target_dir.is_dir():
