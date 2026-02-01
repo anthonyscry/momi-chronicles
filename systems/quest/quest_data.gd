@@ -34,6 +34,9 @@ class_name QuestData
 ## Quest IDs that must be completed before this quest becomes available
 @export var prerequisite_quest_ids: Array[String] = []
 
+## Zone ID to unlock when this quest is completed (empty if no zone unlock)
+@export var zone_unlock: String = ""
+
 # =============================================================================
 # QUEST CREATION
 # =============================================================================
@@ -41,7 +44,7 @@ class_name QuestData
 ## Create a Quest instance from this QuestData
 ## Returns a new Quest object with all objectives initialized
 func create_quest() -> Quest:
-	var quest: Quest = Quest.new(id, title, description, [], rewards)
+	var quest: Quest = Quest.new(id, title, description, [], rewards, zone_unlock)
 
 	# Create QuestObjective instances from the data
 	for i in range(objective_descriptions.size()):

@@ -35,6 +35,9 @@ var objectives: Array = []
 ## Rewards granted upon quest completion (e.g., {"coins": 100, "exp": 50})
 var rewards: Dictionary = {}
 
+## Zone ID to unlock when quest is completed (empty if no zone unlock)
+var zone_unlock: String = ""
+
 ## Current state of the quest
 var state: State = State.NOT_STARTED
 
@@ -48,6 +51,7 @@ func _init(
 	p_description: String = "",
 	p_objectives: Array = [],
 	p_rewards: Dictionary = {},
+	p_zone_unlock: String = "",
 	p_state: State = State.NOT_STARTED
 ) -> void:
 	id = p_id
@@ -55,6 +59,7 @@ func _init(
 	description = p_description
 	objectives = p_objectives
 	rewards = p_rewards
+	zone_unlock = p_zone_unlock
 	state = p_state
 
 # =============================================================================

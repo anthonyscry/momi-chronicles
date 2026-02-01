@@ -192,6 +192,15 @@ func complete_quest(quest_id: String) -> void:
 		if events.has_signal("quest_completed"):
 			events.quest_completed.emit(quest_id)
 
+	# Unlock zone if quest gates a zone
+	if not quest.zone_unlock.is_empty():
+		if has_node("/root/GameManager"):
+			var game_manager = get_node("/root/GameManager")
+			game_manager.unlock_zone(quest.zone_unlock)
+			print("QuestManager: Quest '%s' unlocked zone '%s'" % [quest_id, quest.zone_unlock])
+		else:
+			push_warning("QuestManager: Cannot unlock zone - GameManager not found")
+
 	# Grant rewards (will be implemented in later phase)
 	_grant_rewards(quest.rewards)
 
