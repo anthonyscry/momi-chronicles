@@ -145,23 +145,34 @@ func _on_combo_completed(count: int) -> void:
 
 func _on_ring_menu_opened() -> void:
 	## Track ring menu opening for ring menu tutorial
+	# Complete ring menu tutorial when opened
 	if should_show_tutorial(TUTORIAL_RING_MENU):
 		Events.tutorial_triggered.emit(TUTORIAL_RING_MENU)
 		mark_tutorial_shown(TUTORIAL_RING_MENU)
 		mark_tutorial_completed(TUTORIAL_RING_MENU)
+	elif not is_tutorial_completed(TUTORIAL_RING_MENU):
+		mark_tutorial_completed(TUTORIAL_RING_MENU)
 
-func _on_item_used(item_id: String) -> void:
-	## Track item usage for item usage tutorial
+	# Trigger item usage tutorial when ring menu is opened for the first time
 	if should_show_tutorial(TUTORIAL_ITEM_USAGE):
 		Events.tutorial_triggered.emit(TUTORIAL_ITEM_USAGE)
 		mark_tutorial_shown(TUTORIAL_ITEM_USAGE)
-	increment_action_count(TUTORIAL_ITEM_USAGE)
+		DebugLogger.log_system("Item usage tutorial triggered on ring menu open")
+
+func _on_item_used(item_id: String) -> void:
+	## Track item usage for item usage tutorial
+	# Complete item usage tutorial after first use
+	if tutorials_shown.get(TUTORIAL_ITEM_USAGE, false) and not is_tutorial_completed(TUTORIAL_ITEM_USAGE):
+		mark_tutorial_completed(TUTORIAL_ITEM_USAGE)
+		DebugLogger.log_system("Item usage tutorial completed after first item use: %s" % item_id)
 
 func _on_pickup_collected(item_id: String) -> void:
 	## Track item pickups to potentially trigger ring menu tutorial
-	# Ring menu tutorial should trigger on first consumable item pickup
-	# This is a placeholder - actual logic will be implemented in trigger phase
-	pass
+	# Ring menu tutorial triggers on first consumable item pickup
+	if should_show_tutorial(TUTORIAL_RING_MENU):
+		Events.tutorial_triggered.emit(TUTORIAL_RING_MENU)
+		mark_tutorial_shown(TUTORIAL_RING_MENU)
+		DebugLogger.log_system("Ring menu tutorial triggered on item pickup: %s" % item_id)
 
 func _on_enemy_spawned(enemy_id: String) -> void:
 	## Trigger attack tutorial on first enemy encounter
