@@ -440,17 +440,39 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
 
 
 def _make_checkerboard(w: int, h: int, tile_size: int = 8) -> Image.Image:
-    """Create a checkerboard pattern image for transparency preview."""
-    img = Image.new("RGBA", (w, h))
-    pixels = img.load()
+    """Create a checkerboard pattern image for transparency preview.
+
+    Uses numpy array broadcasting when available for fastest generation.
+    Falls back to PIL tile+paste which is still much faster than per-pixel.
+    """
     c1 = (200, 200, 200, 255)
     c2 = (255, 255, 255, 255)
-    for y in range(h):
-        for x in range(w):
-            if ((x // tile_size) + (y // tile_size)) % 2 == 0:
-                pixels[x, y] = c1
-            else:
-                pixels[x, y] = c2
+
+    if HAS_NUMPY:
+        # Numpy broadcasting: build entire checkerboard in one vectorized operation
+        y_idx = np.arange(h) // tile_size
+        x_idx = np.arange(w) // tile_size
+        # (h,1) + (1,w) broadcasts to (h,w) checkerboard mask
+        checker = (y_idx[:, np.newaxis] + x_idx[np.newaxis, :]) % 2
+        # Build RGBA array: where checker==0 -> c1, checker==1 -> c2
+        arr = np.empty((h, w, 4), dtype=np.uint8)
+        arr[checker == 0] = c1
+        arr[checker == 1] = c2
+        return Image.fromarray(arr, "RGBA")
+
+    # PIL fallback: create a single 2x2 tile and paste it across the image
+    tile_w = tile_size * 2
+    tile_h = tile_size * 2
+    tile = Image.new("RGBA", (tile_w, tile_h))
+    tile.paste(Image.new("RGBA", (tile_size, tile_size), c1), (0, 0))
+    tile.paste(Image.new("RGBA", (tile_size, tile_size), c2), (tile_size, 0))
+    tile.paste(Image.new("RGBA", (tile_size, tile_size), c2), (0, tile_size))
+    tile.paste(Image.new("RGBA", (tile_size, tile_size), c1), (tile_size, tile_size))
+
+    img = Image.new("RGBA", (w, h))
+    for y in range(0, h, tile_h):
+        for x in range(0, w, tile_w):
+            img.paste(tile, (x, y))
     return img
 
 
