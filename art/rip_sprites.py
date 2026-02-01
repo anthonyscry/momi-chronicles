@@ -110,9 +110,10 @@ def detect_background_color(img: Image.Image) -> tuple[tuple, float]:
     return bg_color, confidence
 
 
-def flood_fill_remove(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
+def _flood_fill_remove_pillow(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
     """
-    Flood-fill from all 4 corners to remove background.
+    Pure-Pillow flood-fill fallback (used when numpy is not available).
+    Flood-fill from all 4 corners + edge midpoints to remove background.
     Only removes connected regions (won't punch holes in the sprite).
     Returns count of pixels made transparent.
     """
@@ -153,6 +154,81 @@ def flood_fill_remove(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
                     queue.append((nx, ny))
 
     return transparent_count
+
+
+def _flood_fill_remove_numpy(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
+    """
+    Numpy-optimized flood-fill from all 4 corners + edge midpoints.
+    Uses numpy boolean array for O(1) visited tracking and numpy array
+    indexing for pixel color comparisons. Only removes connected regions.
+    Returns count of pixels made transparent.
+    """
+    w, h = img.size
+    # Convert image to numpy array (h, w, 4) for fast pixel access
+    arr = np.array(img, dtype=np.int16)
+    bg_arr = np.array(bg_color[:3], dtype=np.int16)
+    tolerance_sq = tolerance * tolerance
+
+    # Numpy boolean array for O(1) visited lookup (replaces Python set())
+    visited = np.zeros((h, w), dtype=bool)
+    transparent_count = 0
+
+    # Start flood fill from all 4 corners + edge midpoints
+    seeds = [
+        (0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1),
+        (w // 2, 0), (w // 2, h - 1), (0, h // 2), (w - 1, h // 2),
+    ]
+
+    queue: deque[tuple[int, int]] = deque()
+    for sx, sy in seeds:
+        if not visited[sy, sx]:
+            queue.append((sx, sy))
+            visited[sy, sx] = True
+
+    while queue:
+        x, y = queue.popleft()
+
+        # Color distance check using squared distance (avoids sqrt)
+        diff = arr[y, x, :3] - bg_arr
+        dist_sq = int(diff[0]) * int(diff[0]) + int(diff[1]) * int(diff[1]) + int(diff[2]) * int(diff[2])
+
+        if dist_sq <= tolerance_sq:
+            arr[y, x] = (0, 0, 0, 0)
+            transparent_count += 1
+
+            # Add unvisited neighbors (4-connected for cleaner edges)
+            if x + 1 < w and not visited[y, x + 1]:
+                visited[y, x + 1] = True
+                queue.append((x + 1, y))
+            if x - 1 >= 0 and not visited[y, x - 1]:
+                visited[y, x - 1] = True
+                queue.append((x - 1, y))
+            if y + 1 < h and not visited[y + 1, x]:
+                visited[y + 1, x] = True
+                queue.append((x, y + 1))
+            if y - 1 >= 0 and not visited[y - 1, x]:
+                visited[y - 1, x] = True
+                queue.append((x, y - 1))
+
+    # Write numpy array back to the image in-place
+    result = Image.fromarray(arr.astype(np.uint8), "RGBA")
+    img.paste(result)
+
+    return transparent_count
+
+
+def flood_fill_remove(img: Image.Image, bg_color: tuple, tolerance: int) -> int:
+    """
+    Flood-fill from all 4 corners to remove background.
+    Only removes connected regions (won't punch holes in the sprite).
+    Returns count of pixels made transparent.
+
+    Uses numpy-optimized implementation when available, falls back to
+    pure-Pillow implementation otherwise.
+    """
+    if HAS_NUMPY:
+        return _flood_fill_remove_numpy(img, bg_color, tolerance)
+    return _flood_fill_remove_pillow(img, bg_color, tolerance)
 
 
 def clean_semitransparent_fringe(img: Image.Image, bg_color: tuple, fringe_tolerance: int = 80) -> int:
