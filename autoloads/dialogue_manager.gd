@@ -159,6 +159,9 @@ func make_choice(choice_index: int) -> bool:
 	if _current_dialogue.is_cutscene and not _in_cutscene:
 		_enter_cutscene_mode()
 
+	# Emit signal that dialogue advanced
+	Events.dialogue_advanced.emit(_current_dialogue)
+
 	return true
 
 

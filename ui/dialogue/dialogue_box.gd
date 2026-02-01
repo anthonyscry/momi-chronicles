@@ -21,6 +21,15 @@ var typing_complete: bool = false
 var blink_timer: float = 0.0
 var blink_visible: bool = true
 
+## Dynamic UI components
+var portrait_display: PortraitDisplay = null
+var choice_container: VBoxContainer = null
+var choice_buttons: Array[ChoiceButton] = []
+
+## Preloaded scenes
+const PortraitDisplayScene = preload("res://ui/dialogue/portrait_display.tscn")
+const ChoiceButtonScene = preload("res://ui/dialogue/choice_button.tscn")
+
 func _ready() -> void:
 	# Start hidden
 	hide()
@@ -34,6 +43,12 @@ func _ready() -> void:
 	if continue_indicator:
 		continue_indicator.text = "▼"
 		continue_indicator.visible = false
+
+	# Setup portrait display
+	_setup_portrait_display()
+
+	# Setup choice buttons container
+	_setup_choice_container()
 
 
 func _process(delta: float) -> void:
@@ -62,6 +77,10 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
+		return
+
+	# If choices are shown, let the buttons handle input
+	if _has_active_choices():
 		return
 
 	# Accept on any action press (interact, ui_accept, etc.)
@@ -107,6 +126,9 @@ func _display_dialogue(dialogue: DialogueResource) -> void:
 	if continue_indicator:
 		continue_indicator.visible = false
 
+	# Update choice buttons if dialogue has choices
+	_update_choices(dialogue)
+
 	_update_displayed_text()
 
 
@@ -128,7 +150,8 @@ func _finish_typing() -> void:
 	blink_timer = 0.0
 	blink_visible = true
 
-	if continue_indicator:
+	# Only show continue indicator if there are no choices
+	if continue_indicator and not _has_active_choices():
 		continue_indicator.visible = true
 
 
@@ -145,3 +168,75 @@ func _reset_state() -> void:
 		character_name_label.text = ""
 	if continue_indicator:
 		continue_indicator.visible = false
+
+	# Clear choice buttons
+	_clear_choices()
+
+
+func _setup_portrait_display() -> void:
+	# Create portrait display instance
+	portrait_display = PortraitDisplayScene.instantiate()
+	portrait_display.name = "PortraitDisplay"
+	# Position to the left of the dialogue box
+	portrait_display.position = Vector2(16, 120)
+	add_child(portrait_display)
+
+
+func _setup_choice_container() -> void:
+	# Create container for choice buttons
+	choice_container = VBoxContainer.new()
+	choice_container.name = "ChoiceContainer"
+	# Position below the dialogue text
+	choice_container.position = Vector2(40, 160)
+	choice_container.add_theme_constant_override("separation", 4)
+	choice_container.visible = false
+	add_child(choice_container)
+
+
+func _update_choices(dialogue: DialogueResource) -> void:
+	# Clear existing choices first
+	_clear_choices()
+
+	# If dialogue has no choices, hide container and return
+	if not dialogue.has_choices():
+		if choice_container:
+			choice_container.visible = false
+		return
+
+	# Create choice buttons for each option
+	for i in range(dialogue.choices.size()):
+		var choice = dialogue.choices[i]
+		var choice_text = choice.get("text", "???")
+
+		var button = ChoiceButtonScene.instantiate() as ChoiceButton
+		button.setup(choice_text, i)
+		button.choice_selected.connect(_on_choice_selected)
+
+		choice_container.add_child(button)
+		choice_buttons.append(button)
+
+	# Show choice container
+	if choice_container:
+		choice_container.visible = true
+
+
+func _clear_choices() -> void:
+	# Remove all choice buttons
+	for button in choice_buttons:
+		if is_instance_valid(button):
+			button.queue_free()
+
+	choice_buttons.clear()
+
+	# Hide container
+	if choice_container:
+		choice_container.visible = false
+
+
+func _has_active_choices() -> bool:
+	return choice_buttons.size() > 0 and choice_container and choice_container.visible
+
+
+func _on_choice_selected(choice_index: int) -> void:
+	# Pass choice to DialogueManager
+	DialogueManager.make_choice(choice_index)
