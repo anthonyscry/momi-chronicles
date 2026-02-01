@@ -20,6 +20,7 @@ import sys
 import math
 import argparse
 import pathlib
+import shutil
 from collections import Counter, deque
 from pathlib import Path
 from typing import Optional
@@ -432,6 +433,49 @@ def downscale_nearest(img: Image.Image, target_size: int) -> Image.Image:
     return img.resize((new_w, new_h), Image.NEAREST)
 
 
+def _resolve_output_path(image_path: Path, args: argparse.Namespace) -> Path:
+    """Resolve the output path for a processed sprite.
+
+    If --output-dir is set, maps the image path into the output directory,
+    preserving the directory structure relative to the processing root.
+    Otherwise returns the original image_path (overwrite in place).
+    """
+    output_dir = getattr(args, "output_dir", None)
+    if output_dir is None:
+        return image_path
+
+    output_dir_path = Path(output_dir)
+    processing_root = getattr(args, "_processing_root", None)
+
+    if processing_root is not None:
+        try:
+            relative = image_path.relative_to(processing_root)
+        except ValueError:
+            # Image is outside the processing root — use just the filename
+            relative = Path(image_path.name)
+    else:
+        # Single file mode — use just the filename
+        relative = Path(image_path.name)
+
+    return output_dir_path / relative
+
+
+def _backup_original(image_path: Path) -> bool:
+    """Copy the original file to _originals/ subdirectory before overwriting.
+
+    Uses shutil.copy2 to preserve file metadata. Creates _originals/
+    directory if it doesn't exist. Returns True on success, False on error.
+    """
+    backup_dir = image_path.parent / "_originals"
+    try:
+        backup_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(image_path, backup_dir / image_path.name)
+        return True
+    except (PermissionError, OSError) as e:
+        print(f"  ERROR: Failed to backup {image_path.name}: {e}")
+        return False
+
+
 def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     """
     Remove background and optionally downscale a sprite.
@@ -498,28 +542,53 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
         img = downscale_nearest(img, target_size)
         print(f"  SCALE: {w}x{h} -> {img.size[0]}x{img.size[1]}")
 
+    # Determine output path (--output-dir or overwrite in place)
+    output_path = _resolve_output_path(image_path, args)
+
+    # Create output directory if needed (--output-dir)
+    if output_path != image_path:
+        try:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError) as e:
+            print(f"  ERROR: Cannot create output directory {output_path.parent}: {e}")
+            return False
+
+    # Backup original before overwriting (only when not using --output-dir)
+    if getattr(args, "backup", False) and output_path == image_path:
+        _backup_original(image_path)
+
     # Step 6: Split into individual frames (if --split-frames N specified)
     num_frames: Optional[int] = getattr(args, "split_frames", None)
     if num_frames is not None:
         frames = split_frames(img, num_frames)
         if frames is not None:
             stem = image_path.stem
-            parent = image_path.parent
+            parent = output_path.parent
             for idx, frame in enumerate(frames, start=1):
                 frame_name = f"{stem}_frame_{idx:02d}.png"
                 frame_path = parent / frame_name
-                frame.save(frame_path, "PNG")
+                try:
+                    frame.save(frame_path, "PNG")
+                except (PermissionError, OSError) as e:
+                    print(f"  ERROR: Failed to save frame {frame_path}: {e}")
             print(f"  SPLIT: {len(frames)} frames ({frames[0].size[0]}x{frames[0].size[1]} each)")
 
     # Step 7: Save
-    img.save(image_path, "PNG")
+    try:
+        img.save(output_path, "PNG")
+    except (PermissionError, OSError) as e:
+        print(f"  ERROR: Failed to save {output_path}: {e}")
+        return False
 
     # Save preview with checkerboard
     if save_preview and transparent_count > 0:
         preview = _make_checkerboard(img.size[0], img.size[1])
         preview.paste(img, (0, 0), img)
-        preview_path = image_path.with_name(image_path.stem + "_preview.png")
-        preview.save(preview_path, "PNG")
+        preview_path = output_path.with_name(output_path.stem + "_preview.png")
+        try:
+            preview.save(preview_path, "PNG")
+        except (PermissionError, OSError) as e:
+            print(f"  ERROR: Failed to save preview {preview_path}: {e}")
 
     pct = (transparent_count / total_pixels) * 100
     status = "OK" if pct > 20 else "WARN (low removal — check manually)"
@@ -658,10 +727,6 @@ Examples:
 
     # Warn about not-yet-implemented flags (only when user explicitly sets them)
     _stub_flags: list[str] = []
-    if args.output_dir is not None:
-        _stub_flags.append("--output-dir")
-    if args.backup:
-        _stub_flags.append("--backup")
     if args.dry_run:
         _stub_flags.append("--dry-run")
     if args.batch is not None:
@@ -673,10 +738,12 @@ Examples:
             print(f"  NOTE: {flag} accepted but not yet implemented")
 
     if args.path and Path(args.path).is_file():
+        args._processing_root = Path(args.path).parent
         rip_sprite(Path(args.path), args)
     else:
         # Default: process art/generated/ in repo
         if GENERATED_DIR.is_dir():
+            args._processing_root = GENERATED_DIR
             process_directory(GENERATED_DIR, args)
         else:
             print(f"No generated/ directory found at {GENERATED_DIR}")
