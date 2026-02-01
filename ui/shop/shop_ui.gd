@@ -758,7 +758,15 @@ func _sell_selected() -> void:
 	var sell_price = item.get("sell_price", 0)
 	var item_name = item.get("name", "???")
 	var is_equipment = item.get("type") == "equipment"
-	
+
+	# Safety net: prevent selling equipped items
+	if is_equipment and GameManager.equipment_manager:
+		if GameManager.equipment_manager.is_equipped(item_id):
+			_flash_feedback(COLOR_FAIL_FLASH)
+			AudioManager.play_sfx("menu_navigate")
+			Events.permission_denied.emit("shop", "Cannot sell equipped item")
+			return
+
 	# Perform sell
 	if is_equipment:
 		if GameManager.equipment_manager:
