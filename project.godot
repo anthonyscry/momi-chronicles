@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+DebugConfig="*res://autoloads/debug_config.gd"
 DebugLogger="*res://autoloads/debug_logger.gd"
 Events="*res://autoloads/events.gd"
 ItemDatabase="*res://systems/inventory/item_database.gd"
