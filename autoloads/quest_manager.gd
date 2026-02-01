@@ -298,7 +298,7 @@ func _grant_rewards(rewards: Dictionary) -> void:
 		print("QuestManager: Would grant rewards: ", rewards)
 
 # =============================================================================
-# SERIALIZATION (For Save/Load - will be enhanced in save integration phase)
+# SERIALIZATION (Save/Load Support)
 # =============================================================================
 
 ## Get quest state data for saving
