@@ -17,7 +17,12 @@ signal hit_landed(hurtbox: Hurtbox)
 ## Amount of damage this hitbox deals
 @export var damage: int = 10
 
-## Knockback force applied to hit targets
+## Knockback force multiplier applied to hit targets
+## Works with enemy's knockback_force: 100 = normal, 200 = double knockback, 50 = half knockback
+## Examples:
+##   - Light attack: 80-100 (normal knockback)
+##   - Heavy attack/charge: 150-200 (strong knockback, crowd control)
+##   - Quick jabs: 50-70 (less knockback, more control)
 @export var knockback_force: float = 100.0
 
 # =============================================================================

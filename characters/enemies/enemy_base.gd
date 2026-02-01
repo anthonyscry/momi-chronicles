@@ -8,7 +8,21 @@ class_name EnemyBase
 @export var lose_interest_range: float = 120.0
 @export var attack_damage: int = 10
 @export var attack_cooldown: float = 1.0
+
+## Knockback configuration
+## How far this enemy gets knocked back when hit.
+## TUNING GUIDE (recommended values by enemy type):
+##   Light enemies (rats, crows): 120-150 — flies back satisfyingly
+##   Medium enemies (raccoons, cats): 80-100 — good knockback feel
+##   Heavy enemies (mini-bosses, large): 30-50 — barely budges, feels heavy
+##   Boss enemies: 10-20 or override _on_hurt() to reduce velocity
 @export var knockback_force: float = 80.0
+
+## Knockback resistance multiplier (0.0 = full knockback, 1.0 = immune)
+## Alternative to low knockback_force. Useful for dynamic resistance changes.
+## Example: 0.7 = take 30% of knockback, 0.0 = take 100% of knockback
+@export_range(0.0, 1.0) var knockback_resistance: float = 0.0
+
 @export var exp_value: int = 10  # Base EXP for generic enemy
 
 @onready var sprite: Polygon2D = $Sprite2D
@@ -145,29 +159,42 @@ func _connect_signals() -> void:
 
 func _on_hurt(attacking_hitbox: Hitbox) -> void:
 	var damage_amount = attacking_hitbox.damage if attacking_hitbox else 10
-	
+
 	if health:
 		health.take_damage(damage_amount)
 		# Update health bar
 		if health_bar:
 			health_bar.update_health(health.get_current_health(), health.get_max_health())
-	
+
 	# Emit damage event for effects (damage numbers, shake, etc.)
 	Events.enemy_damaged.emit(self, damage_amount)
-	
+
 	var knockback_dir = (global_position - attacking_hitbox.global_position).normalized()
+
+	# Calculate knockback: use enemy's knockback_force as base, factor in attacker's force and resistance
+	# This allows both per-enemy tuning AND per-attack variation
+	var attacker_force_multiplier = 1.0
+	if attacking_hitbox and attacking_hitbox.knockback_force > 0:
+		# Scale by attacker's knockback force (100 = normal, 200 = double, 50 = half)
+		attacker_force_multiplier = attacking_hitbox.knockback_force / 100.0
+
+	# Apply resistance (0.0 = full knockback, 1.0 = immune)
+	var resistance_multiplier = 1.0 - knockback_resistance
+
 	# Improved knockback: burst initial velocity then fast deceleration
 	# Multiplier gives a snappy "pop" that decays quickly
-	velocity = knockback_dir * knockback_force * 1.6
-	
+	velocity = knockback_dir * knockback_force * attacker_force_multiplier * resistance_multiplier * 1.6
+
 	# Visual: slight sprite pop in knockback direction for weight feel
-	if sprite:
+	# Scale pop by resistance for heavier enemies
+	var pop_distance = 3.0 * resistance_multiplier
+	if sprite and pop_distance > 0.5:
 		var pop_tween = create_tween()
-		pop_tween.tween_property(sprite, "position", knockback_dir * 3.0, 0.05)\
+		pop_tween.tween_property(sprite, "position", knockback_dir * pop_distance, 0.05)\
 			.set_ease(Tween.EASE_OUT)
 		pop_tween.tween_property(sprite, "position", Vector2.ZERO, 0.12)\
 			.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_BACK)
-	
+
 	if health and not health.is_dead():
 		state_machine.transition_to("Hurt")
 

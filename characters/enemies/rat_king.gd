@@ -24,7 +24,7 @@ func _ready() -> void:
 	lose_interest_range = 200.0
 	attack_damage = 18
 	attack_cooldown = 2.0
-	knockback_force = 120.0
+	knockback_force = 40.0  # Mini-boss — heavy feel, barely budges
 	exp_value = 120
 	
 	# Mini-boss config

@@ -19,7 +19,7 @@ func _ready() -> void:
 	attack_range = 12.0
 	attack_damage = 5
 	attack_cooldown = 0.8
-	knockback_force = 30.0
+	knockback_force = 130.0  # Light enemy — flies back satisfyingly on hit
 	exp_value = 8
 
 	# Call parent ready (sets up state machine, health bar, etc.)

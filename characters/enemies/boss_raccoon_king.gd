@@ -133,8 +133,9 @@ func _enter_enrage() -> void:
 func _on_hurt(attacking_hitbox: Hitbox) -> void:
 	super._on_hurt(attacking_hitbox)
 	check_enrage()
-	
-	# Boss doesn't flinch as much
+
+	# Boss heavy feel: reduce knockback to 30% (alternative to setting low knockback_force)
+	# This approach allows using normal knockback_force while having boss-specific resistance
 	velocity = velocity * 0.3
 
 func _on_died() -> void:

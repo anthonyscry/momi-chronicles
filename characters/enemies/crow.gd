@@ -14,7 +14,7 @@ func _ready() -> void:
 	lose_interest_range = 140.0
 	attack_damage = 10
 	attack_cooldown = 0.8
-	knockback_force = 60.0
+	knockback_force = 110.0  # Light enemy — flies back satisfyingly
 	exp_value = 15  # Crows are fast but squishy
 	
 	# Call parent ready
