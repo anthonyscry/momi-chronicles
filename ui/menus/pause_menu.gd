@@ -1,163 +1,61 @@
 extends CanvasLayer
 class_name PauseMenu
-## Pause menu with resume, audio controls, and quit options.
+## Pause menu overlay with tabs for quest log and other pause menu features.
+## Press ESC to open/close. Pauses game tree when visible.
 
-@onready var overlay: ColorRect = $Overlay
-@onready var panel: Panel = $Panel
-@onready var resume_button: Button = $Panel/VBoxContainer/ResumeButton
-@onready var save_button: Button = $Panel/VBoxContainer/SaveButton
-@onready var quit_button: Button = $Panel/VBoxContainer/QuitButton
-@onready var music_slider: HSlider = $Panel/VBoxContainer/MusicContainer/MusicSlider
-@onready var sfx_slider: HSlider = $Panel/VBoxContainer/SFXContainer/SFXSlider
+## Container for tab content
+@onready var panel: PanelContainer = $CenterContainer/PanelContainer
+@onready var tab_container: TabContainer = $CenterContainer/PanelContainer/MarginContainer/TabContainer
+@onready var resume_button: Button = $CenterContainer/PanelContainer/MarginContainer/TabContainer/General/VBoxContainer/ResumeButton
 
-var panel_start_y: float = 0.0
+## Whether menu is currently visible
+var is_paused: bool = false
+
 
 func _ready() -> void:
-	# Start hidden
-	hide()
+	# Hide menu by default
+	visible = false
+	is_paused = false
+
+	# Set process mode to always process even when paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	
-	# Store original position
-	panel_start_y = panel.position.y
-	
-	# Connect buttons
-	resume_button.pressed.connect(_on_resume_pressed)
-	save_button.pressed.connect(_on_save_pressed)
-	quit_button.pressed.connect(_on_quit_pressed)
-	
-	# Connect focus for sounds
-	resume_button.focus_entered.connect(_on_button_focused)
-	save_button.focus_entered.connect(_on_button_focused)
-	quit_button.focus_entered.connect(_on_button_focused)
-	
-	# Connect sliders
-	music_slider.value_changed.connect(_on_music_volume_changed)
-	sfx_slider.value_changed.connect(_on_sfx_volume_changed)
-	
-	# Connect to game events
-	Events.game_paused.connect(_on_game_paused)
-	Events.game_resumed.connect(_on_game_resumed)
+
+	# Connect resume button
+	if resume_button:
+		resume_button.pressed.connect(_on_resume_pressed)
 
 
-func _on_button_focused() -> void:
-	AudioManager.play_sfx("menu_navigate")
+func _unhandled_input(event: InputEvent) -> void:
+	# Toggle pause menu with ESC key
+	if event.is_action_pressed("pause"):
+		_toggle_pause()
+		get_viewport().set_input_as_handled()
 
 
-## Screen shake toggle (created dynamically)
-var shake_toggle: CheckButton = null
+func _toggle_pause() -> void:
+	is_paused = not is_paused
 
-func _setup_shake_toggle() -> void:
-	# Add screen shake toggle to the VBox after sliders
-	var vbox = $Panel/VBoxContainer
-	if not vbox:
-		return
-	
-	var container = HBoxContainer.new()
-	container.name = "ShakeContainer"
-	
-	var label = Label.new()
-	label.text = "Screen Shake"
-	label.add_theme_font_size_override("font_size", 9)
-	container.add_child(label)
-	
-	shake_toggle = CheckButton.new()
-	shake_toggle.name = "ShakeToggle"
-	shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
-	shake_toggle.toggled.connect(_on_shake_toggled)
-	shake_toggle.focus_entered.connect(_on_button_focused)
-	container.add_child(shake_toggle)
-	
-	# Insert before quit button
-	var quit_idx = quit_button.get_index()
-	vbox.add_child(container)
-	vbox.move_child(container, quit_idx)
+	if is_paused:
+		_open_menu()
+	else:
+		_close_menu()
 
 
-func _on_shake_toggled(enabled: bool) -> void:
-	EffectsManager.screen_shake_enabled = enabled
+func _open_menu() -> void:
+	visible = true
+	is_paused = true
+	get_tree().paused = true
+
+	# Focus resume button for keyboard navigation
+	if resume_button:
+		resume_button.grab_focus()
 
 
-func _on_game_paused() -> void:
-	# Don't show pause menu if ring menu is open (it has its own pause)
-	if RingMenu and RingMenu.is_open:
-		return
-	
-	# Create shake toggle on first open (lazy init)
-	if shake_toggle == null:
-		_setup_shake_toggle()
-	
-	# Update sliders to current values
-	music_slider.value = AudioManager.get_music_volume()
-	sfx_slider.value = AudioManager.get_sfx_volume()
-	
-	# Update shake toggle
-	if shake_toggle:
-		shake_toggle.button_pressed = EffectsManager.screen_shake_enabled
-	
-	show()
-	_animate_in()
-	resume_button.grab_focus()
-
-
-func _on_game_resumed() -> void:
-	# Save audio settings when closing menu
-	AudioManager.save_settings()
-	_animate_out()
-
-
-func _animate_in() -> void:
-	# Fade in overlay
-	overlay.modulate.a = 0.0
-	var tween = create_tween()
-	tween.tween_property(overlay, "modulate:a", 1.0, 0.15)
-	
-	# Slide panel down from above
-	panel.position.y = panel_start_y - 30
-	panel.modulate.a = 0.0
-	tween.parallel().tween_property(panel, "position:y", panel_start_y, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	tween.parallel().tween_property(panel, "modulate:a", 1.0, 0.15)
-
-
-func _animate_out() -> void:
-	var tween = create_tween()
-	tween.tween_property(overlay, "modulate:a", 0.0, 0.1)
-	tween.parallel().tween_property(panel, "position:y", panel_start_y - 20, 0.1).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(panel, "modulate:a", 0.0, 0.1)
-	tween.tween_callback(hide)
+func _close_menu() -> void:
+	visible = false
+	is_paused = false
+	get_tree().paused = false
 
 
 func _on_resume_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	GameManager.resume_game()
-
-
-func _on_save_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	if SaveManager.save_game():
-		# Visual feedback - flash button text briefly
-		var original_text = save_button.text
-		save_button.text = "Saved!"
-		save_button.disabled = true
-		await get_tree().create_timer(1.0).timeout
-		save_button.text = original_text
-		save_button.disabled = false
-	else:
-		save_button.text = "Save Failed"
-		await get_tree().create_timer(1.0).timeout
-		save_button.text = "Save Game"
-
-
-func _on_quit_pressed() -> void:
-	AudioManager.play_sfx("menu_select")
-	AudioManager.save_settings()
-	GameManager.quit_game()
-
-
-func _on_music_volume_changed(value: float) -> void:
-	AudioManager.set_music_volume(value)
-
-
-func _on_sfx_volume_changed(value: float) -> void:
-	AudioManager.set_sfx_volume(value)
-	# Play a test sound so user can hear the new volume
-	AudioManager.play_sfx("menu_navigate")
+	_close_menu()
