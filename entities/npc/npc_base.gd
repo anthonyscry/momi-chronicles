@@ -8,8 +8,17 @@ class_name NPCBase
 ## The dialogue ID to trigger when interacting with this NPC
 @export var dialogue_id: String = ""
 
+## The text to display in the interaction prompt
+@export var prompt_text: String = "[E]"
+
+## How far above the NPC to show the prompt (in pixels)
+@export var prompt_offset: float = -40.0
+
 ## Reference to the interaction area that detects the player
 @onready var interaction_area: Area2D = $InteractionArea
+
+## The interaction prompt label
+var _prompt_label: Label = null
 
 ## Tracks if the player is currently in the interaction area
 var _player_in_range: bool = false
@@ -18,6 +27,9 @@ var _player_in_range: bool = false
 var _dialogue_active: bool = false
 
 func _ready() -> void:
+	# Create interaction prompt
+	_create_prompt_label()
+
 	# Connect interaction area signals
 	if interaction_area:
 		interaction_area.body_entered.connect(_on_interaction_area_body_entered)
@@ -65,12 +77,43 @@ func _on_dialogue_ended() -> void:
 	if _player_in_range:
 		_show_interaction_prompt()
 
-## Show the interaction prompt (will be implemented in next subtask)
-func _show_interaction_prompt() -> void:
-	# Placeholder - will be implemented in subtask-4-2
-	pass
+## Creates the interaction prompt label
+func _create_prompt_label() -> void:
+	_prompt_label = Label.new()
+	_prompt_label.text = prompt_text
+	_prompt_label.modulate = Color.WHITE
+	_prompt_label.position = Vector2(0, prompt_offset)
 
-## Hide the interaction prompt (will be implemented in next subtask)
+	# Center the label horizontally
+	_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_prompt_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	# Set up label style for better visibility
+	_prompt_label.add_theme_font_size_override("font_size", 16)
+
+	# Start hidden
+	_prompt_label.modulate.a = 0.0
+	_prompt_label.visible = false
+
+	add_child(_prompt_label)
+
+## Show the interaction prompt with fade-in animation
+func _show_interaction_prompt() -> void:
+	if not _prompt_label:
+		return
+
+	_prompt_label.visible = true
+
+	# Fade in animation
+	var tween = create_tween()
+	tween.tween_property(_prompt_label, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_OUT)
+
+## Hide the interaction prompt with fade-out animation
 func _hide_interaction_prompt() -> void:
-	# Placeholder - will be implemented in subtask-4-2
-	pass
+	if not _prompt_label:
+		return
+
+	# Fade out animation
+	var tween = create_tween()
+	tween.tween_property(_prompt_label, "modulate:a", 0.0, 0.15).set_ease(Tween.EASE_IN)
+	tween.tween_callback(func(): _prompt_label.visible = false)
