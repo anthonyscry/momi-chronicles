@@ -34,6 +34,7 @@ UITester="*res://autoloads/ui_tester.gd"
 RingMenu="*res://ui/ring_menu/ring_menu.tscn"
 ShopCatalog="*res://systems/shop/shop_catalog.gd"
 ShopUI="*res://ui/shop/shop_ui.tscn"
+DialogueManager="*res://autoloads/dialogue_manager.gd"
 
 [display]
 
