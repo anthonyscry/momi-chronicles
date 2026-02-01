@@ -287,15 +287,63 @@ func is_quest_failed(quest_id: String) -> bool:
 	return failed_quest_ids.has(quest_id)
 
 # =============================================================================
-# REWARDS (Placeholder)
+# QUEST REWARDS
 # =============================================================================
 
-## Grant quest rewards (to be implemented in quest content phase)
+## Grant quest rewards (coins, EXP, items, equipment)
 func _grant_rewards(rewards: Dictionary) -> void:
-	# This will be implemented when reward system is integrated
-	# For now, just log what rewards would be granted
-	if not rewards.is_empty():
-		print("QuestManager: Would grant rewards: ", rewards)
+	if rewards.is_empty():
+		return
+
+	# Grant coins
+	if rewards.has("coins") and rewards["coins"] > 0:
+		if has_node("/root/GameManager"):
+			var game_manager = get_node("/root/GameManager")
+			game_manager.add_coins(rewards["coins"])
+			print("QuestManager: Granted %d coins" % rewards["coins"])
+
+	# Grant EXP
+	if rewards.has("exp") and rewards["exp"] > 0:
+		var player = get_tree().get_first_node_in_group("player")
+		if player and is_instance_valid(player) and player.has_node("ProgressionComponent"):
+			var progression = player.get_node("ProgressionComponent")
+			progression.add_exp(rewards["exp"])
+			print("QuestManager: Granted %d EXP" % rewards["exp"])
+		else:
+			push_warning("QuestManager: Cannot grant EXP - player or ProgressionComponent not found")
+
+	# Grant items
+	if rewards.has("item") and not rewards["item"].is_empty():
+		if has_node("/root/GameManager"):
+			var game_manager = get_node("/root/GameManager")
+			if game_manager.inventory and is_instance_valid(game_manager.inventory):
+				var quantity = rewards.get("item_quantity", 1)
+				var success = game_manager.inventory.add_item(rewards["item"], quantity)
+				if success:
+					print("QuestManager: Granted item '%s' x%d" % [rewards["item"], quantity])
+				else:
+					push_warning("QuestManager: Failed to grant item '%s'" % rewards["item"])
+			else:
+				push_warning("QuestManager: Cannot grant item - Inventory not found")
+
+	# Grant equipment
+	if rewards.has("equipment") and not rewards["equipment"].is_empty():
+		if has_node("/root/GameManager"):
+			var game_manager = get_node("/root/GameManager")
+			if game_manager.equipment_manager and is_instance_valid(game_manager.equipment_manager):
+				var success = game_manager.equipment_manager.add_equipment(rewards["equipment"])
+				if success:
+					print("QuestManager: Granted equipment '%s'" % rewards["equipment"])
+				else:
+					push_warning("QuestManager: Failed to grant equipment '%s'" % rewards["equipment"])
+			else:
+				push_warning("QuestManager: Cannot grant equipment - EquipmentManager not found")
+
+	# Emit event for reward notification UI (future enhancement)
+	if has_node("/root/Events"):
+		var events = get_node("/root/Events")
+		if events.has_signal("quest_rewards_granted"):
+			events.quest_rewards_granted.emit(rewards)
 
 # =============================================================================
 # SERIALIZATION (Save/Load Support)
