@@ -85,6 +85,9 @@ var sfx_tracks: Dictionary = {
 	"health_pickup": "res://assets/audio/sfx/health_pickup.wav",
 	"coin": "res://assets/audio/sfx/coin.wav",
 	"level_up": "res://assets/audio/sfx/level_up.wav",
+	"item_equip": "res://assets/audio/sfx/item_equip.wav",
+	"item_use": "res://assets/audio/sfx/item_use.wav",
+	"shop_purchase": "res://assets/audio/sfx/shop_purchase.wav",
 	# Phase P4: Audio polish
 	"footstep_walk": "res://assets/audio/sfx/footstep_walk.wav",
 	"footstep_run": "res://assets/audio/sfx/footstep_run.wav",
