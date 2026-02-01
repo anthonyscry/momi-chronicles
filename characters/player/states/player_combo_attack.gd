@@ -121,18 +121,22 @@ func physics_update(delta: float) -> void:
 func _check_chain_input() -> void:
 	if not can_chain:
 		return
-	
-	# Check for attack input during combo window
+
+	# Check for attack input during combo window (live input)
 	var attack_pressed = Input.is_action_just_pressed("attack")
 	if not attack_pressed and InputMap.has_action("attack_alt"):
 		attack_pressed = Input.is_action_just_pressed("attack_alt")
-	
+
 	# Bot control
 	if player.bot_controlled:
 		var bot_action = player.consume_bot_action()
 		if bot_action == "attack":
 			attack_pressed = true
-	
+
+	# Also check input buffer for attack action
+	if not attack_pressed and player.has_buffered_action("attack"):
+		attack_pressed = true
+
 	if attack_pressed and combo_index < COMBO_DATA.size() - 1:
 		chain_requested = true
 
@@ -140,39 +144,63 @@ func _finish_attack() -> void:
 	# Track damage for this hit
 	var current_data = COMBO_DATA[combo_index]
 	total_combo_damage += int(player.get_effective_base_damage() * current_data.damage_mult)
-	
+
 	if chain_requested and combo_index < COMBO_DATA.size() - 1:
-		# Chain to next attack
+		# Chain to next attack - consume buffered attack if that's what triggered it
+		if player.has_buffered_action("attack"):
+			player.consume_buffered_action()
+
 		combo_index += 1
 		chain_requested = false
-		
+
 		# Re-enter this state for next hit (restart timers)
 		attack_timer = 0.0
 		hitbox_active = false
 		can_chain = false
-		
+
 		# Set up next hit (uses player effective damage with equipment + buffs)
 		var next_data = COMBO_DATA[combo_index]
 		var next_effective_base = player.get_effective_base_damage()
 		var next_damage = int(next_effective_base * next_data.damage_mult)
-		
+
 		if player.hitbox:
 			player.hitbox.damage = next_damage
 			player.hitbox.reset()
-		
+
 		_position_hitbox()
 		player.set_combo_count(combo_index + 1)
 		_apply_combo_visual()
-		
+
 		Events.player_attacked.emit()
 	else:
 		# Combo ended
 		if combo_index == COMBO_DATA.size() - 1:
 			# Full combo completed!
 			Events.combo_completed.emit(total_combo_damage)
-		
+
 		combo_index = 0
 		total_combo_damage = 0
+
+		# Check for buffered actions and transition accordingly
+		_handle_buffered_inputs()
+
+# =============================================================================
+# INPUT BUFFERING
+# =============================================================================
+
+func _handle_buffered_inputs() -> void:
+	# Check for buffered actions and transition to appropriate state
+	var buffered_action = player.consume_buffered_action()
+
+	if buffered_action == "dodge":
+		state_machine.transition_to("Dodge")
+	elif buffered_action == "attack":
+		# Start a new combo
+		state_machine.transition_to("ComboAttack")
+	elif buffered_action == "special_attack" and player.is_ability_unlocked("special_attack"):
+		state_machine.transition_to("SpecialAttack")
+	else:
+		# No buffered action, return to idle
 		state_machine.transition_to("Idle")
 
 # =============================================================================

@@ -38,12 +38,31 @@ func exit() -> void:
 
 func physics_update(delta: float) -> void:
 	dodge_timer += delta
-	
+
 	var progress = dodge_timer / DODGE_DURATION
 	var speed_multiplier = 1.0 - (progress * progress)
-	
+
 	player.velocity = dodge_direction * DODGE_SPEED * speed_multiplier
 	player.move_and_slide()
-	
+
 	if dodge_timer >= DODGE_DURATION:
+		_handle_buffered_inputs()
+
+# =============================================================================
+# INPUT BUFFERING
+# =============================================================================
+
+func _handle_buffered_inputs() -> void:
+	# Check for buffered actions and transition to appropriate state
+	var buffered_action = player.consume_buffered_action()
+
+	if buffered_action == "attack":
+		state_machine.transition_to("ComboAttack")
+	elif buffered_action == "dodge":
+		# Chain dodges if desired
+		state_machine.transition_to("Dodge")
+	elif buffered_action == "special_attack" and player.is_ability_unlocked("special_attack"):
+		state_machine.transition_to("SpecialAttack")
+	else:
+		# No buffered action, return to idle
 		state_machine.transition_to("Idle")

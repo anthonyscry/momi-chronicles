@@ -20,6 +20,7 @@ const RUN_SPEED: float = 140.0
 @onready var health: HealthComponent = $HealthComponent
 @onready var progression = $ProgressionComponent  # ProgressionComponent - no type to avoid cyclic dependency
 @onready var guard = $GuardComponent  # GuardComponent for blocking
+@onready var input_buffer: InputBuffer = $InputBuffer  # InputBuffer for responsive input handling
 
 var facing_direction: String = "down"
 var facing_left: bool = false
@@ -97,6 +98,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_F3:
 			if hitbox_visualizer:
 				hitbox_visualizer.toggle()
+
+	# Buffer combat inputs for responsive action execution
+	if input_buffer:
+		_buffer_combat_inputs()
 
 
 func _physics_process(delta: float) -> void:
@@ -199,6 +204,50 @@ func consume_bot_action() -> String:
 	var action = bot_pending_action
 	bot_pending_action = ""
 	return action
+
+# =============================================================================
+# INPUT BUFFERING
+# =============================================================================
+
+## Buffer combat inputs for responsive action execution
+func _buffer_combat_inputs() -> void:
+	if not input_buffer:
+		return
+
+	# Buffer attack actions
+	if Input.is_action_just_pressed("attack"):
+		input_buffer.buffer_action("attack")
+	if InputMap.has_action("attack_alt") and Input.is_action_just_pressed("attack_alt"):
+		input_buffer.buffer_action("attack")
+
+	# Buffer dodge action
+	if Input.is_action_just_pressed("dodge"):
+		input_buffer.buffer_action("dodge")
+
+	# Buffer block action (if guard available)
+	if guard and Input.is_action_just_pressed("block"):
+		input_buffer.buffer_action("block")
+
+	# Buffer special attack (if unlocked)
+	if Input.is_action_just_pressed("special_attack"):
+		input_buffer.buffer_action("special_attack")
+
+## Consume and return the next buffered action (called by states)
+func consume_buffered_action() -> String:
+	if not input_buffer:
+		return ""
+	return input_buffer.consume_buffered_action()
+
+## Check if a specific action is buffered without consuming it
+func has_buffered_action(action_name: String) -> bool:
+	if not input_buffer:
+		return false
+	return input_buffer.has_buffered_action(action_name)
+
+## Clear all buffered actions (e.g., on state transitions that should reset buffer)
+func clear_buffered_actions() -> void:
+	if input_buffer:
+		input_buffer.clear_buffer()
 
 ## Bot triggers an action (attack, special_attack, dodge)
 func bot_trigger_action(action: String) -> void:
