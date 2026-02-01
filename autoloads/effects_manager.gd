@@ -64,6 +64,45 @@ var freeze_timer: SceneTreeTimer = null
 var is_frozen: bool = false
 
 # =============================================================================
+# ATTACK TYPE CONFIGURATIONS
+# =============================================================================
+
+## Configuration for screen shake and hit-stop per attack type
+## Each entry: {shake_intensity, shake_duration, hitstop_duration}
+const ATTACK_CONFIGS: Dictionary = {
+	"light": {
+		"shake_intensity": 2.0,
+		"shake_duration": 0.1,
+		"hitstop_duration": 0.03
+	},
+	"heavy": {
+		"shake_intensity": 5.0,
+		"shake_duration": 0.18,
+		"hitstop_duration": 0.06
+	},
+	"combo_finisher": {
+		"shake_intensity": 7.0,
+		"shake_duration": 0.25,
+		"hitstop_duration": 0.08
+	},
+	"ground_pound": {
+		"shake_intensity": 10.0,
+		"shake_duration": 0.35,
+		"hitstop_duration": 0.1
+	},
+	"charge_release": {
+		"shake_intensity": 6.0,
+		"shake_duration": 0.2,
+		"hitstop_duration": 0.07
+	},
+	"parry": {
+		"shake_intensity": 6.0,
+		"shake_duration": 0.2,
+		"hitstop_duration": 0.08
+	}
+}
+
+# =============================================================================
 # LIFECYCLE
 # =============================================================================
 
@@ -338,6 +377,21 @@ func hitstop_heavy() -> void:
 	impact_freeze(0.08)
 
 
+## Apply configured screen shake and hitstop for a specific attack type
+func apply_attack_impact(attack_type: String, intensity_multiplier: float = 1.0) -> void:
+	if not ATTACK_CONFIGS.has(attack_type):
+		push_warning("EffectsManager: Unknown attack type '%s'" % attack_type)
+		return
+
+	var config = ATTACK_CONFIGS[attack_type]
+	var shake_intensity = config.shake_intensity * intensity_multiplier
+	var shake_duration = config.shake_duration
+	var hitstop_duration = config.hitstop_duration
+
+	screen_shake(shake_intensity, shake_duration)
+	impact_freeze(hitstop_duration)
+
+
 # =============================================================================
 # POOLING HELPERS
 # =============================================================================
@@ -386,44 +440,44 @@ func _get_effects_container() -> Node:
 func _on_player_hit_enemy(enemy: Node) -> void:
 	if enemy == null:
 		return
-	
+
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		spawn_hit_spark(player.global_position, enemy.global_position)
 		# Attack swoosh arc
 		_create_attack_swoosh(player)
-	
-	# Light hitstop for hitting enemy
-	hitstop_light()
+
+	# Light impact for hitting enemy (screen shake handled by combo system)
+	# Only apply hitstop here
+	impact_freeze(ATTACK_CONFIGS["light"].hitstop_duration)
 
 
 func _on_enemy_damaged(enemy: Node, amount: int) -> void:
 	if enemy == null:
 		return
-	
+
 	# Spawn damage number above the enemy
 	spawn_damage_number(enemy.global_position + Vector2(0, -16), amount)
-	
-	# Light screen shake for enemy damage
-	shake_light()
+
+	# Light screen shake for enemy damage (using configured values)
+	screen_shake(ATTACK_CONFIGS["light"].shake_intensity, ATTACK_CONFIGS["light"].shake_duration)
 
 
 func _on_enemy_defeated(enemy: Node) -> void:
 	if enemy == null:
 		return
-	
+
 	spawn_death_poof(enemy.global_position)
-	
+
 	# Enhanced death explosion particles
 	_create_death_explosion(enemy.global_position)
-	
-	# Heavy effects for kill
-	shake_medium()
-	hitstop_heavy()
-	
+
+	# Heavy effects for kill (use heavy attack config)
+	apply_attack_impact("heavy")
+
 	# Brief flash at enemy position
 	_flash_screen(Color(1, 1, 1, 0.25), 0.1)
-	
+
 	# Try to spawn health pickup
 	_try_spawn_health_pickup(enemy)
 
@@ -463,21 +517,22 @@ func _on_player_special_attacked() -> void:
 func _on_combo_hit(combo_count: int) -> void:
 	if combo_count == 0:
 		return
-	
-	# Shake intensity increases with combo
-	var index = mini(combo_count - 1, COMBO_SHAKE_MULTIPLIERS.size() - 1)
-	var multiplier = COMBO_SHAKE_MULTIPLIERS[index]
-	screen_shake(4.0 * multiplier, 0.15)
-	
-	# Hit 3 gets extra hitstop
-	if combo_count == 3:
-		hitstop_heavy()
+
+	# Combo hits 1-2 use light attack config, hit 3 (finisher) uses combo_finisher config
+	if combo_count < 3:
+		# Light attacks with increasing intensity
+		var index = mini(combo_count - 1, COMBO_SHAKE_MULTIPLIERS.size() - 1)
+		var multiplier = COMBO_SHAKE_MULTIPLIERS[index]
+		apply_attack_impact("light", multiplier)
+	else:
+		# Combo finisher gets special impact
+		apply_attack_impact("combo_finisher")
 
 
 func _on_combo_completed(total_damage: int) -> void:
-	# Big screen shake for full combo
-	shake_heavy()
-	
+	# Full combo completion uses finisher config with extra multiplier
+	apply_attack_impact("combo_finisher", 1.2)
+
 	# Brief time slow for impact
 	Engine.time_scale = 0.5
 	await get_tree().create_timer(0.1 * 0.5).timeout
@@ -892,15 +947,12 @@ func _on_ground_pound_impact(damage: int, radius: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if not player:
 		return
-	
+
 	var pos = player.global_position
-	
-	# Heavy screen shake
-	screen_shake(10.0, 0.35)
-	
-	# Heavy hitstop
-	hitstop_heavy()
-	
+
+	# Apply configured ground pound impact
+	apply_attack_impact("ground_pound")
+
 	# Camera punch (zoom effect)
 	camera_punch(1.15, 0.2)
 	
@@ -1020,24 +1072,18 @@ func _on_charge_released(damage: int, charge_percent: float) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if not player:
 		return
-	
+
 	# Remove charge glow
 	if charge_glow_node and is_instance_valid(charge_glow_node):
 		charge_glow_node.queue_free()
 		charge_glow_node = null
-	
-	# Scale effects based on charge percent
-	var intensity = 0.5 + charge_percent * 0.5  # 50% to 100%
-	
-	# Screen shake scaled to charge
-	screen_shake(5.0 * intensity, 0.2)
-	
-	# Hitstop for powerful charged hits
-	if charge_percent > 0.7:
-		hitstop_heavy()
-	else:
-		hitstop_light()
-	
+
+	# Scale effects based on charge percent (50% to 100% intensity)
+	var intensity_multiplier = 0.5 + charge_percent * 0.5
+
+	# Apply configured charge release impact scaled by charge amount
+	apply_attack_impact("charge_release", intensity_multiplier)
+
 	# Camera punch for fully charged
 	if charge_percent > 0.9:
 		camera_punch(1.1, 0.15)
@@ -1078,15 +1124,12 @@ func _on_parry_success(attacker: Node, reflected_damage: int) -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if not player:
 		return
-	
+
 	var pos = player.global_position
-	
-	# Medium screen shake
-	screen_shake(6.0, 0.2)
-	
-	# Hitstop for impact
-	hitstop_heavy()
-	
+
+	# Apply configured parry impact
+	apply_attack_impact("parry")
+
 	# Blue parry flash
 	_flash_screen(Color(0.3, 0.6, 1.0, 0.4), 0.15)
 	
