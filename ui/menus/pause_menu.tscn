@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://pause_menu_001"]
+[gd_scene load_steps=4 format=3 uid="uid://pause_menu_001"]
 
 [ext_resource type="Script" path="res://ui/menus/pause_menu.gd" id="1_pause_menu"]
+[ext_resource type="PackedScene" uid="uid://quest_log_001" path="res://ui/quest/quest_log.tscn" id="2_quest_log"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.1, 0.1, 0.15, 0.95)
@@ -28,7 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(240, 180)
+custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
@@ -73,9 +74,6 @@ text = "Resume (ESC)"
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 
-[node name="InfoLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/TabContainer/General/VBoxContainer"]
+[node name="Quests" parent="CenterContainer/PanelContainer/MarginContainer/TabContainer" instance=ExtResource("2_quest_log")]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 8
-text = "Quest Log coming soon..."
-horizontal_alignment = 1
+metadata/_tab_index = 1
