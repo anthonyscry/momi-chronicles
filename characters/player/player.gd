@@ -27,6 +27,9 @@ var facing_left: bool = false
 ## Current combo count (for UI display)
 var current_combo_count: int = 0
 
+## Debug: Hitbox visualizer (created at runtime)
+var hitbox_visualizer: HitboxVisualizer = null
+
 # =============================================================================
 # CAMERA FEEL
 # =============================================================================
@@ -65,24 +68,35 @@ var bot_blocking: bool = false
 func _ready() -> void:
 	add_to_group("player")
 	state_machine.init(self)
-	
+
 	if hurtbox:
 		hurtbox.hurt.connect(_on_hurt)
 	if health:
 		health.died.connect(_on_died)
 	if hitbox:
 		hitbox.hit_landed.connect(_on_hit_landed)
-	
+
 	# Connect to level up for stat scaling
 	if progression:
 		progression.level_changed.connect(_on_level_changed)
-	
+
 	# Connect to equipment changes to re-apply stats
 	if GameManager.equipment_manager:
 		GameManager.equipment_manager.stats_recalculated.connect(_on_equipment_changed)
-	
+
 	# Apply initial stats
 	_apply_level_stats()
+
+	# Setup debug hitbox visualizer
+	_setup_hitbox_visualizer()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# F3 toggles hitbox visualizer (same key as debug panel)
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			if hitbox_visualizer:
+				hitbox_visualizer.toggle()
 
 
 func _physics_process(delta: float) -> void:
@@ -342,3 +356,17 @@ func get_ground_pound_cooldown() -> float:
 	# Access static cooldown via preload to avoid cyclic dependency
 	var GroundPoundState = preload("res://characters/player/states/player_ground_pound.gd")
 	return GroundPoundState.cooldown_remaining
+
+# =============================================================================
+# DEBUG TOOLS
+# =============================================================================
+
+## Setup hitbox visualizer for debug mode
+func _setup_hitbox_visualizer() -> void:
+	# Create visualizer instance
+	hitbox_visualizer = HitboxVisualizer.new()
+	hitbox_visualizer.name = "HitboxVisualizer"
+	add_child(hitbox_visualizer)
+
+	# Auto-track all hitboxes and hurtboxes
+	hitbox_visualizer.auto_track_parent()

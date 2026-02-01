@@ -43,6 +43,9 @@ var attack_timer: float = 0.0
 var is_stunned: bool = false
 var stun_timer: float = 0.0
 
+## Debug: Hitbox visualizer (created at runtime)
+var hitbox_visualizer: HitboxVisualizer = null
+
 func _ready() -> void:
 	add_to_group("enemies")
 	state_machine.init(self)
@@ -50,10 +53,13 @@ func _ready() -> void:
 	_setup_health_bar()
 	if hitbox:
 		hitbox.damage = attack_damage
-	
+
 	# Initialize drop table if not set by subclass or editor
 	if drop_table.is_empty():
 		_init_default_drops()
+
+	# Setup debug hitbox visualizer
+	_setup_hitbox_visualizer()
 
 
 func _setup_health_bar() -> void:
@@ -62,6 +68,17 @@ func _setup_health_bar() -> void:
 	add_child(health_bar)
 	# Position above the enemy sprite
 	health_bar.position = Vector2(-12, -18)
+
+
+## Setup hitbox visualizer for debug mode
+func _setup_hitbox_visualizer() -> void:
+	# Create visualizer instance
+	hitbox_visualizer = HitboxVisualizer.new()
+	hitbox_visualizer.name = "HitboxVisualizer"
+	add_child(hitbox_visualizer)
+
+	# Auto-track all hitboxes and hurtboxes
+	hitbox_visualizer.auto_track_parent()
 
 
 ## Override to use a different attack state (e.g. CatPounce instead of Attack)
@@ -74,12 +91,20 @@ func is_alive() -> bool:
 		return not health.is_dead()
 	return true
 
+func _unhandled_input(event: InputEvent) -> void:
+	# F3 toggles hitbox visualizer (same key as debug panel)
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			if hitbox_visualizer:
+				hitbox_visualizer.toggle()
+
+
 func _process(delta: float) -> void:
 	if not can_attack:
 		attack_timer -= delta
 		if attack_timer <= 0:
 			can_attack = true
-	
+
 	# Stun timer
 	if is_stunned:
 		stun_timer -= delta
