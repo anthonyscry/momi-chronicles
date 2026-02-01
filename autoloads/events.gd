@@ -239,3 +239,12 @@ signal shop_interact_requested
 
 ## Emitted when shop UI closes
 signal shop_closed
+
+# =============================================================================
+# PERMISSION SIGNALS
+# =============================================================================
+
+## Emitted when any system denies an action due to insufficient permissions.
+## system: which system denied (e.g. 'shop', 'equipment', 'ability', 'guard')
+## reason: human-readable explanation string
+signal permission_denied(system: String, reason: String)
