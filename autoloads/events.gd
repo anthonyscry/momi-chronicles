@@ -56,6 +56,25 @@ signal quest_failed(quest_id: String)
 signal active_quest_changed(quest_id: String)
 
 # =============================================================================
+# COMPANION EVENTS
+# =============================================================================
+
+## Emitted when a companion joins the party
+signal companion_joined(companion_id: String)
+
+## Emitted when the active companion is changed (companion swap)
+signal active_companion_changed(companion_id: String)
+
+## Emitted when a companion is knocked out
+signal companion_knocked_out(companion_id: String)
+
+## Emitted when a companion is revived
+signal companion_revived(companion_id: String)
+
+## Emitted when a companion's meter value changes
+signal companion_meter_changed(companion_id: String, current: float, max_val: float)
+
+# =============================================================================
 # TUTORIAL SIGNALS
 # =============================================================================
 

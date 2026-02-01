@@ -98,6 +98,8 @@ func _connect_event_signals() -> void:
 	Events.item_used.connect(_on_item_used)
 	Events.pickup_collected.connect(_on_pickup_collected)
 	Events.enemy_spawned.connect(_on_enemy_spawned)
+	Events.companion_joined.connect(_on_companion_joined)
+	Events.active_companion_changed.connect(_on_active_companion_changed)
 
 # =============================================================================
 # EVENT HANDLERS
@@ -198,6 +200,20 @@ func _on_player_damaged() -> void:
 			DebugLogger.log_system("Block tutorial triggered on player damage")
 
 		defensive_tutorials_triggered = true
+
+func _on_companion_joined(companion_id: String) -> void:
+	## Trigger companion swap tutorial when a companion joins the party
+	if should_show_tutorial(TUTORIAL_COMPANION_SWAP):
+		Events.tutorial_triggered.emit(TUTORIAL_COMPANION_SWAP)
+		mark_tutorial_shown(TUTORIAL_COMPANION_SWAP)
+		DebugLogger.log_system("Companion swap tutorial triggered on companion join: %s" % companion_id)
+
+func _on_active_companion_changed(companion_id: String) -> void:
+	## Track companion swaps for companion swap tutorial
+	# Complete companion swap tutorial after first swap
+	if tutorials_shown.get(TUTORIAL_COMPANION_SWAP, false) and not is_tutorial_completed(TUTORIAL_COMPANION_SWAP):
+		mark_tutorial_completed(TUTORIAL_COMPANION_SWAP)
+		DebugLogger.log_system("Companion swap tutorial completed after first companion swap to: %s" % companion_id)
 
 # =============================================================================
 # MOVEMENT TUTORIAL LOGIC
