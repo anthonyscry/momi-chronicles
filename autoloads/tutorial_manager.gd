@@ -92,6 +92,7 @@ func _connect_event_signals() -> void:
 	Events.player_dodged.connect(_on_player_dodged)
 	Events.player_blocked.connect(_on_player_blocked)
 	Events.player_damaged.connect(_on_player_damaged)
+	Events.combo_changed.connect(_on_combo_changed)
 	Events.combo_completed.connect(_on_combo_completed)
 	Events.ring_menu_opened.connect(_on_ring_menu_opened)
 	Events.item_used.connect(_on_item_used)
@@ -123,12 +124,24 @@ func _on_player_blocked() -> void:
 		mark_tutorial_shown(TUTORIAL_BLOCK)
 	increment_action_count(TUTORIAL_BLOCK)
 
-func _on_combo_completed(count: int) -> void:
-	## Track combo completions for combo tutorial
-	if should_show_tutorial(TUTORIAL_COMBO):
+func _on_combo_changed(count: int) -> void:
+	## Trigger combo tutorial when player lands 2 attacks in succession
+	# Only show combo tutorial if attack tutorial is already completed
+	if count >= 2 and is_tutorial_completed(TUTORIAL_ATTACK) and should_show_tutorial(TUTORIAL_COMBO):
 		Events.tutorial_triggered.emit(TUTORIAL_COMBO)
 		mark_tutorial_shown(TUTORIAL_COMBO)
-	increment_action_count(TUTORIAL_COMBO)
+		DebugLogger.log_system("Combo tutorial triggered on combo count: %d" % count)
+
+func _on_combo_completed(count: int) -> void:
+	## Track combo completions for combo tutorial
+	# Only increment count if tutorial has been shown
+	if tutorials_shown.get(TUTORIAL_COMBO, false) and not is_tutorial_completed(TUTORIAL_COMBO):
+		action_counts[TUTORIAL_COMBO] = action_counts.get(TUTORIAL_COMBO, 0) + 1
+
+		# Complete after 2 successful combos (not the default 3)
+		if action_counts[TUTORIAL_COMBO] >= 2:
+			mark_tutorial_completed(TUTORIAL_COMBO)
+			DebugLogger.log_system("Combo tutorial completed after %d combos" % action_counts[TUTORIAL_COMBO])
 
 func _on_ring_menu_opened() -> void:
 	## Track ring menu opening for ring menu tutorial
