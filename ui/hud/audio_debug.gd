@@ -9,12 +9,17 @@ const SHOW_DURATION: float = 4.0
 
 
 func _ready() -> void:
+	# Hide in release builds
+	if not DebugConfig.show_debug_ui:
+		visible = false
+		return
+
 	# Start hidden
 	$Panel.modulate.a = 0.0
-	
+
 	# Connect to AudioManager version changes
 	AudioManager.version_changed.connect(_on_version_changed)
-	
+
 	# Show initial state after a short delay
 	await get_tree().create_timer(0.5).timeout
 	_update_display()
@@ -55,6 +60,7 @@ func _fade_out() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# F2 toggle only works in debug builds (show_debug_ui check in _ready ensures this)
 	# Show UI when F2 is pressed (AudioManager handles the toggle)
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F2:
 		# Update display after a tiny delay to let AudioManager process first
