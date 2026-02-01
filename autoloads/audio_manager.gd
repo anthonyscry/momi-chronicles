@@ -1,4 +1,5 @@
 extends Node
+class_name AudioManager
 ## Manages all game audio - background music and sound effects.
 ## Handles crossfading between tracks, volume control, dynamic music, and audio bus routing.
 ## 
