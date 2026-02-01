@@ -353,6 +353,10 @@ func _connect_signals() -> void:
 		Events.item_used.connect(_on_item_used)
 	if Events.has_signal("shop_purchase_completed"):
 		Events.shop_purchase_completed.connect(_on_shop_purchase)
+	if Events.has_signal("shop_interact_requested"):
+		Events.shop_interact_requested.connect(_on_shop_opened)
+	if Events.has_signal("shop_closed"):
+		Events.shop_closed.connect(_on_shop_closed)
 
 	# Phase P6: Combat/gameplay sounds
 	if Events.has_signal("player_guard_broken"):
@@ -904,6 +908,12 @@ func _on_item_used(_item: Dictionary) -> void:
 
 func _on_shop_purchase(_item: Dictionary, _cost: int) -> void:
 	play_sfx("shop_purchase", 0.0, 0.05)
+
+func _on_shop_opened() -> void:
+	play_sfx("menu_open", -2.0, 0.0)
+
+func _on_shop_closed() -> void:
+	play_sfx("menu_close", -2.0, 0.0)
 
 # Combat/Gameplay Sounds
 func _on_player_guard_broken() -> void:
