@@ -16,3 +16,4 @@ rewards = {
 }
 is_main_quest = true
 prerequisite_quest_ids = Array[String](["main_001"])
+zone_unlock = "sewers"
