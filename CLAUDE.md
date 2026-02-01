@@ -56,6 +56,7 @@ godot --path .                 # Run the game
 | EffectsManager | `autoloads/effects_manager.gd` | Hit flash, screen shake, particles |
 | AutoBot | `autoloads/auto_bot.gd` | AI player (F1 toggle) |
 | SaveManager | `autoloads/save_manager.gd` | Atomic save/load with backup |
+| AudioDebug | `ui/hud/audio_debug.tscn` | Audio debug overlay |
 | UITester | `autoloads/ui_tester.gd` | Automated UI testing (F2) |
 | RingMenu | `ui/ring_menu/ring_menu.tscn` | Secret of Mana-style radial menu |
 | ShopCatalog | `systems/shop/shop_catalog.gd` | Shop pricing and stock |
