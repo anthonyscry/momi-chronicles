@@ -99,12 +99,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			if hitbox_visualizer:
 				hitbox_visualizer.toggle()
 
-	# Buffer combat inputs for responsive action execution
+
+func _physics_process(delta: float) -> void:
+	# Poll inputs in physics process for frame-perfect response
 	if input_buffer:
 		_buffer_combat_inputs()
 
-
-func _physics_process(delta: float) -> void:
 	_update_camera_feel(delta)
 
 
