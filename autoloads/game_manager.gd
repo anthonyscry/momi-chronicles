@@ -2,7 +2,16 @@ extends Node
 ## Manages global game state including pause, current zone, and game flow.
 
 # =============================================================================
-# STATE
+# CONSTANTS
+# =============================================================================
+
+## Preload Phase 16 classes
+const InventoryClass = preload("res://systems/inventory/inventory.gd")
+const EquipmentManagerClass = preload("res://systems/equipment/equipment_manager.gd")
+const PartyManagerClass = preload("res://systems/party/party_manager.gd")
+
+# =============================================================================
+# STATE VARIABLES
 # =============================================================================
 
 ## Whether the game is currently paused
@@ -21,15 +30,6 @@ var coins: int = 0
 var inventory = null           # Inventory
 var equipment_manager = null   # EquipmentManager
 var party_manager = null       # PartyManager
-
-## Preload Phase 16 classes
-const InventoryClass = preload("res://systems/inventory/inventory.gd")
-const EquipmentManagerClass = preload("res://systems/equipment/equipment_manager.gd")
-const PartyManagerClass = preload("res://systems/party/party_manager.gd")
-
-# =============================================================================
-# LIFECYCLE
-# =============================================================================
 
 ## Zone scene paths
 var zone_scenes: Dictionary = {
@@ -53,6 +53,15 @@ var mini_bosses_defeated: Dictionary = {
 ## Spawn point to use after zone transition
 var pending_spawn_point: String = ""
 
+## Transition fade overlay
+var _fade_overlay: CanvasLayer = null
+var _fade_rect: ColorRect = null
+var _is_transitioning: bool = false
+
+# =============================================================================
+# LIFECYCLE
+# =============================================================================
+
 func _ready() -> void:
 	# Connect to player death for game over handling
 	Events.player_died.connect(_on_player_died)
@@ -60,48 +69,36 @@ func _ready() -> void:
 	Events.zone_transition_requested.connect(_on_zone_transition_requested)
 	Events.boss_defeated.connect(_on_boss_defeated)
 	Events.mini_boss_defeated.connect(_on_mini_boss_defeated)
-	
+
 	# Auto-save on zone entry
 	Events.zone_entered.connect(_on_zone_entered_autosave)
 	# Auto-save after boss defeat (delayed for celebration)
 	Events.boss_defeated.connect(_on_boss_defeated_autosave)
 	# Auto-save after mini-boss defeat
 	Events.mini_boss_defeated.connect(_on_mini_boss_defeated_autosave)
-	
+
 	# Initialize inventory system (Phase 16)
 	inventory = InventoryClass.new()
 	inventory.name = "Inventory"
 	add_child(inventory)
-	
+
 	# Initialize equipment system (Phase 16)
 	equipment_manager = EquipmentManagerClass.new()
 	equipment_manager.name = "EquipmentManager"
 	add_child(equipment_manager)
-	
+
 	# Initialize party system (Phase 16)
 	party_manager = PartyManagerClass.new()
 	party_manager.name = "PartyManager"
 	add_child(party_manager)
 
-func _on_boss_defeated(_boss: Node) -> void:
-	boss_defeated = true
-
-func _on_mini_boss_defeated(_boss: Node, boss_key: String) -> void:
-	if mini_bosses_defeated.has(boss_key):
-		mini_bosses_defeated[boss_key] = true
-
-func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
-	# Wait 2 seconds for death animation + loot notification
-	await get_tree().create_timer(2.0).timeout
-	SaveManager.save_game()
-	DebugLogger.log_save("Auto-saved after mini-boss defeat")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
 		toggle_pause()
 
 # =============================================================================
-# PAUSE SYSTEM
+# PUBLIC API — PAUSE SYSTEM
 # =============================================================================
 
 ## Toggle pause state
@@ -128,30 +125,63 @@ func resume_game() -> void:
 	Events.game_resumed.emit()
 
 # =============================================================================
-# GAME FLOW
+# PUBLIC API — GAME FLOW
 # =============================================================================
-
-## Handle player death
-func _on_player_died() -> void:
-	is_player_alive = false
-	Events.game_over.emit()
-
-## Track current zone
-func _on_zone_entered(zone_name: String) -> void:
-	current_zone = zone_name
 
 ## Restart the game (reload current scene)
 func restart_game() -> void:
 	is_player_alive = true
 	is_paused = false
 	get_tree().paused = false
-	
+
 	# Clear temporary state before scene reload
 	_clear_temporary_state()
-	
+
 	get_tree().reload_current_scene()
 	Events.game_restarted.emit()
 
+## Quit to desktop
+func quit_game() -> void:
+	get_tree().quit()
+
+# =============================================================================
+# PUBLIC API — ZONE TRANSITIONS
+# =============================================================================
+
+## Load a specific zone
+func load_zone(zone_name: String, spawn_point: String = "default") -> void:
+	_on_zone_transition_requested(zone_name, spawn_point)
+
+## Get the pending spawn point and clear it
+func get_pending_spawn() -> String:
+	var spawn = pending_spawn_point
+	pending_spawn_point = ""
+	return spawn
+
+# =============================================================================
+# PUBLIC API — CURRENCY
+# =============================================================================
+
+## Add coins to player's wallet
+func add_coins(amount: int) -> void:
+	coins += amount
+	Events.coins_changed.emit(coins)
+
+## Get current coin count
+func get_coins() -> int:
+	return coins
+
+## Spend coins if player has enough
+func spend_coins(amount: int) -> bool:
+	if coins >= amount:
+		coins -= amount
+		Events.coins_changed.emit(coins)
+		return true
+	return false
+
+# =============================================================================
+# PRIVATE METHODS
+# =============================================================================
 
 ## Clear temporary state that survives scene reload (autoload children).
 ## Combo counter, poison visuals, and guard meter are scene-tree nodes
@@ -163,67 +193,23 @@ func _clear_temporary_state() -> void:
 			Events.buff_expired.emit(effect_type)
 		inventory.active_buffs.clear()
 
-## Quit to desktop
-func quit_game() -> void:
-	get_tree().quit()
-
-# =============================================================================
-# ZONE TRANSITIONS
-# =============================================================================
-
-## Transition fade overlay
-var _fade_overlay: CanvasLayer = null
-var _fade_rect: ColorRect = null
-var _is_transitioning: bool = false
-
-## Handle zone transition request with fade effect
-func _on_zone_transition_requested(target_zone: String, spawn_point: String) -> void:
-	if not zone_scenes.has(target_zone):
-		push_error("Unknown zone: " + target_zone)
-		return
-	
-	if _is_transitioning:
-		return
-	_is_transitioning = true
-	
-	pending_spawn_point = spawn_point
-	Events.zone_exited.emit(current_zone)
-	
-	# Fade out, load zone, fade in
-	_ensure_fade_overlay()
-	await _fade_to_black(0.3)
-	
-	# Load the new zone
-	var zone_path = zone_scenes[target_zone]
-	get_tree().change_scene_to_file(zone_path)
-	
-	# Wait a frame for scene to load
-	await get_tree().process_frame
-	await get_tree().process_frame
-	
-	# Fade back in
-	await _fade_from_black(0.4)
-	_is_transitioning = false
-
-
 ## Ensure the fade overlay exists (persistent across scenes)
 func _ensure_fade_overlay() -> void:
 	if _fade_overlay and is_instance_valid(_fade_overlay):
 		return
-	
+
 	_fade_overlay = CanvasLayer.new()
 	_fade_overlay.name = "FadeOverlay"
 	_fade_overlay.layer = 128  # Above everything
 	_fade_overlay.process_mode = Node.PROCESS_MODE_ALWAYS  # Works during pause
 	add_child(_fade_overlay)
-	
+
 	_fade_rect = ColorRect.new()
 	_fade_rect.name = "FadeRect"
 	_fade_rect.color = Color(0, 0, 0, 0)
 	_fade_rect.anchors_preset = Control.PRESET_FULL_RECT
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade_overlay.add_child(_fade_rect)
-
 
 ## Fade screen to black
 func _fade_to_black(duration: float) -> void:
@@ -235,7 +221,6 @@ func _fade_to_black(duration: float) -> void:
 		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
 	await tween.finished
 
-
 ## Fade screen from black
 func _fade_from_black(duration: float) -> void:
 	_ensure_fade_overlay()
@@ -246,46 +231,54 @@ func _fade_from_black(duration: float) -> void:
 		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	await tween.finished
 
-
-## Load a specific zone
-func load_zone(zone_name: String, spawn_point: String = "default") -> void:
-	_on_zone_transition_requested(zone_name, spawn_point)
-
-
-## Get the pending spawn point and clear it
-func get_pending_spawn() -> String:
-	var spawn = pending_spawn_point
-	pending_spawn_point = ""
-	return spawn
-
-
 # =============================================================================
-# CURRENCY SYSTEM
+# SIGNAL HANDLERS
 # =============================================================================
 
-## Add coins to player's wallet
-func add_coins(amount: int) -> void:
-	coins += amount
-	Events.coins_changed.emit(coins)
+## Handle player death
+func _on_player_died() -> void:
+	is_player_alive = false
+	Events.game_over.emit()
 
+## Track current zone
+func _on_zone_entered(zone_name: String) -> void:
+	current_zone = zone_name
 
-## Get current coin count
-func get_coins() -> int:
-	return coins
+## Handle zone transition request with fade effect
+func _on_zone_transition_requested(target_zone: String, spawn_point: String) -> void:
+	if not zone_scenes.has(target_zone):
+		push_error("Unknown zone: " + target_zone)
+		return
 
+	if _is_transitioning:
+		return
+	_is_transitioning = true
 
-## Spend coins if player has enough
-func spend_coins(amount: int) -> bool:
-	if coins >= amount:
-		coins -= amount
-		Events.coins_changed.emit(coins)
-		return true
-	return false
+	pending_spawn_point = spawn_point
+	Events.zone_exited.emit(current_zone)
 
+	# Fade out, load zone, fade in
+	_ensure_fade_overlay()
+	await _fade_to_black(0.3)
 
-# =============================================================================
-# AUTO-SAVE
-# =============================================================================
+	# Load the new zone
+	var zone_path = zone_scenes[target_zone]
+	get_tree().change_scene_to_file(zone_path)
+
+	# Wait a frame for scene to load
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	# Fade back in
+	await _fade_from_black(0.4)
+	_is_transitioning = false
+
+func _on_boss_defeated(_boss: Node) -> void:
+	boss_defeated = true
+
+func _on_mini_boss_defeated(_boss: Node, boss_key: String) -> void:
+	if mini_bosses_defeated.has(boss_key):
+		mini_bosses_defeated[boss_key] = true
 
 ## Auto-save on zone entry
 func _on_zone_entered_autosave(zone_name: String) -> void:
@@ -296,10 +289,16 @@ func _on_zone_entered_autosave(zone_name: String) -> void:
 		SaveManager.save_game()
 		DebugLogger.log_zone("Auto-saved on zone entry: %s" % zone_name)
 
-
 ## Auto-save after boss defeat (delayed for celebration/rewards)
 func _on_boss_defeated_autosave(_boss: Node) -> void:
 	# Wait 3 seconds for victory celebration and rewards
 	await get_tree().create_timer(3.0).timeout
 	SaveManager.save_game()
 	DebugLogger.log_save("Auto-saved after boss defeat")
+
+## Auto-save after mini-boss defeat (delayed for death animation)
+func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
+	# Wait 2 seconds for death animation + loot notification
+	await get_tree().create_timer(2.0).timeout
+	SaveManager.save_game()
+	DebugLogger.log_save("Auto-saved after mini-boss defeat")
