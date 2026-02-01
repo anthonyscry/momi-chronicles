@@ -147,7 +147,8 @@ func _do_impact() -> void:
 	
 	# Visual effects
 	_create_impact_effect()
-	EffectsManager.screen_shake(15.0, 0.3)
+	# Boss hit level screen shake for dramatic impact
+	EffectsManager.screen_shake(10.0, 0.3)
 	
 	# Start cooldown
 	cooldown_remaining = COOLDOWN

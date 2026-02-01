@@ -194,9 +194,10 @@ func _update_charge_visual(percent: float) -> void:
 			EffectsManager.screen_shake(2.0, 0.05)
 
 func _release_burst(charge_percent: float) -> void:
-	# Screen shake based on charge
-	var shake_intensity = lerpf(3.0, 12.0, charge_percent)
-	EffectsManager.screen_shake(shake_intensity, 0.2)
+	# Screen shake based on charge (scales from medium to boss hit)
+	var shake_intensity = lerpf(4.0, 10.0, charge_percent)  # Medium to boss hit
+	var shake_duration = lerpf(0.15, 0.3, charge_percent)   # Scale duration too
+	EffectsManager.screen_shake(shake_intensity, shake_duration)
 	
 	# Flash sprite
 	if player.sprite:

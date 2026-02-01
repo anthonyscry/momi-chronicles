@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c1kpwx5v8mh5r"]
+[gd_scene load_steps=17 format=3 uid="uid://c1kpwx5v8mh5r"]
 
 [ext_resource type="Script" path="res://characters/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://components/state_machine/state_machine.gd" id="2_state_machine"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="10_hitbox"]
 [ext_resource type="Script" path="res://components/hurtbox/hurtbox.gd" id="11_hurtbox"]
 [ext_resource type="Script" path="res://components/health/health_component.gd" id="12_health"]
+[ext_resource type="Script" path="res://components/input/input_buffer.gd" id="20_input_buffer"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 6.0
@@ -125,3 +126,7 @@ emit_global_events = true
 [node name="ProgressionComponent" parent="." instance=ExtResource("15_progression")]
 
 [node name="GuardComponent" parent="." instance=ExtResource("19_guard")]
+
+[node name="InputBuffer" type="Node" parent="."]
+script = ExtResource("20_input_buffer")
+buffer_window = 0.1

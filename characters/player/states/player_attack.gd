@@ -58,34 +58,51 @@ func exit() -> void:
 func physics_update(delta: float) -> void:
 	attack_timer += delta
 	var progress = attack_timer / ATTACK_DURATION
-	
+
 	# Enable hitbox during active frames
 	if progress >= HITBOX_START and progress < HITBOX_END:
 		if not hitbox_active and player.hitbox:
 			player.hitbox.enable()
 			hitbox_active = true
+			# Light attack screen shake
+			EffectsManager.screen_shake(2.0, 0.1)
 	elif progress >= HITBOX_END:
 		if hitbox_active and player.hitbox:
 			player.hitbox.disable()
 			hitbox_active = false
-	
-	# Attack finished
+
+	# Attack finished - check for buffered inputs
 	if attack_timer >= ATTACK_DURATION:
-		state_machine.transition_to("Idle")
+		_handle_buffered_inputs()
 
 # =============================================================================
 # PRIVATE METHODS
 # =============================================================================
 
+func _handle_buffered_inputs() -> void:
+	# Check for buffered actions and transition to appropriate state
+	var buffered_action = player.consume_buffered_action()
+
+	if buffered_action == "dodge":
+		state_machine.transition_to("Dodge")
+	elif buffered_action == "attack":
+		# Chain to another attack (restart attack state)
+		state_machine.transition_to("Attack")
+	elif buffered_action == "special_attack" and player.is_ability_unlocked("special_attack"):
+		state_machine.transition_to("SpecialAttack")
+	else:
+		# No buffered action, return to idle
+		state_machine.transition_to("Idle")
+
 func _position_hitbox() -> void:
 	if not player.hitbox:
 		return
-	
+
 	# Get the collision shape to reposition
 	var hitbox_shape: CollisionShape2D = player.hitbox.get_node_or_null("CollisionShape2D")
 	if not hitbox_shape:
 		return
-	
+
 	# Position based on facing direction
 	match player.facing_direction:
 		"down":

@@ -20,12 +20,16 @@ const RUN_SPEED: float = 140.0
 @onready var health: HealthComponent = $HealthComponent
 @onready var progression = $ProgressionComponent  # ProgressionComponent - no type to avoid cyclic dependency
 @onready var guard = $GuardComponent  # GuardComponent for blocking
+@onready var input_buffer: InputBuffer = $InputBuffer  # InputBuffer for responsive input handling
 
 var facing_direction: String = "down"
 var facing_left: bool = false
 
 ## Current combo count (for UI display)
 var current_combo_count: int = 0
+
+## Debug: Hitbox visualizer (created at runtime)
+var hitbox_visualizer: HitboxVisualizer = null
 
 # =============================================================================
 # CAMERA FEEL
@@ -65,27 +69,42 @@ var bot_blocking: bool = false
 func _ready() -> void:
 	add_to_group("player")
 	state_machine.init(self)
-	
+
 	if hurtbox:
 		hurtbox.hurt.connect(_on_hurt)
 	if health:
 		health.died.connect(_on_died)
 	if hitbox:
 		hitbox.hit_landed.connect(_on_hit_landed)
-	
+
 	# Connect to level up for stat scaling
 	if progression:
 		progression.level_changed.connect(_on_level_changed)
-	
+
 	# Connect to equipment changes to re-apply stats
 	if GameManager.equipment_manager:
 		GameManager.equipment_manager.stats_recalculated.connect(_on_equipment_changed)
-	
+
 	# Apply initial stats
 	_apply_level_stats()
 
+	# Setup debug hitbox visualizer
+	_setup_hitbox_visualizer()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# F3 toggles hitbox visualizer (same key as debug panel)
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			if hitbox_visualizer:
+				hitbox_visualizer.toggle()
+
 
 func _physics_process(delta: float) -> void:
+	# Poll inputs in physics process for frame-perfect response
+	if input_buffer:
+		_buffer_combat_inputs()
+
 	_update_camera_feel(delta)
 
 
@@ -185,6 +204,50 @@ func consume_bot_action() -> String:
 	var action = bot_pending_action
 	bot_pending_action = ""
 	return action
+
+# =============================================================================
+# INPUT BUFFERING
+# =============================================================================
+
+## Buffer combat inputs for responsive action execution
+func _buffer_combat_inputs() -> void:
+	if not input_buffer:
+		return
+
+	# Buffer attack actions
+	if Input.is_action_just_pressed("attack"):
+		input_buffer.buffer_action("attack")
+	if InputMap.has_action("attack_alt") and Input.is_action_just_pressed("attack_alt"):
+		input_buffer.buffer_action("attack")
+
+	# Buffer dodge action
+	if Input.is_action_just_pressed("dodge"):
+		input_buffer.buffer_action("dodge")
+
+	# Buffer block action (if guard available)
+	if guard and Input.is_action_just_pressed("block"):
+		input_buffer.buffer_action("block")
+
+	# Buffer special attack (if unlocked)
+	if Input.is_action_just_pressed("special_attack"):
+		input_buffer.buffer_action("special_attack")
+
+## Consume and return the next buffered action (called by states)
+func consume_buffered_action() -> String:
+	if not input_buffer:
+		return ""
+	return input_buffer.consume_buffered_action()
+
+## Check if a specific action is buffered without consuming it
+func has_buffered_action(action_name: String) -> bool:
+	if not input_buffer:
+		return false
+	return input_buffer.has_buffered_action(action_name)
+
+## Clear all buffered actions (e.g., on state transitions that should reset buffer)
+func clear_buffered_actions() -> void:
+	if input_buffer:
+		input_buffer.clear_buffer()
 
 ## Bot triggers an action (attack, special_attack, dodge)
 func bot_trigger_action(action: String) -> void:
@@ -342,3 +405,17 @@ func get_ground_pound_cooldown() -> float:
 	# Access static cooldown via preload to avoid cyclic dependency
 	var GroundPoundState = preload("res://characters/player/states/player_ground_pound.gd")
 	return GroundPoundState.cooldown_remaining
+
+# =============================================================================
+# DEBUG TOOLS
+# =============================================================================
+
+## Setup hitbox visualizer for debug mode
+func _setup_hitbox_visualizer() -> void:
+	# Create visualizer instance
+	hitbox_visualizer = HitboxVisualizer.new()
+	hitbox_visualizer.name = "HitboxVisualizer"
+	add_child(hitbox_visualizer)
+
+	# Auto-track all hitboxes and hurtboxes
+	hitbox_visualizer.auto_track_parent()
