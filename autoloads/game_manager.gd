@@ -76,3 +76,12 @@ func load_game(save_data: Dictionary) -> void:
 		player_position = Vector2(pos["x"], pos["y"])
 
 	DebugLogger.log_system("Game state loaded - Coins: %d, Zone: %s" % [coins, current_zone])
+
+
+## Reset game to initial state (called when returning to title screen)
+func reset_game() -> void:
+	coins = 0
+	current_zone = ""
+	player_position = Vector2.ZERO
+	party_manager = null
+	DebugLogger.log_system("Game state reset")
