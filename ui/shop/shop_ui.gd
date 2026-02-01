@@ -75,6 +75,7 @@ func _ready() -> void:
 	
 	Events.shop_interact_requested.connect(open_shop)
 	Events.coins_changed.connect(_on_coins_changed)
+	Events.player_leveled_up.connect(_on_player_leveled_up)
 
 
 func _build_ui() -> void:
@@ -631,6 +632,7 @@ func _update_detail() -> void:
 	detail_price.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_afford else COLOR_PRICE_EXPENSIVE)
 	
 	# Stats (equipment only)
+	var level_too_low := false
 	if is_equipment and item.has("stats"):
 		var stat_text = ""
 		var stats = item.get("stats", {})
@@ -640,14 +642,29 @@ func _update_detail() -> void:
 			if stat_text != "":
 				stat_text += ", "
 			stat_text += "+%s %s" % [str(val), stat_name]
+
+		# Check level requirement
+		var min_level = item.get("min_level", 1)
+		if min_level > 1:
+			var player_level = _get_player_level()
+			if player_level < min_level:
+				level_too_low = true
+				stat_text += "\nRequires Lv.%d" % min_level
+
 		detail_stats.text = stat_text
+		detail_stats.add_theme_color_override("font_color", COLOR_PRICE_EXPENSIVE if level_too_low else Color(0.6, 0.85, 0.5, 1))
 	else:
 		detail_stats.text = ""
-	
+		detail_stats.add_theme_color_override("font_color", Color(0.6, 0.85, 0.5, 1))
+
 	# Action prompt
 	if already_owned:
 		detail_action.text = "Already owned"
 		detail_action.add_theme_color_override("font_color", COLOR_OWNED_GRAY)
+	elif level_too_low:
+		var min_level = item.get("min_level", 1)
+		detail_action.text = "Lv.%d Required" % min_level
+		detail_action.add_theme_color_override("font_color", COLOR_PRICE_EXPENSIVE)
 	elif not can_afford:
 		detail_action.text = "Not enough coins"
 		detail_action.add_theme_color_override("font_color", COLOR_PRICE_EXPENSIVE)
@@ -687,7 +704,18 @@ func _buy_selected() -> void:
 			AudioManager.play_sfx("menu_navigate")
 			print("[Shop] Already owned: %s" % item.get("name", ""))
 			return
-	
+
+	# Check level requirement (equipment)
+	if is_equipment:
+		var min_level = item.get("min_level", 1)
+		if min_level > 1:
+			var player_level = _get_player_level()
+			if player_level < min_level:
+				_flash_feedback(COLOR_FAIL_FLASH)
+				AudioManager.play_sfx("menu_navigate")
+				Events.permission_denied.emit("shop", "Level %d required" % min_level)
+				return
+
 	# Attempt purchase
 	if not GameManager.spend_coins(price):
 		_flash_feedback(COLOR_FAIL_FLASH)
@@ -829,6 +857,19 @@ func _update_coin_display() -> void:
 
 func _on_coins_changed(_total: int) -> void:
 	_update_coin_display()
+
+
+func _on_player_leveled_up(_new_level: int) -> void:
+	if is_open:
+		_refresh_list()
+
+
+## Get current player level via group lookup. Returns 1 if player not found.
+func _get_player_level() -> int:
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_node("ProgressionComponent"):
+		return player.get_node("ProgressionComponent").get_level()
+	return 1
 
 
 func _update_tab_label() -> void:
