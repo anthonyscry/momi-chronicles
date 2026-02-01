@@ -20,11 +20,16 @@ var buff_icons = null  # BuffIcons instance (preloaded to avoid scope issues)
 var save_indicator: Label
 
 ## Whether debug panel is visible
-var debug_visible: bool = true
+var debug_visible: bool = DebugConfig.show_debug_ui
 
 func _ready() -> void:
-	# Show debug by default (can toggle with F3)
-	debug_panel.visible = debug_visible
+	# Hide debug panel in release builds
+	if not DebugConfig.show_debug_ui:
+		debug_panel.visible = false
+		debug_visible = false
+	else:
+		# Show debug by default in debug builds (can toggle with F3)
+		debug_panel.visible = debug_visible
 	
 	# Create low HP vignette overlay
 	_setup_low_hp_vignette()
@@ -46,7 +51,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# F3 toggles debug panel
+	# F3 toggles debug panel (only in debug builds)
+	if not DebugConfig.show_debug_ui:
+		return
+
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F3:
 			debug_visible = not debug_visible
