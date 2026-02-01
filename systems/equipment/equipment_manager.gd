@@ -72,16 +72,15 @@ func equip(equip_id: String) -> bool:
 	# Check level requirement
 	var min_level = equip_data.get("min_level", 1)
 	if min_level > 1:
-		var player = Engine.get_main_loop().root.get_node_or_null("Game/Player")
-		if player == null:
-			# Try group lookup
-			var tree = Engine.get_main_loop()
-			if tree is SceneTree:
-				player = tree.get_first_node_in_group("player")
+		var player = get_tree().get_first_node_in_group("player")
+		# Old fragile path lookup (kept as fallback reference):
+		# var player = Engine.get_main_loop().root.get_node_or_null("Game/Player")
 		if player and player.has_node("ProgressionComponent"):
 			var current_level = player.get_node("ProgressionComponent").get_level()
 			if current_level < min_level:
-				push_warning("Level %d required for %s (current: %d)" % [min_level, equip_data.get("name", equip_id), current_level])
+				var equip_name = equip_data.get("name", equip_id)
+				push_warning("Level %d required for %s (current: %d)" % [min_level, equip_name, current_level])
+				Events.permission_denied.emit("equipment", "Level %d required for %s" % [min_level, equip_name])
 				return false
 	
 	# Check ownership (must be in inventory OR already equipped elsewhere)

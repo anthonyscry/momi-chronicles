@@ -315,7 +315,13 @@ func _update_selection() -> void:
 		if item_name_label:
 			item_name_label.text = item.get("name", "???")
 		if item_desc_label:
-			item_desc_label.text = item.get("desc", "")
+			var desc_text = item.get("desc", "")
+			# Show level requirement for equipment that player can't equip
+			if current_ring == RingType.EQUIPMENT:
+				var min_level = item.get("min_level", 1)
+				if min_level > 1 and not item.get("player_can_equip", true):
+					desc_text += " [Lv.%d Req]" % min_level
+			item_desc_label.text = desc_text
 	else:
 		if item_name_label:
 			item_name_label.text = ""
@@ -333,7 +339,13 @@ func _get_inventory_items() -> Array:
 
 func _get_equipment_items() -> Array:
 	if GameManager.equipment_manager:
-		return GameManager.equipment_manager.get_equipment_for_ring()
+		var items = GameManager.equipment_manager.get_equipment_for_ring()
+		var player_level = _get_player_level()
+		for item in items:
+			var min_level = item.get("min_level", 1)
+			item["min_level"] = min_level
+			item["player_can_equip"] = player_level >= min_level
+		return items
 	return []
 
 func _get_companions() -> Array:
@@ -362,7 +374,17 @@ func _equip_item(item: Dictionary) -> void:
 	var equip_id = item.get("id", "")
 	if equip_id.is_empty():
 		return
-	
+
+	# Check level requirement before equipping
+	if not item.get("equipped", false):
+		var min_level = item.get("min_level", 1)
+		if min_level > 1:
+			var player_level = _get_player_level()
+			if player_level < min_level:
+				AudioManager.play_sfx("menu_navigate")
+				Events.permission_denied.emit("equipment", "Level %d required" % min_level)
+				return
+
 	if GameManager.equipment_manager:
 		if item.get("equipped", false):
 			GameManager.equipment_manager.unequip(item.get("slot", 0))
@@ -397,6 +419,17 @@ func _handle_option(item: Dictionary) -> void:
 		"quit":
 			close_menu()
 			get_tree().change_scene_to_file("res://ui/menus/title_screen.tscn")
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+## Get current player level via group lookup. Returns 1 if player not found.
+func _get_player_level() -> int:
+	var player = get_tree().get_first_node_in_group("player")
+	if player and player.has_node("ProgressionComponent"):
+		return player.get_node("ProgressionComponent").get_level()
+	return 1
 
 # =============================================================================
 # PUBLIC API (for other systems to populate rings)

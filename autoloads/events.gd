@@ -229,9 +229,17 @@ signal tutorial_completed(tutorial_id: String)
 
 ## Emitted when a player performs an action tracked by a tutorial
 signal tutorial_action_performed(tutorial_id: String, count: int)
-=======
 ## Emitted when cutscene mode begins (player input disabled).
 signal cutscene_started
 
 ## Emitted when cutscene mode ends (player input re-enabled).
 signal cutscene_ended
+=======
+# =============================================================================
+# PERMISSION SIGNALS
+# =============================================================================
+
+## Emitted when any system denies an action due to insufficient permissions.
+## system: which system denied (e.g. 'shop', 'equipment', 'ability', 'guard')
+## reason: human-readable explanation string
+signal permission_denied(system: String, reason: String)

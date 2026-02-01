@@ -169,6 +169,45 @@ func can_afford(item_id: String) -> bool:
 
 
 # =============================================================================
+# VALIDATION HELPERS
+# =============================================================================
+
+## Check if a piece of equipment can be purchased.
+## Returns {'can_buy': bool, 'reason': String} after validating:
+## (1) equipment exists in shop, (2) stock > 0, (3) player level >= min_level,
+## (4) not already owned, (5) can afford.
+func can_buy_equipment(equip_id: String) -> Dictionary:
+	# Check equipment exists in shop
+	if not SHOP_EQUIPMENT.has(equip_id):
+		return {"can_buy": false, "reason": "Not available in shop"}
+
+	# Check stock
+	if get_stock(equip_id) <= 0:
+		return {"can_buy": false, "reason": "Out of stock"}
+
+	# Check player level vs min_level
+	var equip_data = EquipmentDatabase.get_equipment(equip_id)
+	if not equip_data.is_empty():
+		var min_level = equip_data.get("min_level", 1)
+		if min_level > 1:
+			var player = get_tree().get_first_node_in_group("player")
+			if player and player.has_node("ProgressionComponent"):
+				var current_level = player.get_node("ProgressionComponent").get_level()
+				if current_level < min_level:
+					return {"can_buy": false, "reason": "Requires Level %d" % min_level}
+
+	# Check not already owned
+	if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(equip_id):
+		return {"can_buy": false, "reason": "Already owned"}
+
+	# Check can afford
+	if not can_afford(equip_id):
+		return {"can_buy": false, "reason": "Not enough coins"}
+
+	return {"can_buy": true, "reason": ""}
+
+
+# =============================================================================
 # CATALOG QUERIES
 # =============================================================================
 

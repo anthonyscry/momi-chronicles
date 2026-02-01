@@ -46,6 +46,9 @@ var original_y: float = 0.0
 # Static cooldown tracking (shared across instances)
 static var cooldown_remaining: float = 0.0
 
+# Denial feedback spam prevention (shared across instances)
+static var denial_cooldown: float = 0.0
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -53,12 +56,23 @@ static var cooldown_remaining: float = 0.0
 func enter() -> void:
 	# Check if ability is unlocked
 	if player.progression and player.progression.get_level() < UNLOCK_LEVEL:
-		# Not unlocked - return to idle
+		# Not unlocked - denial feedback (throttled)
+		if denial_cooldown <= 0:
+			AudioManager.play_sfx("menu_navigate")
+			_flash_sprite(Color(1.5, 0.5, 0.5))
+			Events.permission_denied.emit("ability", "Ground Pound requires Level %d" % UNLOCK_LEVEL)
+			denial_cooldown = 0.3
 		state_machine.transition_to("Idle")
 		return
-	
+
 	# Check cooldown
 	if cooldown_remaining > 0:
+		# On cooldown - denial feedback (throttled)
+		if denial_cooldown <= 0:
+			AudioManager.play_sfx("menu_navigate")
+			_flash_sprite(Color(0.5, 0.5, 1.5))
+			Events.permission_denied.emit("ability", "Ground Pound on cooldown")
+			denial_cooldown = 0.3
 		state_machine.transition_to("Idle")
 		return
 	
@@ -96,6 +110,8 @@ func _process(delta: float) -> void:
 	# Update static cooldown (runs even when not in this state)
 	if cooldown_remaining > 0:
 		cooldown_remaining -= delta
+	if denial_cooldown > 0:
+		denial_cooldown -= delta
 
 # =============================================================================
 # PHASES
@@ -163,6 +179,17 @@ func _update_recovery(delta: float) -> void:
 	
 	if phase_timer >= RECOVERY_DURATION:
 		state_machine.transition_to("Idle")
+
+# =============================================================================
+# DENIAL FEEDBACK
+# =============================================================================
+
+## Flash player sprite a color then tween back to white
+func _flash_sprite(color: Color) -> void:
+	if player.sprite:
+		player.sprite.modulate = color
+		var tween = create_tween()
+		tween.tween_property(player.sprite, "modulate", Color.WHITE, 0.2)
 
 # =============================================================================
 # IMPACT

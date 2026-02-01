@@ -9,8 +9,14 @@ var item_data: Dictionary = {}
 
 ## Visual state
 var is_selected: bool = false
+var is_equipped: bool = false
 var target_scale: float = 1.0
 var target_alpha: float = 1.0
+
+## Level gating colors
+const DIMMED_COLOR_MULTIPLIER: Color = Color(0.4, 0.4, 0.5, 0.7)
+const LEVEL_REQ_COLOR: Color = Color(0.8, 0.3, 0.3)
+const EQUIPPED_GLOW_COLOR: Color = Color(0.3, 1.0, 0.3, 0.3)
 
 ## Node references
 @onready var icon: ColorRect = $Icon
@@ -39,25 +45,45 @@ func _process(delta: float) -> void:
 ## Set up the item display
 func setup(data: Dictionary) -> void:
 	item_data = data
-	
+	is_equipped = data.get("equipped", false)
+
 	# Set icon color based on type
 	var color = _get_type_color(data.get("type", "item"))
 	if data.has("color"):
 		color = data.color
-	
+
+	# Dim icon for level-gated equipment the player can't equip
+	if data.has("player_can_equip") and not data.player_can_equip:
+		color *= DIMMED_COLOR_MULTIPLIER
+
 	if icon:
 		icon.color = color
 		icon.visible = true
-	
+
 	# Label is now hidden - item name shown in center of ring menu
 	# if label and data.has("name"):
 	# 	label.text = data.name
-	
-	# Set quantity (for stackable items)
+
+	# Show level requirement for gated items, otherwise show quantity
 	if quantity_label:
-		var qty = data.get("quantity", 1)
-		quantity_label.visible = qty > 1
-		quantity_label.text = "x%d" % qty
+		var min_level = data.get("min_level", 1)
+		if min_level > 1 and data.has("player_can_equip") and not data.player_can_equip:
+			quantity_label.visible = true
+			quantity_label.text = "Lv.%d" % min_level
+			quantity_label.add_theme_color_override("font_color", LEVEL_REQ_COLOR)
+		else:
+			quantity_label.remove_theme_color_override("font_color")
+			var qty = data.get("quantity", 1)
+			quantity_label.visible = qty > 1
+			quantity_label.text = "x%d" % qty
+
+	# Show green glow for equipped items
+	if glow:
+		if is_equipped:
+			glow.color = EQUIPPED_GLOW_COLOR
+			glow.visible = true
+		else:
+			glow.visible = false
 
 func _get_type_color(type: String) -> Color:
 	match type:
@@ -72,11 +98,13 @@ func set_selected(selected: bool) -> void:
 	is_selected = selected
 	target_scale = SELECTED_SCALE if selected else UNSELECTED_SCALE
 	target_alpha = SELECTED_ALPHA if selected else UNSELECTED_ALPHA
-	
-	# Show glow when selected
+
+	# Show glow when selected, or keep visible for equipped items
 	if glow:
-		glow.visible = selected
-	
+		glow.visible = selected or is_equipped
+		if is_equipped and not selected:
+			glow.color = EQUIPPED_GLOW_COLOR
+
 	# Bring to front when selected
 	if selected:
 		z_index = 10
