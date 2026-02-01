@@ -1,12 +1,18 @@
 {
   "version": "1.0.0",
   "project_name": "Momi's Adventure",
-  "gsd_settings": {
-    "yolo_mode": true,
-    "autonomous_execution": true,
-    "skip_confirmations": true,
+  "mode": "yolo",
+  "depth": "standard",
+  "model_profile": "quality",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true
+  },
+  "git": {
     "auto_commit": false,
-    "profile": "quality"
+    "branching_strategy": "none",
+    "base_branch": "master"
   },
   "tech_stack": {
     "engine": "Godot 4.5",
