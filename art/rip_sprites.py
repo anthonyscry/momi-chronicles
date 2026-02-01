@@ -353,6 +353,39 @@ def clean_semitransparent_fringe(
     return _clean_fringe_pillow(img, bg_color, fringe_tolerance, passes)
 
 
+def crop_to_content(img: Image.Image, padding: int = 2) -> Image.Image:
+    """
+    Crop image to the bounding box of non-transparent pixels plus padding.
+
+    Uses PIL's Image.getbbox() for efficient bounding-box detection.
+    Returns the original image unchanged if it's already smaller than 16x16
+    or if no non-transparent content is found.
+    """
+    w, h = img.size
+
+    # Don't crop if image is already smaller than 16x16
+    if w < 16 or h < 16:
+        return img
+
+    # Get bounding box of non-transparent pixels (alpha > 0)
+    bbox = img.getbbox()
+    if bbox is None:
+        # Fully transparent image — return as-is
+        return img
+
+    # Add padding around the bounding box
+    left = max(0, bbox[0] - padding)
+    upper = max(0, bbox[1] - padding)
+    right = min(w, bbox[2] + padding)
+    lower = min(h, bbox[3] + padding)
+
+    # Don't crop if result would be same size or larger
+    if left == 0 and upper == 0 and right == w and lower == h:
+        return img
+
+    return img.crop((left, upper, right, lower))
+
+
 def downscale_nearest(img: Image.Image, target_size: int) -> Image.Image:
     """Downscale using nearest-neighbor to preserve pixel art crispness."""
     w, h = img.size
@@ -374,8 +407,9 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
     1. Detect background color from corners/edges
     2. Flood-fill from corners to remove connected background
     3. Clean semi-transparent fringe pixels
-    4. Optionally downscale with nearest-neighbor
-    5. Save with transparency
+    4. Crop to content bounding box (if --crop enabled)
+    5. Optionally downscale with nearest-neighbor
+    6. Save with transparency
 
     Returns True if background was successfully removed.
     """
@@ -416,12 +450,21 @@ def rip_sprite(image_path: Path, args: argparse.Namespace) -> bool:
             print(f"  WARN {image_path.name}: No background removed — manual check needed")
         return False
 
-    # Step 4: Downscale if target specified
+    # Step 4: Crop to content bounding box
+    do_crop: bool = getattr(args, "crop", True)
+    padding: int = getattr(args, "padding", 2)
+    if do_crop:
+        pre_crop_size = img.size
+        img = crop_to_content(img, padding)
+        if img.size != pre_crop_size:
+            print(f"  CROP: {pre_crop_size[0]}x{pre_crop_size[1]} -> {img.size[0]}x{img.size[1]} (padding={padding})")
+
+    # Step 5: Downscale if target specified
     if target_size:
         img = downscale_nearest(img, target_size)
         print(f"  SCALE: {w}x{h} -> {img.size[0]}x{img.size[1]}")
 
-    # Step 5: Save
+    # Step 6: Save
     img.save(image_path, "PNG")
 
     # Save preview with checkerboard
@@ -568,10 +611,6 @@ Examples:
 
     # Warn about not-yet-implemented flags (only when user explicitly sets them)
     _stub_flags: list[str] = []
-    if args.no_crop:
-        _stub_flags.append("--no-crop")
-    if args.padding != 2:
-        _stub_flags.append("--padding")
     if args.split_frames is not None:
         _stub_flags.append("--split-frames")
     if args.output_dir is not None:
