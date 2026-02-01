@@ -18,16 +18,23 @@ This document describes the end-to-end process for creating polished pixel art s
 
 ## Quick Reference: Pixel Scale Standards
 
-| Asset Type | Size | Examples |
-|-----------|------|----------|
-| Environment Tiles | 16x16 | Grass, walls, props |
-| Items/Equipment | 16x16 | Potions, collars, hats |
-| Regular Enemies | 24x24 | Crow, Raccoon, Rat, Cat |
-| Player/Companions | 32x32 | Momi, Cinnamon, Philo |
-| Mini-Bosses | 36-40px | Alpha Raccoon, Crow Matriarch |
-| Major Bosses | 48x48 | Rat King, Raccoon King |
+| Asset Type | Size | Examples | Generation Size* |
+|-----------|------|----------|------------------|
+| Environment Tiles | 16x16 | Grass, walls, props | 32x32 |
+| Items/Equipment | 16x16 | Potions, collars, hats | 32x32 |
+| Regular Enemies | 24x24 | Crow, Raccoon, Rat, Cat | 48x48 |
+| Player/Companions | 32x32 | Momi, Cinnamon, Philo | 64x64 |
+| Mini-Bosses | 36-40px | Alpha Raccoon, Crow Matriarch | 72-80px |
+| Major Bosses | 48x48 | Rat King, Raccoon King | 96x96 |
 
-**CRITICAL:** All sprites must match these exact dimensions. See VISUAL_STANDARDS.md for detailed requirements.
+*_Generation Size:_ Generate at 2× target size for quality, then downscale with nearest-neighbor filter.
+
+**CRITICAL:** All sprites must match these exact dimensions. See [VISUAL_STANDARDS.md](../.auto-claude/specs/005-visual-polish-sprite-consistency/VISUAL_STANDARDS.md) for:
+- Detailed pixel scale requirements and rationale
+- Color palette constraints (player vs enemy)
+- Visual distinctiveness requirements
+- Quality verification methods
+- AI generation prompt templates
 
 ---
 
@@ -486,34 +493,152 @@ python art/rip_sprites.py art/generated/items/
 
 Before moving to the next phase, ALL sprites must pass:
 
-### Gate 1: Size Verification (Automated)
+### Gate 1: Size Verification (Automated) ⚙️
+**Requirement:** All sprites match target pixel dimensions exactly
+**Verification Method:**
+```bash
+# Run automated size check for all sprite directories
+python -c "
+from PIL import Image
+import os
+
+expected = {
+    'characters': (32, 32),
+    'enemies': (24, 24),
+    'bosses': (48, 48),
+    'items': (16, 16),
+    'equipment': (16, 16),
+    'tiles': (16, 16)
+}
+
+passed = True
+for dir_name, size in expected.items():
+    dir_path = f'art/generated/{dir_name}'
+    if os.path.exists(dir_path):
+        for file in os.listdir(dir_path):
+            if file.endswith('.png') and '_preview' not in file:
+                img = Image.open(os.path.join(dir_path, file))
+                if img.size != size:
+                    print(f'❌ FAIL: {dir_name}/{file} is {img.size}, expected {size}')
+                    passed = False
+
+if passed:
+    print('✅ PASS: All sprites match target dimensions')
+else:
+    print('❌ FAIL: Size mismatches detected - regeneration required')
+"
+```
+
+**Pass Criteria:**
 - [ ] All sprites match target pixel dimensions
 - [ ] No oversized or undersized sprites
-- [ ] Batch verification script returns "OK" for all
+- [ ] Batch verification script returns "PASS"
 
-### Gate 2: Visual QA (Manual)
-- [ ] All sprites have 1px black outlines
-- [ ] All backgrounds are fully transparent
-- [ ] No AI artifacts or generation errors
-- [ ] Aesthetic consistency across all assets
+**On Failure:** Regenerate sprites with correct dimensions specified in prompt
 
-### Gate 3: Color Palette Check (Manual)
-- [ ] Player/companions use warm friendly tones
-- [ ] Enemies use cool hostile tones
-- [ ] No palette conflicts (enemies don't use player colors)
+---
+
+### Gate 2: Visual QA (Manual) 👁️
+**Requirement:** All sprites meet technical quality standards
+**Verification Method:** Visual inspection of each sprite
+
+**Pass Criteria:**
+- [ ] All sprites have complete 1px black outlines
+- [ ] All backgrounds are fully transparent (no artifacts)
+- [ ] No AI artifacts or generation errors (text, distortions, blur)
+- [ ] Aesthetic consistency across all assets (Earthbound-Ghibli style)
+- [ ] Lighting direction consistent (top-left)
+- [ ] Sprites centered in canvas (no clipping)
+
+**On Failure:** Regenerate sprite or manually edit to fix issues
+
+---
+
+### Gate 3: Color Palette Check (Manual) 🎨
+**Requirement:** Color palettes follow visual standards
+**Verification Method:** Compare sprites against [VISUAL_STANDARDS.md](../.auto-claude/specs/005-visual-polish-sprite-consistency/VISUAL_STANDARDS.md) color requirements
+
+**Pass Criteria:**
+- [ ] Player/companions use warm friendly tones (tans, browns, blues)
+- [ ] Enemies use cool hostile tones (grays, purples, desaturated colors)
+- [ ] No palette conflicts (enemies avoid Momi's tan #D9B373 or Cinnamon's brown #BF804D)
 - [ ] Color coding is consistent (red = health, orange = power, etc.)
+- [ ] Hostile enemies have glowing/menacing eyes (red/yellow)
 
-### Gate 4: Distinctiveness Test (Manual)
-- [ ] Player is instantly identifiable in side-by-side comparison
-- [ ] Enemies look hostile and threatening (not friendly/cute)
-- [ ] Items are readable at small scale
-- [ ] No visual confusion between asset types
+**On Failure:** Regenerate sprite with corrected color palette in prompt
 
-### Gate 5: Integration Test (In-Game)
-- [ ] Sprites display correctly in Godot scenes
-- [ ] Animations play smoothly without jitter
-- [ ] Scale looks appropriate in gameplay
+---
+
+### Gate 4: Distinctiveness Test (Manual) 🔍
+**Requirement:** Player is instantly identifiable vs enemies
+**Verification Method:** Visual comparison tests
+
+**Test 1 - Side-by-Side Comparison:**
+```bash
+# Generate comparison image (if comparison script exists)
+# Or manually place sprites side-by-side for review
+```
+- [ ] Player (Momi) is instantly identifiable in comparison
+- [ ] Size difference clear (24x24 enemies < 32x32 player < 48x48 bosses)
+- [ ] Silhouettes are distinct (posture, shape, proportions)
+
+**Test 2 - Cluster Test:**
+- [ ] Place player sprite among 5+ enemy sprites
+- [ ] Player stands out immediately (within 1-2 seconds)
+- [ ] No visual confusion in busy scenes
+
+**Test 3 - Enemy Hostility Check:**
+- [ ] Enemies look hostile and threatening (NOT friendly/cute)
+- [ ] Enemy postures are aggressive (hunched, sneaky, or menacing)
+- [ ] Clear visual language: player = heroic, enemies = threatening
+
+**Test 4 - Item Readability:**
+- [ ] Items are readable at 16x16 scale
+- [ ] Iconic silhouettes (bottle = potion, bone = treat)
+- [ ] Color coding is clear
+
+**On Failure:** Regenerate sprite with emphasis on visual distinctiveness
+
+---
+
+### Gate 5: Integration Test (In-Game) 🎮
+**Requirement:** Sprites work correctly in actual gameplay
+**Verification Method:** Playtest in Godot engine
+
+**Pass Criteria:**
+- [ ] Sprites display correctly in Godot scenes (no corruption)
+- [ ] Animations play smoothly without jitter or drift
+- [ ] Scale looks appropriate in gameplay (not too large/small)
 - [ ] Visual clarity during combat and exploration
+- [ ] Player remains identifiable in busy combat scenarios
+- [ ] Frame alignment correct (characters don't shift/bounce)
+
+**On Failure:**
+- If display issues: Check sprite import settings in Godot
+- If animation issues: Verify frame alignment and pivot points
+- If scale issues: Review sprite dimensions and scene scale settings
+
+---
+
+### Enforcement Strategy Summary
+
+**Pre-Generation (Phase 2):**
+1. Review [VISUAL_STANDARDS.md](../.auto-claude/specs/005-visual-polish-sprite-consistency/VISUAL_STANDARDS.md) before generating sprites
+2. Use provided prompt templates with exact pixel dimensions
+3. Specify 2× generation size for quality (e.g., 64x64 → 32x32)
+
+**Post-Generation (Phase 3):**
+1. Run automated size verification (Gate 1)
+2. Post-process with rip_sprites.py (background removal)
+3. Manual visual QA (Gates 2-4)
+4. Fix failures before proceeding to integration
+
+**Post-Integration (Phase 4):**
+1. In-game testing (Gate 5)
+2. Playtest for visual clarity and distinctiveness
+3. Iterate if needed (regenerate or adjust)
+
+**All 5 gates must pass before sprites are considered production-ready.**
 
 ---
 
