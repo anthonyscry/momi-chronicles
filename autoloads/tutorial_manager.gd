@@ -37,6 +37,13 @@ var tutorials_completed: Dictionary = {}
 ## Tracks action counts for tutorials requiring multiple demonstrations
 var action_counts: Dictionary = {}
 
+## Movement tutorial tracking
+var movement_tutorial_triggered: bool = false
+var movement_time: float = 0.0
+const MOVEMENT_TUTORIAL_DURATION: float = 3.0
+var ready_timer: float = 0.0
+const READY_DELAY: float = 0.5  # Wait for player to spawn
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -45,6 +52,9 @@ func _ready() -> void:
 	_initialize_tutorial_state()
 	_connect_event_signals()
 	DebugLogger.log_system("TutorialManager initialized")
+
+func _process(delta: float) -> void:
+	_check_movement_tutorial(delta)
 
 # =============================================================================
 # INITIALIZATION
@@ -142,6 +152,41 @@ func _on_enemy_spawned(enemy_id: String) -> void:
 	pass
 
 # =============================================================================
+# MOVEMENT TUTORIAL LOGIC
+# =============================================================================
+
+func _check_movement_tutorial(delta: float) -> void:
+	## Handle movement tutorial triggering and completion
+
+	# Wait for initial delay before triggering tutorial (ensures player is spawned)
+	if ready_timer < READY_DELAY:
+		ready_timer += delta
+		return
+
+	# Trigger movement tutorial if not yet triggered and should be shown
+	if not movement_tutorial_triggered and should_show_tutorial(TUTORIAL_MOVEMENT):
+		Events.tutorial_triggered.emit(TUTORIAL_MOVEMENT)
+		mark_tutorial_shown(TUTORIAL_MOVEMENT)
+		movement_tutorial_triggered = true
+		DebugLogger.log_system("Movement tutorial triggered")
+		return
+
+	# Skip if tutorial already completed
+	if is_tutorial_completed(TUTORIAL_MOVEMENT):
+		return
+
+	# Track movement input
+	var input_vector = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+
+	if input_vector.length() > 0.1:  # Player is moving
+		movement_time += delta
+
+		# Complete tutorial after required movement duration
+		if movement_time >= MOVEMENT_TUTORIAL_DURATION:
+			mark_tutorial_completed(TUTORIAL_MOVEMENT)
+			DebugLogger.log_system("Movement tutorial completed after %.1f seconds" % movement_time)
+
+# =============================================================================
 # PUBLIC API
 # =============================================================================
 
@@ -189,6 +234,9 @@ func reset_all_tutorials() -> void:
 	tutorials_shown.clear()
 	tutorials_completed.clear()
 	action_counts.clear()
+	movement_tutorial_triggered = false
+	movement_time = 0.0
+	ready_timer = 0.0
 	_initialize_tutorial_state()
 	DebugLogger.log_system("All tutorials reset")
 
@@ -207,5 +255,8 @@ func load_save_data(data: Dictionary) -> void:
 	tutorials_shown = data.get("tutorials_shown", {})
 	tutorials_completed = data.get("tutorials_completed", {})
 	action_counts = data.get("action_counts", {})
+	movement_tutorial_triggered = false
+	movement_time = 0.0
+	ready_timer = 0.0
 	_initialize_tutorial_state()
 	DebugLogger.log_system("Tutorial progress loaded from save")
