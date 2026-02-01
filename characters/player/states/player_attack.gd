@@ -64,6 +64,8 @@ func physics_update(delta: float) -> void:
 		if not hitbox_active and player.hitbox:
 			player.hitbox.enable()
 			hitbox_active = true
+			# Light attack screen shake
+			EffectsManager.screen_shake(2.0, 0.1)
 	elif progress >= HITBOX_END:
 		if hitbox_active and player.hitbox:
 			player.hitbox.disable()

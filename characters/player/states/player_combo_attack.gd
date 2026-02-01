@@ -20,6 +20,13 @@ const COMBO_WINDOW: float = 0.4
 ## Base damage (can be modified by level)
 const BASE_DAMAGE: int = 25
 
+## Screen shake values per combo hit: [intensity, duration]
+const COMBO_SHAKE = [
+	{"intensity": 2.0, "duration": 0.1},   # Hit 1: Light
+	{"intensity": 4.0, "duration": 0.15},  # Hit 2: Medium
+	{"intensity": 6.0, "duration": 0.2}    # Hit 3: Heavy
+]
+
 # =============================================================================
 # STATE
 # =============================================================================
@@ -102,6 +109,9 @@ func physics_update(delta: float) -> void:
 		if not hitbox_active and player.hitbox:
 			player.hitbox.enable()
 			hitbox_active = true
+			# Progressive screen shake per combo hit
+			var shake_data = COMBO_SHAKE[combo_index]
+			EffectsManager.screen_shake(shake_data.intensity, shake_data.duration)
 	elif progress >= current_data.hitbox_end:
 		if hitbox_active and player.hitbox:
 			player.hitbox.disable()
