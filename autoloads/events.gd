@@ -290,3 +290,6 @@ signal quest_updated(quest_id: String)
 signal quest_completed(quest_id: String)
 signal quest_failed(quest_id: String)
 signal active_quest_changed(quest_id: String)
+
+# Zone events
+signal zone_unlocked(zone_id: String)

@@ -41,6 +41,9 @@ var zone_scenes: Dictionary = {
 	"sewers": "res://world/zones/sewers.tscn"
 }
 
+## Set of unlocked zone IDs (for quest-gated progression)
+var unlocked_zones: Array[String] = []
+
 ## Track boss defeat for save state
 var boss_defeated: bool = false
 
@@ -98,6 +101,12 @@ func _ready() -> void:
 	party_manager = PartyManagerClass.new()
 	party_manager.name = "PartyManager"
 	add_child(party_manager)
+
+	# Start with first zone unlocked by default
+	if unlocked_zones.is_empty():
+		unlock_zone("neighborhood")
+
+	DebugLogger.log_system("GameManager initialized")
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -303,6 +312,45 @@ func set_coins(amount: int) -> void:
 	Events.coins_changed.emit(coins)
 
 
+# =============================================================================
+# ZONE MANAGEMENT
+# =============================================================================
+
+## Check if a zone is unlocked
+func is_zone_unlocked(zone_id: String) -> bool:
+	return zone_id in unlocked_zones
+
+
+## Unlock a new zone (called by quest completion)
+func unlock_zone(zone_id: String) -> void:
+	if zone_id.is_empty():
+		push_warning("GameManager: Attempted to unlock zone with empty ID")
+		return
+
+	if is_zone_unlocked(zone_id):
+		DebugLogger.log_system("Zone already unlocked: %s" % zone_id)
+		return
+
+	unlocked_zones.append(zone_id)
+	Events.zone_unlocked.emit(zone_id)
+	DebugLogger.log_system("Zone unlocked: %s" % zone_id)
+
+
+## Get list of all unlocked zones
+func get_unlocked_zones() -> Array[String]:
+	return unlocked_zones.duplicate()
+
+
+## Reset zone unlocks (for new game)
+func reset_zones() -> void:
+	unlocked_zones.clear()
+	unlock_zone("neighborhood")  # Always start with first zone unlocked
+
+
+# =============================================================================
+# SAVE / LOAD
+# =============================================================================
+
 ## Save game state to dictionary (called by SaveManager)
 func save_game() -> Dictionary:
 	var save_data = {
@@ -311,7 +359,8 @@ func save_game() -> Dictionary:
 		"player_position": {
 			"x": player_position.x,
 			"y": player_position.y
-		}
+		},
+		"unlocked_zones": unlocked_zones.duplicate()
 	}
 	return save_data
 
@@ -329,7 +378,16 @@ func load_game(save_data: Dictionary) -> void:
 		var pos = save_data["player_position"]
 		player_position = Vector2(pos["x"], pos["y"])
 
-	DebugLogger.log_system("Game state loaded - Coins: %d, Zone: %s" % [coins, current_zone])
+	if save_data.has("unlocked_zones"):
+		unlocked_zones = []
+		for zone_id in save_data["unlocked_zones"]:
+			unlocked_zones.append(zone_id)
+
+	# Ensure at least the starting zone is unlocked
+	if unlocked_zones.is_empty():
+		unlock_zone("neighborhood")
+
+	DebugLogger.log_system("Game state loaded - Coins: %d, Zone: %s, Unlocked zones: %d" % [coins, current_zone, unlocked_zones.size()])
 
 	# Fade out, load zone, fade in
 	_ensure_fade_overlay()
