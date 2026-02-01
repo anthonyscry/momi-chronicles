@@ -88,6 +88,13 @@ var sfx_tracks: Dictionary = {
 	"item_equip": "res://assets/audio/sfx/item_equip.wav",
 	"item_use": "res://assets/audio/sfx/item_use.wav",
 	"shop_purchase": "res://assets/audio/sfx/shop_purchase.wav",
+
+	# Phase P6: Gameplay sounds
+	"guard_broken": "res://assets/audio/sfx/guard_broken.wav",
+	"combo_complete": "res://assets/audio/sfx/combo_complete.wav",
+	"buff_applied": "res://assets/audio/sfx/buff_applied.wav",
+	"buff_expired": "res://assets/audio/sfx/buff_expired.wav",
+
 	# Phase P4: Audio polish
 	"footstep_walk": "res://assets/audio/sfx/footstep_walk.wav",
 	"footstep_run": "res://assets/audio/sfx/footstep_run.wav",
@@ -324,6 +331,38 @@ func _connect_signals() -> void:
 	Events.player_ground_pound_impact.connect(_on_ground_pound_audio)
 	Events.player_charge_started.connect(_on_charge_started_audio)
 	Events.player_charge_released.connect(_on_charge_released_audio)
+
+	# Phase P6: UI menu sounds
+	if Events.has_signal("menu_opened"):
+		Events.menu_opened.connect(_on_menu_opened)
+	if Events.has_signal("menu_closed"):
+		Events.menu_closed.connect(_on_menu_closed)
+	if Events.has_signal("inventory_opened"):
+		Events.inventory_opened.connect(_on_inventory_opened)
+	if Events.has_signal("inventory_closed"):
+		Events.inventory_closed.connect(_on_inventory_closed)
+	if Events.has_signal("ring_menu_opened"):
+		Events.ring_menu_opened.connect(_on_ring_menu_opened)
+	if Events.has_signal("ring_menu_closed"):
+		Events.ring_menu_closed.connect(_on_ring_menu_closed)
+
+	# Phase P6: Item/shop sounds
+	if Events.has_signal("item_equipped"):
+		Events.item_equipped.connect(_on_item_equipped)
+	if Events.has_signal("item_used"):
+		Events.item_used.connect(_on_item_used)
+	if Events.has_signal("shop_purchase_completed"):
+		Events.shop_purchase_completed.connect(_on_shop_purchase)
+
+	# Phase P6: Combat/gameplay sounds
+	if Events.has_signal("player_guard_broken"):
+		Events.player_guard_broken.connect(_on_player_guard_broken)
+	if Events.has_signal("combo_completed"):
+		Events.combo_completed.connect(_on_combo_completed)
+	if Events.has_signal("buff_applied"):
+		Events.buff_applied.connect(_on_buff_applied)
+	if Events.has_signal("buff_expired"):
+		Events.buff_expired.connect(_on_buff_expired)
 
 # =============================================================================
 # DYNAMIC MUSIC SYSTEM
@@ -832,3 +871,49 @@ func _on_charge_started_audio() -> void:
 
 func _on_charge_released_audio(_damage: int, _charge_percent: float) -> void:
 	play_sfx("charge_release", 0.0, 0.1)
+
+# =============================================================================
+# PHASE P6 EVENT HANDLERS - New SFX
+# =============================================================================
+
+# UI Menu Sounds
+func _on_menu_opened() -> void:
+	play_sfx("menu_open", -2.0, 0.0)
+
+func _on_menu_closed() -> void:
+	play_sfx("menu_close", -2.0, 0.0)
+
+func _on_inventory_opened() -> void:
+	play_sfx("inventory_open", -2.0, 0.0)
+
+func _on_inventory_closed() -> void:
+	play_sfx("inventory_close", -2.0, 0.0)
+
+func _on_ring_menu_opened() -> void:
+	play_sfx("ring_menu_open", -2.0, 0.0)
+
+func _on_ring_menu_closed() -> void:
+	play_sfx("ring_menu_close", -2.0, 0.0)
+
+# Item/Shop Sounds
+func _on_item_equipped(_item: Dictionary) -> void:
+	play_sfx("item_equip", 0.0, 0.1)
+
+func _on_item_used(_item: Dictionary) -> void:
+	play_sfx("item_use", -2.0, 0.1)
+
+func _on_shop_purchase(_item: Dictionary, _cost: int) -> void:
+	play_sfx("shop_purchase", 0.0, 0.05)
+
+# Combat/Gameplay Sounds
+func _on_player_guard_broken() -> void:
+	play_sfx("guard_broken", 0.0, 0.1)
+
+func _on_combo_completed(_combo_length: int) -> void:
+	play_sfx("combo_complete", 0.0, 0.1)
+
+func _on_buff_applied(_effect_type: int, _value: float, _duration: float) -> void:
+	play_sfx("buff_applied", -2.0, 0.1)
+
+func _on_buff_expired(_effect_type: int) -> void:
+	play_sfx("buff_expired", -3.0, 0.1)

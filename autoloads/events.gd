@@ -186,6 +186,22 @@ signal game_loaded
 signal save_corrupted
 
 # =============================================================================
+# MENU SIGNALS
+# =============================================================================
+
+## Emitted when pause menu opens
+signal menu_opened
+
+## Emitted when pause menu closes
+signal menu_closed
+
+## Emitted when inventory opens
+signal inventory_opened
+
+## Emitted when inventory closes
+signal inventory_closed
+
+# =============================================================================
 # RING MENU SIGNALS
 # =============================================================================
 
@@ -214,6 +230,12 @@ signal buff_expired(effect_type: int)
 ## UI refresh, paper-doll display, or stat comparisons.
 signal equipment_changed(slot: int, equipment_id: String)
 
+## Emitted when an item is equipped
+signal item_equipped(item: Dictionary)
+
+## Emitted when a consumable item is used
+signal item_used(item: Dictionary)
+
 # =============================================================================
 # COMPANION/PARTY SIGNALS
 # =============================================================================
@@ -239,3 +261,6 @@ signal shop_interact_requested
 
 ## Emitted when shop UI closes
 signal shop_closed
+
+## Emitted when a purchase is completed
+signal shop_purchase_completed(item: Dictionary, cost: int)
