@@ -1,18 +1,17 @@
 extends Node
-## Manages game save/load with atomic writes and backup system.
+class_name SaveManager
+## Manages game save/load operations.
+## Coordinates data collection from various managers and persists to JSON file.
 
 # =============================================================================
 # CONSTANTS
 # =============================================================================
 
-const SAVE_PATH: String = "user://save.dat"
-const BACKUP_PATH: String = "user://save.dat.bak"
-const SAVE_VERSION: int = 3
+const SAVE_FILE_PATH = "user://save_data.json"
 
 # =============================================================================
 # STATE VARIABLES
-# =============================================================================
-
+# ======================================================================
 ## Pending data for player after zone loads
 var _pending_level: int = 1
 var _pending_exp: int = 0
@@ -54,32 +53,16 @@ func get_save_info() -> Dictionary:
 
 # =============================================================================
 # PRIVATE METHODS — SAVE DATA STRUCTURE
+=======
+# LIFECYCLE
 # =============================================================================
 
-## Default save data (fresh game)
-func _get_default_data() -> Dictionary:
-	return {
-		"version": SAVE_VERSION,
-		"level": 1,
-		"total_exp": 0,
-		"coins": 0,
-		"current_zone": "neighborhood",
-		"boss_defeated": false,
-		"mini_bosses_defeated": {
-			"alpha_raccoon": false,
-			"crow_matriarch": false,
-			"rat_king": false,
-		},
-		"equipment": {},
-		"inventory": {},
-		"party": {},
-		"timestamp": Time.get_unix_time_from_system()
-	}
+func _ready() -> void:
+	DebugLogger.log_system("SaveManager initialized")
 
 # =============================================================================
 # PRIVATE METHODS — DATA GATHERING
-# =============================================================================
-
+# ======================================================================
 func _gather_save_data() -> Dictionary:
 	var data = _get_default_data()
 
@@ -284,3 +267,112 @@ func _on_zone_entered_after_load(_zone_name: String) -> void:
 		player.progression.get_exp_to_next_level()
 	)
 	DebugLogger.log_save("Game loaded — level %d, exp %d restored" % [_pending_level, _pending_exp])
+=======
+# SAVE OPERATIONS
+# =============================================================================
+
+## Collect all save data from game managers and return as Dictionary
+func get_save_data() -> Dictionary:
+	var save_data = {}
+
+	# Tutorial progress
+	if TutorialManager:
+		save_data["tutorial"] = TutorialManager.get_save_data()
+
+	# TODO: Add other manager data as needed
+	# save_data["player"] = PlayerManager.get_save_data()
+	# save_data["inventory"] = InventoryManager.get_save_data()
+	# save_data["quests"] = QuestManager.get_save_data()
+
+	DebugLogger.log_system("Save data collected")
+	return save_data
+
+## Save game data to file
+func save_game() -> bool:
+	var save_data = get_save_data()
+
+	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
+	if file == null:
+		DebugLogger.log_error("Failed to open save file for writing: %s" % SAVE_FILE_PATH)
+		return false
+
+	var json_string = JSON.stringify(save_data, "\t")
+	file.store_string(json_string)
+	file.close()
+
+	DebugLogger.log_system("Game saved to: %s" % SAVE_FILE_PATH)
+	Events.game_saved.emit()
+	return true
+
+# =============================================================================
+# LOAD OPERATIONS
+# =============================================================================
+
+## Load game data from file and distribute to managers
+func load_game() -> bool:
+	if not FileAccess.file_exists(SAVE_FILE_PATH):
+		DebugLogger.log_warning("Save file does not exist: %s" % SAVE_FILE_PATH)
+		return false
+
+	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
+	if file == null:
+		DebugLogger.log_error("Failed to open save file for reading: %s" % SAVE_FILE_PATH)
+		return false
+
+	var json_string = file.get_as_text()
+	file.close()
+
+	var json = JSON.new()
+	var parse_result = json.parse(json_string)
+	if parse_result != OK:
+		DebugLogger.log_error("Failed to parse save file JSON")
+		return false
+
+	var save_data = json.data
+	if typeof(save_data) != TYPE_DICTIONARY:
+		DebugLogger.log_error("Save data is not a dictionary")
+		return false
+
+	load_save_data(save_data)
+	return true
+
+## Distribute save data to appropriate managers
+func load_save_data(data: Dictionary) -> void:
+	# Tutorial progress
+	if data.has("tutorial") and TutorialManager:
+		TutorialManager.load_save_data(data["tutorial"])
+
+	# TODO: Add other manager loading as needed
+	# if data.has("player") and PlayerManager:
+	#     PlayerManager.load_save_data(data["player"])
+	# if data.has("inventory") and InventoryManager:
+	#     InventoryManager.load_save_data(data["inventory"])
+
+	DebugLogger.log_system("Save data loaded and distributed to managers")
+	Events.game_loaded.emit()
+
+# =============================================================================
+# UTILITY
+# =============================================================================
+
+## Check if a save file exists
+func has_save_file() -> bool:
+	return FileAccess.file_exists(SAVE_FILE_PATH)
+
+## Delete the save file
+func delete_save() -> bool:
+	if not has_save_file():
+		return false
+
+	var dir = DirAccess.open("user://")
+	if dir == null:
+		DebugLogger.log_error("Failed to access user directory")
+		return false
+
+	var result = dir.remove(SAVE_FILE_PATH.get_file())
+	if result == OK:
+		DebugLogger.log_system("Save file deleted")
+		return true
+	else:
+		DebugLogger.log_error("Failed to delete save file")
+		return false

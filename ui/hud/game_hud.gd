@@ -19,6 +19,9 @@ var buff_icons = null  # BuffIcons instance (preloaded to avoid scope issues)
 ## Save indicator
 var save_indicator: Label
 
+## Tutorial prompt overlay
+var tutorial_prompt = null  # TutorialPrompt instance
+
 ## Whether debug panel is visible
 var debug_visible: bool = DebugConfig.show_debug_ui
 
@@ -39,7 +42,10 @@ func _ready() -> void:
 	
 	# Create save indicator
 	_setup_save_indicator()
-	
+
+	# Create tutorial prompt overlay
+	_setup_tutorial_prompt()
+
 	# Connect to health changes
 	Events.player_health_changed.connect(_on_health_changed)
 	
@@ -122,6 +128,15 @@ func _setup_buff_icons() -> void:
 	# Position bottom-left below health bar
 	buff_icons.position = Vector2(8, 60)
 	add_child(buff_icons)
+
+
+func _setup_tutorial_prompt() -> void:
+	var TutorialPromptScript = preload("res://ui/tutorial/tutorial_prompt.gd")
+	tutorial_prompt = TutorialPromptScript.new()
+	tutorial_prompt.name = "TutorialPrompt"
+	# Center screen overlay
+	tutorial_prompt.anchors_preset = Control.PRESET_FULL_RECT
+	add_child(tutorial_prompt)
 
 
 func _setup_low_hp_vignette() -> void:

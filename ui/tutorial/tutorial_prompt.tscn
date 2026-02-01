@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://tutorial_prompt_001"]
+
+[ext_resource type="Script" path="res://ui/tutorial/tutorial_prompt.gd" id="1_tutorial"]
+
+[node name="TutorialPrompt" type="CanvasLayer"]
+script = ExtResource("1_tutorial")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -50.0
+offset_right = 120.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="PromptText" type="Label" parent="Panel/MarginContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 10
+text = "Tutorial Prompt"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
