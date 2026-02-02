@@ -38,10 +38,18 @@ Progress: ███████████████████████�
 | Suno pattern for Gemini automation | Consistent Playwright sync API, argparse CLI, try/except import guard |
 | 3-tier image download fallback | Gemini DOM varies; blob extraction → JS fetch → manual save prevents crashes |
 
+## Next Milestone: v1.8 Quest System
+
+| Phase | Name | Requirements | Status |
+|-------|------|-------------|--------|
+| 40 | Dialogue Expansion | 4 story NPCs + reputation system | 📋 Planned (2 plans) |
+| 41 | Quest Tracking UI | Journal, objective tracker | ⏳ Pending |
+| 42 | Quest Types | Fetch, elimination, delivery, chain quests | ⏳ Pending |
+
 ## Session Continuity
 Last session: 2026-02-01
-Stopped at: Phase 39 COMPLETE — v1.7 Rooftops Zone milestone COMPLETE
-Next: v1.8 Quest System — Phase 40 (Dialogue System Expansion)
+Stopped at: Phase 39 COMPLETE, Phase 40 PLANNED — ready for execution
+Next: Execute Phase 40 (Dialogue System Expansion) — 2 plans, Wave 1 parallel
 
 ---
 

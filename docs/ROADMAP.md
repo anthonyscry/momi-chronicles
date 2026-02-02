@@ -103,20 +103,32 @@ Plans:
 ## v1.8: QUEST SYSTEM
 
 ### Phase 40: Dialogue System Expansion
-**Goal**: Rich NPC interactions beyond shopkeeper
+**Goal**: Rich NPC interactions beyond shopkeeper — 4 story NPCs with branching dialogue and reputation system
 
-| NPC | Role |
-|-----|------|
-| **Old Lady Gertrude** | Gives fetch quests, hints about Raccoon King |
-| **Mailman Maurice** | Postal mission, delivers "important letter" |
-| **Kids Gang** | Find their lost ball, hide-and-seek minigame |
-| **Grumpy Mr. Henderson** | Initially hostile, warms up after helping his garden |
+**Status:** 📋 Planned (2 plans)
+
+**Plans:** 2 plans in 1 wave (parallel)
+
+Plans:
+- [ ] 40-01-PLAN.md — DialogueNPC base + Gertrude & Maurice (NPCs + dialogue JSON + zone placement)
+- [ ] 40-02-PLAN.md — Kids Gang & Henderson + reputation system (remaining NPCs + GameManager reputation tracking)
+
+**Already exists:** DialogueManager autoload, DialogueResource, DialogueData JSON loader, DialogueBox UI (typewriter + choices), NPCBase class, ShopNPC (Nutkin), Events signals for dialogue/quest
+
+| NPC | Role | Location |
+|-----|------|----------|
+| **Old Lady Gertrude** | Hints about Raccoon King, lore | Near houses (120, 220) |
+| **Mailman Maurice** | Neighborhood news, delivery quest hooks | Main road (400, 300) |
+| **Kids Gang** | Playful fans of Momi, ball quest hooks | Park area (180, 480) |
+| **Grumpy Mr. Henderson** | Hostile → friendly arc, reputation-gated dialogue | North houses (280, 180) |
 
 **Deliverables:**
-- Dialogue tree system with branching choices
-- NPC base class extended for dialogue interaction
-- 4 NPCs with unique dialogue trees
-- Reputation/friendliness system affecting dialogue options
+- ~~Dialogue tree system with branching choices~~ ✅ Already exists
+- ~~NPC base class extended for dialogue interaction~~ ✅ Already exists
+- Reusable DialogueNPC script (Area2D pattern like ShopNPC)
+- 4 NPCs with unique dialogue trees (5-7 nodes each)
+- Reputation/friendliness system (0-100 scale, saved, affects Henderson's dialogue)
+- Mini-boss defeats boost all NPC reputation (+10 per boss)
 
 ---
 
