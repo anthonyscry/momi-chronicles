@@ -2,20 +2,20 @@
 
 ## Current Position
 
-Phase: 40 — Dialogue System Expansion
-Plan: 40-02 (complete)
-Status: Phase 40 COMPLETE — Story NPCs + reputation system implemented.
-Last activity: 2026-02-01 - Phase 40 executed (4 NPCs + dialogue + reputation)
+Phase: 42 — Quest Types Implementation
+Plan: 42-02 (complete)
+Status: Phase 42 COMPLETE — Quest engine extensions + 7 new quests + zone pickups.
+Last activity: 2026-02-01 - Phase 42 executed (new trigger types, 9 total quests, zone pickups)
 
-Progress: ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~33% (v1.8)
+Progress: ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~40% (v1.8)
 
 ## Current Milestone: v1.8 Quest System
 
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
 | 40 | Dialogue Expansion | 4 story NPCs + reputation system | ✅ COMPLETE |
-| 41 | Quest Tracking UI | Journal, objective tracker | ⏳ Pending |
-| 42 | Quest Types | Fetch, elimination, delivery, chain quests | ⏳ Pending |
+| 41 | Quest Tracking UI | Journal, objective tracker | ✅ COMPLETE |
+| 42 | Quest Types | Fetch, elimination, delivery, chain quests | ✅ COMPLETE |
 
 ## Accumulated Decisions (from v1.0-v1.5)
 | Decision | Rationale |
@@ -37,11 +37,65 @@ Progress: ████████░░░░░░░░░░░░░░░�
 | 3-tier image download fallback | Gemini DOM varies; blob extraction → JS fetch → manual save prevents crashes |
 | DialogueNPC Area2D pattern for story NPCs | Matches ShopNPC pattern; reusable, programmatic, no .tscn per NPC |
 | Reputation per NPC (0-100) in GameManager | Simple dict, saved/loaded, mini-boss defeats boost all +10 |
+| Programmatic quest definitions (code, not .tres) | Matches ItemDatabase/EquipmentDatabase pattern |
+| Event-driven quest objectives | dialogue_started + zone_entered signals drive completion |
+| NPC quest markers with hardcoded map | Simple for 2 quests, generalize in Phase 42 |
 
 ## Session Continuity
 Last session: 2026-02-01
-Stopped at: Phase 40 COMPLETE — ready for Phase 41 (Quest Tracking UI)
-Next: Plan and execute Phase 41 (Quest Tracking UI) — journal, objective tracker
+Stopped at: Phase 42 COMPLETE — v1.8 Quest System milestone complete
+Next: Begin v1.9 milestone (Phase 43: Companion Ability Expansion)
+
+---
+
+## Phase 42 Completed Summary
+
+**42-01 (Quest Engine Extensions):**
+- Added `requires_prior_complete` flag to QuestObjective for sequential objectives
+- Added `quest_giver_id` to QuestData for data-driven NPC-quest association
+- Added `objective_requires_prior` array to QuestData
+- Wired Events.enemy_defeated → _check_enemy_kill_objectives (supports "any" and specific types)
+- Wired Events.pickup_collected → _check_item_collect_objectives
+- All 4 objective checkers respect requires_prior_complete flag
+- Reputation rewards in _grant_rewards ({"reputation": {"npc_id": amount}})
+- Replaced hardcoded quest auto-start with generic quest_giver_id loop
+- Added `npc_id` stable identifier to dialogue_npc.gd, removed hardcoded npc_quest_map
+- NPC quest markers fully data-driven ("!" from quest_giver_id, "?" respects requires_prior)
+- Set npc_id on all 4 neighborhood NPCs
+- Progress counts in QuestTracker ("Objective (3/5)") and QuestLog ("[✓] Objective (3/5)")
+- Created quest_item_pickup.gd component (Area2D, quest-gated visibility, collection animation)
+
+**42-02 (Quest Content):**
+- 7 new quests (q3-q9) covering all 5 quest types: Fetch, Elimination, Delivery, Chain (4-part)
+- Henderson reputation gate (>= 30) for pest_control quest
+- Lost ball pickup in Backyard (300, 80), quest-gated to find_lost_ball
+- Mail package pickup in Neighborhood (420, 310), quest-gated to special_delivery
+- Total: 9 quests, 565 coins + 280 EXP in new rewards, reputation gains across all NPCs
+
+---
+
+## Phase 41 Completed Summary
+
+**41-01 (Quest Backend Wiring):**
+- Fixed Events.quest_updated signal to 2 params (quest_id, objective_index)
+- Replaced all print() → DebugLogger.log_system() in quest_manager.gd
+- Extended QuestObjective with trigger_type, trigger_id, target_count, current_count + advance() method
+- Updated QuestData with objective_trigger_types/ids/counts arrays
+- Added 2 sample quests: "Meet the Neighbors" (talk to 3 NPCs) + "Community Watch" (visit 2 zones)
+- Wired Events.dialogue_started → auto-start quests + complete dialogue objectives
+- Wired Events.zone_entered → complete zone objectives
+- Wired SaveManager for quest persistence (save/load)
+- Wired GameManager.reset_game() for quest state reset
+
+**41-02 (Quest UI Integration):**
+- Added QuestTracker to GameHUD (top-right corner, auto-shows on active quest)
+- Added quest reward notification popup (gold text, slide-up fade animation)
+- Added "Quest Log" option to ring menu OPTIONS ring
+- Quest log opens as dark overlay (CanvasLayer 100) with quest_log.tscn
+- ESC/dodge/ring_menu closes quest log overlay
+- Added NPC quest markers: yellow "!" for available quests, gray "?" for in-progress objectives
+- Markers update dynamically on quest events + bob animation
+- Fixed print() → DebugLogger in ring_menu.gd
 
 ---
 
@@ -145,6 +199,10 @@ Next: Plan and execute Phase 41 (Quest Tracking UI) — journal, objective track
 | 39-02 Victory Screen | Victory overlay + re-entry + game_complete | ✅ COMPLETE |
 | 40-01 Story NPCs | 4 NPCs + dialogue trees + zone placement | ✅ COMPLETE |
 | 40-02 Reputation System | Reputation tracking + Henderson gating + save/load | ✅ COMPLETE |
+| 41-01 Quest Backend | Signal fixes, trigger metadata, sample quests, save/load | ✅ COMPLETE |
+| 41-02 Quest UI | HUD tracker, ring menu journal, NPC markers, reward popup | ✅ COMPLETE |
+| 42-01 Quest Engine | New triggers, sequential objectives, data-driven markers, pickup component | ✅ COMPLETE |
+| 42-02 Quest Content | 7 new quests (fetch, elimination, delivery, chain), zone pickups | ✅ COMPLETE |
 
 ---
 

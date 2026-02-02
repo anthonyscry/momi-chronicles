@@ -106,7 +106,7 @@ signal zone_unlocked(zone_id)
 # =============================================================================
 
 signal quest_started(quest_id)
-signal quest_updated(quest_id)
+signal quest_updated(quest_id, objective_index)
 signal quest_completed(quest_id)
 signal quest_failed(quest_id)
 signal active_quest_changed(quest_id)

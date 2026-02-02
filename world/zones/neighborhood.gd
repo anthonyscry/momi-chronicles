@@ -4,6 +4,7 @@ extends BaseZone
 
 const ALPHA_RACCOON_SCENE = preload("res://characters/enemies/alpha_raccoon.tscn")
 const DialogueNPCScript = preload("res://characters/npcs/dialogue_npc.gd")
+const QuestItemPickupScript = preload("res://components/quest_item_pickup/quest_item_pickup.gd")
 
 # =============================================================================
 # SPAWN POINTS
@@ -45,6 +46,9 @@ func _setup_zone() -> void:
 	_build_maurice()
 	_build_kids_gang()
 	_build_henderson()
+	
+	# Build quest item pickups
+	_build_quest_pickups()
 	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
@@ -249,6 +253,27 @@ func _on_alpha_raccoon_trigger(body: Node2D) -> void:
 
 
 # =============================================================================
+# QUEST ITEM PICKUPS
+# =============================================================================
+
+func _build_quest_pickups() -> void:
+	_build_mail_package_pickup()
+
+func _build_mail_package_pickup() -> void:
+	# Mail package for "Special Delivery" quest (Maurice delivery quest)
+	# Placed near Maurice's position — he asks you to pick it up from his mail cart
+	var pickup = Area2D.new()
+	pickup.set_script(QuestItemPickupScript)
+	pickup.name = "MailPackagePickup"
+	pickup.item_id = "mail_package"
+	pickup.quest_id = "special_delivery"  # Only visible when quest is active
+	pickup.pickup_color = Color(0.4, 0.3, 0.7)  # Purple package
+	pickup.label_text = "Package"
+	pickup.position = Vector2(420, 310)  # Near Maurice (400, 300) — his mail cart area
+	add_child(pickup)
+
+
+# =============================================================================
 # STORY NPCs (Dialogue System)
 # =============================================================================
 
@@ -277,32 +302,35 @@ func _create_dialogue_npc(npc_name_text: String, npc_dialogue_id: String, npc_co
 
 func _build_gertrude() -> void:
 	# Old Lady Gertrude — near houses, hints about Raccoon King
-	_create_dialogue_npc(
+	var npc = _create_dialogue_npc(
 		"Gertrude",
 		"gertrude_start",
 		Color(0.7, 0.5, 0.7),  # Lavender — grandmotherly
 		Vector2(120, 220)
 	)
+	npc.npc_id = "gertrude"
 
 
 func _build_maurice() -> void:
 	# Mailman Maurice — main road, delivery quest hooks
-	_create_dialogue_npc(
+	var npc = _create_dialogue_npc(
 		"Maurice",
 		"maurice_start",
 		Color(0.3, 0.5, 0.8),  # Blue — mail carrier uniform
 		Vector2(400, 300)
 	)
+	npc.npc_id = "maurice"
 
 
 func _build_kids_gang() -> void:
 	# Kids Gang — park area, playful fans
-	_create_dialogue_npc(
+	var npc = _create_dialogue_npc(
 		"Kids Gang",
 		"kids_start",
 		Color(0.9, 0.6, 0.2),  # Orange — energetic
 		Vector2(180, 480)
 	)
+	npc.npc_id = "kids_gang"
 
 
 func _build_henderson() -> void:
@@ -321,3 +349,4 @@ func _build_henderson() -> void:
 		Color(0.5, 0.4, 0.3),  # Brown — earthy, grumpy old man
 		Vector2(280, 180)
 	)
+	_henderson_npc.npc_id = "henderson"

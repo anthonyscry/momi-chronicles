@@ -7,7 +7,7 @@
 | **Engine** | Godot 4.5 / GDScript |
 | **Resolution** | 384×216 (16:9 pixel art) |
 | **Perspective** | 3/4 top-down |
-| **Current Milestone** | v1.8 Quest System — Phase 40 complete, Phases 41-42 pending |
+| **Current Milestone** | v1.8 Quest System — COMPLETE (Phases 40-42) |
 | **Last Updated** | 2026-02-01 |
 
 ---
@@ -139,32 +139,63 @@ Plans:
 ---
 
 ### Phase 41: Quest Tracking UI
-**Goal**: Display active quests and objectives
+**Goal**: Wire existing quest stubs into a working system — backend event wiring, HUD tracker, quest journal, NPC markers, and reward notifications
+
+**Status:** ✅ Complete
+
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [x] 41-01-PLAN.md — Quest backend wiring (fix bugs, sample quests, save/load, event-driven completion)
+- [x] 41-02-PLAN.md — Quest UI integration (HUD tracker, ring menu quest log, NPC markers, reward popup)
+
+**Already exists:** Quest/QuestData/QuestObjective classes, QuestManager autoload, QuestTracker + QuestLog UI with .tscn files, Events quest signals
 
 **Deliverables:**
-- Quest journal UI panel (accessible from ring menu)
-- Quest objective tracker (HUD corner display)
-- Quest completion detection and reward distribution
-- Quest givers' marker icons on overworld
+- ~~Quest journal UI panel (accessible from ring menu)~~ ✅ Complete
+- ~~Quest objective tracker (HUD corner display)~~ ✅ Complete
+- ~~Quest completion detection and reward distribution~~ ✅ Complete
+- ~~Quest givers' marker icons on overworld~~ ✅ Complete
+- ~~2 sample quests for testing (Meet the Neighbors, Community Watch)~~ ✅ Complete
+
+**Key artifacts:**
+- `autoloads/quest_manager.gd` — Sample quests, event-driven objectives, save/load
+- `systems/quest/quest_objective.gd` — Trigger metadata (type/id/count) + advance()
+- `ui/hud/game_hud.gd` — QuestTracker + reward popup integration
+- `ui/ring_menu/ring_menu.gd` — Quest Log option + overlay
+- `characters/npcs/dialogue_npc.gd` — Quest markers ("!" / "?")
 
 ---
 
 ### Phase 42: Quest Types Implementation
-**Goal**: Varied quest structures for engagement
+**Goal**: Varied quest structures for engagement — extend quest engine with new trigger types, sequential objectives, and create 7 new quests covering all 5 quest type patterns
 
-| Quest Type | Example | Structure |
-|------------|---------|-----------|
-| **Fetch** | Find lost dog toy in Sewers | Collect -> Return -> Reward |
-| **Elimination** | Clear 10 crows from Backyard | Kill count -> Return -> Reward |
-| **Delivery** | Deliver Acorn to Old Lady Gertrude | Pickup -> Travel -> Deliver -> Reward |
-| **Interaction** | Talk to 3 NPCs about the strange noises | NPC visits -> Report -> Reward |
-| **Chain** | Series of 4 escalating quests | Quest 1->2->3->4-> Big Reward |
+**Status:** ✅ Complete
+
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [x] 42-01-PLAN.md — Quest engine extensions (enemy_kill + item_collect triggers, sequential objectives, data-driven NPC markers, quest item pickup component)
+- [x] 42-02-PLAN.md — Quest content (7 new quests: 1 fetch, 1 elimination, 1 delivery, 4-part chain + zone pickups)
+
+| Quest Type | Quest Name | Quest Giver | Structure |
+|------------|-----------|-------------|-----------|
+| **Fetch** | Find the Lost Ball | Kids Gang | Collect ball in Backyard -> Return -> Reward |
+| **Elimination** | Pest Control | Henderson (rep>=30) | Kill 5 enemies -> Return -> Reward |
+| **Delivery** | Special Delivery | Maurice | Pickup package -> Deliver to Gertrude -> Reward |
+| **Chain 1/4** | Investigation: First Patrol | Gertrude | Visit Backyard -> Report -> Reward |
+| **Chain 2/4** | Investigation: Cleanup | Gertrude | Kill 3 enemies -> Report -> Reward |
+| **Chain 3/4** | Investigation: Sewers Recon | Gertrude | Visit Sewers -> Report -> Reward |
+| **Chain 4/4** | Investigation: Full Report | Gertrude | Talk to 3 NPCs -> Report -> Big Reward |
 
 **Deliverables:**
 - Quest types: Fetch, Elimination, Delivery, Interaction, Chain
-- Quest giver NPC spawning logic
-- Quest state machine (available, active, ready_to_complete, completed)
-- Quest rewards (EXP, coins, items, reputation)
+- New trigger types: enemy_kill, item_collect (wired to Events signals)
+- Sequential objective ordering (requires_prior_complete flag)
+- Data-driven NPC quest markers (replaces hardcoded map)
+- Reusable quest item pickup component
+- Reputation rewards in quest system
+- Quest progress counts in HUD tracker and journal
 
 ---
 

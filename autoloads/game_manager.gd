@@ -401,4 +401,9 @@ func reset_game() -> void:
 		"henderson": 0,
 	}
 	reset_zones()
+	if QuestManager:
+		QuestManager.active_quests.clear()
+		QuestManager.completed_quest_ids.clear()
+		QuestManager.failed_quest_ids.clear()
+		QuestManager.current_active_quest_id = ""
 	DebugLogger.log_system("Game state reset")

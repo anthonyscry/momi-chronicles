@@ -48,8 +48,14 @@ var current_active_quest_id: String = ""
 # =============================================================================
 
 func _ready() -> void:
-	# Quest data will be loaded via load_quest_data() or load from save
-	pass
+	_register_all_quests()
+	DebugLogger.log_system("QuestManager initialized with %d quests" % available_quests.size())
+
+	# Wire event listeners for auto-completion
+	Events.dialogue_started.connect(_on_dialogue_started_for_quests)
+	Events.zone_entered.connect(_on_zone_entered_for_quests)
+	Events.enemy_defeated.connect(_on_enemy_defeated_for_quests)
+	Events.pickup_collected.connect(_on_pickup_collected_for_quests)
 
 # =============================================================================
 # QUEST DATA LOADING
@@ -197,7 +203,7 @@ func complete_quest(quest_id: String) -> void:
 		if has_node("/root/GameManager"):
 			var game_manager = get_node("/root/GameManager")
 			game_manager.unlock_zone(quest.zone_unlock)
-			print("QuestManager: Quest '%s' unlocked zone '%s'" % [quest_id, quest.zone_unlock])
+			DebugLogger.log_system("QuestManager: Quest '%s' unlocked zone '%s'" % [quest_id, quest.zone_unlock])
 		else:
 			push_warning("QuestManager: Cannot unlock zone - GameManager not found")
 
@@ -309,7 +315,7 @@ func _grant_rewards(rewards: Dictionary) -> void:
 		if has_node("/root/GameManager"):
 			var game_manager = get_node("/root/GameManager")
 			game_manager.add_coins(rewards["coins"])
-			print("QuestManager: Granted %d coins" % rewards["coins"])
+			DebugLogger.log_system("QuestManager: Granted %d coins" % rewards["coins"])
 
 	# Grant EXP
 	if rewards.has("exp") and rewards["exp"] > 0:
@@ -317,7 +323,7 @@ func _grant_rewards(rewards: Dictionary) -> void:
 		if player and is_instance_valid(player) and player.has_node("ProgressionComponent"):
 			var progression = player.get_node("ProgressionComponent")
 			progression.add_exp(rewards["exp"])
-			print("QuestManager: Granted %d EXP" % rewards["exp"])
+			DebugLogger.log_system("QuestManager: Granted %d EXP" % rewards["exp"])
 		else:
 			push_warning("QuestManager: Cannot grant EXP - player or ProgressionComponent not found")
 
@@ -329,7 +335,7 @@ func _grant_rewards(rewards: Dictionary) -> void:
 				var quantity = rewards.get("item_quantity", 1)
 				var success = game_manager.inventory.add_item(rewards["item"], quantity)
 				if success:
-					print("QuestManager: Granted item '%s' x%d" % [rewards["item"], quantity])
+					DebugLogger.log_system("QuestManager: Granted item '%s' x%d" % [rewards["item"], quantity])
 				else:
 					push_warning("QuestManager: Failed to grant item '%s'" % rewards["item"])
 			else:
@@ -342,11 +348,20 @@ func _grant_rewards(rewards: Dictionary) -> void:
 			if game_manager.equipment_manager and is_instance_valid(game_manager.equipment_manager):
 				var success = game_manager.equipment_manager.add_equipment(rewards["equipment"])
 				if success:
-					print("QuestManager: Granted equipment '%s'" % rewards["equipment"])
+					DebugLogger.log_system("QuestManager: Granted equipment '%s'" % rewards["equipment"])
 				else:
 					push_warning("QuestManager: Failed to grant equipment '%s'" % rewards["equipment"])
 			else:
 				push_warning("QuestManager: Cannot grant equipment - EquipmentManager not found")
+
+	# Grant reputation
+	if rewards.has("reputation") and rewards["reputation"] is Dictionary:
+		var rep_data: Dictionary = rewards["reputation"]
+		for npc_id in rep_data:
+			if has_node("/root/GameManager"):
+				var game_manager = get_node("/root/GameManager")
+				game_manager.add_reputation(npc_id, int(rep_data[npc_id]))
+				DebugLogger.log_system("QuestManager: Granted +%d reputation with '%s'" % [int(rep_data[npc_id]), npc_id])
 
 	# Emit event for reward notification UI (future enhancement)
 	if has_node("/root/Events"):
@@ -406,4 +421,297 @@ func load_save_data(data: Dictionary) -> void:
 					var objective: QuestObjective = quest.objectives[i]
 					objective.from_dict(objectives_data[i])
 
-			active_quests[quest_id] = quest
+		active_quests[quest_id] = quest
+
+# =============================================================================
+# QUEST REGISTRATION (sample quests defined in code)
+# =============================================================================
+
+func _register_all_quests() -> void:
+	# Quest 1: Meet the Neighbors — triggered by talking to Gertrude
+	var q1 = QuestData.new()
+	q1.id = "meet_neighbors"
+	q1.title = "Meet the Neighbors"
+	q1.description = "Gertrude suggested you introduce yourself to the other neighbors."
+	q1.is_main_quest = false
+	q1.quest_giver_id = "gertrude"
+	q1.objective_descriptions = ["Talk to Mailman Maurice", "Talk to the Kids Gang", "Talk to Mr. Henderson"]
+	q1.optional_objectives = [false, false, false]
+	q1.objective_trigger_types = ["dialogue", "dialogue", "dialogue"]
+	q1.objective_trigger_ids = ["maurice", "kids_gang", "henderson"]
+	q1.objective_target_counts = [1, 1, 1]
+	q1.rewards = {"coins": 50, "exp": 25}
+	register_quest_data(q1)
+
+	# Quest 2: Community Watch — triggered by talking to Maurice (requires meet_neighbors)
+	var q2 = QuestData.new()
+	q2.id = "community_watch"
+	q2.title = "Community Watch"
+	q2.description = "Maurice heard about trouble in other areas. Patrol the Backyard and Sewers."
+	q2.is_main_quest = false
+	q2.quest_giver_id = "maurice"
+	q2.prerequisite_quest_ids = ["meet_neighbors"]
+	q2.objective_descriptions = ["Visit the Backyard", "Visit the Sewers"]
+	q2.optional_objectives = [false, false]
+	q2.objective_trigger_types = ["zone", "zone"]
+	q2.objective_trigger_ids = ["backyard", "sewers"]
+	q2.objective_target_counts = [1, 1]
+	q2.rewards = {"coins": 75, "exp": 30}
+	register_quest_data(q2)
+
+	# Quest 3: Fetch — Find the Lost Ball (triggered by talking to Kids Gang, requires meet_neighbors)
+	var q3 = QuestData.new()
+	q3.id = "find_lost_ball"
+	q3.title = "Find the Lost Ball"
+	q3.description = "The Kids Gang lost their favorite ball somewhere in the Backyard. Find it and bring it back!"
+	q3.is_main_quest = false
+	q3.quest_giver_id = "kids_gang"
+	q3.prerequisite_quest_ids = ["meet_neighbors"]
+	q3.objective_descriptions = ["Find the lost ball in the Backyard", "Return to the Kids Gang"]
+	q3.optional_objectives = [false, false]
+	q3.objective_trigger_types = ["item_collect", "dialogue"]
+	q3.objective_trigger_ids = ["lost_ball", "kids_gang"]
+	q3.objective_target_counts = [1, 1]
+	q3.objective_requires_prior = [false, true]  # Must find ball before returning
+	q3.rewards = {"coins": 60, "exp": 30, "reputation": {"kids_gang": 15}}
+	register_quest_data(q3)
+
+	# Quest 4: Elimination — Pest Control (triggered by talking to Henderson, requires rep >= 30)
+	var q4 = QuestData.new()
+	q4.id = "pest_control"
+	q4.title = "Pest Control"
+	q4.description = "Mr. Henderson is tired of pests in the Backyard. Defeat 5 enemies there to clean things up."
+	q4.is_main_quest = false
+	q4.quest_giver_id = "henderson"
+	q4.prerequisite_quest_ids = ["meet_neighbors"]
+	q4.objective_descriptions = ["Defeat 5 enemies", "Report back to Mr. Henderson"]
+	q4.optional_objectives = [false, false]
+	q4.objective_trigger_types = ["enemy_kill", "dialogue"]
+	q4.objective_trigger_ids = ["any", "henderson"]
+	q4.objective_target_counts = [5, 1]
+	q4.objective_requires_prior = [false, true]  # Must defeat enemies before reporting
+	q4.rewards = {"coins": 100, "exp": 50, "reputation": {"henderson": 20}}
+	register_quest_data(q4)
+
+	# Quest 5: Delivery — Special Delivery (triggered by talking to Maurice, requires community_watch)
+	var q5 = QuestData.new()
+	q5.id = "special_delivery"
+	q5.title = "Special Delivery"
+	q5.description = "Maurice has a package for Old Lady Gertrude but can't leave his route. Pick it up and deliver it to her."
+	q5.is_main_quest = false
+	q5.quest_giver_id = "maurice"
+	q5.prerequisite_quest_ids = ["community_watch"]
+	q5.objective_descriptions = ["Pick up Maurice's package", "Deliver the package to Gertrude"]
+	q5.optional_objectives = [false, false]
+	q5.objective_trigger_types = ["item_collect", "dialogue"]
+	q5.objective_trigger_ids = ["mail_package", "gertrude"]
+	q5.objective_target_counts = [1, 1]
+	q5.objective_requires_prior = [false, true]  # Must pick up before delivering
+	q5.rewards = {"coins": 75, "exp": 35, "reputation": {"maurice": 15, "gertrude": 10}}
+	register_quest_data(q5)
+
+	# Quest 6: Chain 1/4 — Investigation: First Patrol (triggered by Gertrude, requires meet_neighbors)
+	var q6 = QuestData.new()
+	q6.id = "investigation_1"
+	q6.title = "Neighborhood Investigation: First Patrol"
+	q6.description = "Gertrude heard strange noises from the Backyard at night. Go check it out and report back."
+	q6.is_main_quest = true
+	q6.quest_giver_id = "gertrude"
+	q6.prerequisite_quest_ids = ["meet_neighbors"]
+	q6.objective_descriptions = ["Investigate the Backyard", "Report back to Gertrude"]
+	q6.optional_objectives = [false, false]
+	q6.objective_trigger_types = ["zone", "dialogue"]
+	q6.objective_trigger_ids = ["backyard", "gertrude"]
+	q6.objective_target_counts = [1, 1]
+	q6.objective_requires_prior = [false, true]
+	q6.rewards = {"coins": 40, "exp": 20, "reputation": {"gertrude": 10}}
+	register_quest_data(q6)
+
+	# Quest 7: Chain 2/4 — Investigation: Cleanup (requires investigation_1)
+	var q7 = QuestData.new()
+	q7.id = "investigation_2"
+	q7.title = "Neighborhood Investigation: Cleanup"
+	q7.description = "Gertrude says the pests are getting worse. Clear out some enemies in the Backyard."
+	q7.is_main_quest = true
+	q7.quest_giver_id = "gertrude"
+	q7.prerequisite_quest_ids = ["investigation_1"]
+	q7.objective_descriptions = ["Defeat 3 enemies", "Report back to Gertrude"]
+	q7.optional_objectives = [false, false]
+	q7.objective_trigger_types = ["enemy_kill", "dialogue"]
+	q7.objective_trigger_ids = ["any", "gertrude"]
+	q7.objective_target_counts = [3, 1]
+	q7.objective_requires_prior = [false, true]
+	q7.rewards = {"coins": 60, "exp": 30, "reputation": {"gertrude": 10}}
+	register_quest_data(q7)
+
+	# Quest 8: Chain 3/4 — Investigation: Sewers Recon (requires investigation_2)
+	var q8 = QuestData.new()
+	q8.id = "investigation_3"
+	q8.title = "Neighborhood Investigation: Sewers Recon"
+	q8.description = "Gertrude suspects the source of the pests is in the Sewers. Scout the area."
+	q8.is_main_quest = true
+	q8.quest_giver_id = "gertrude"
+	q8.prerequisite_quest_ids = ["investigation_2"]
+	q8.objective_descriptions = ["Explore the Sewers", "Report back to Gertrude"]
+	q8.optional_objectives = [false, false]
+	q8.objective_trigger_types = ["zone", "dialogue"]
+	q8.objective_trigger_ids = ["sewers", "gertrude"]
+	q8.objective_target_counts = [1, 1]
+	q8.objective_requires_prior = [false, true]
+	q8.rewards = {"coins": 80, "exp": 40, "reputation": {"gertrude": 10}}
+	register_quest_data(q8)
+
+	# Quest 9: Chain 4/4 — Investigation: The Full Report (requires investigation_3)
+	var q9 = QuestData.new()
+	q9.id = "investigation_4"
+	q9.title = "Neighborhood Investigation: The Full Report"
+	q9.description = "Gertrude wants a full report. Talk to all the neighbors about what you've found, then report back."
+	q9.is_main_quest = true
+	q9.quest_giver_id = "gertrude"
+	q9.prerequisite_quest_ids = ["investigation_3"]
+	q9.objective_descriptions = ["Talk to Maurice about the sewers", "Talk to the Kids Gang about the backyard", "Talk to Mr. Henderson about the noises", "Deliver the full report to Gertrude"]
+	q9.optional_objectives = [false, false, false, false]
+	q9.objective_trigger_types = ["dialogue", "dialogue", "dialogue", "dialogue"]
+	q9.objective_trigger_ids = ["maurice", "kids_gang", "henderson", "gertrude"]
+	q9.objective_target_counts = [1, 1, 1, 1]
+	q9.objective_requires_prior = [false, false, false, true]  # First 3 parallel, last requires all prior
+	q9.rewards = {"coins": 150, "exp": 75, "reputation": {"gertrude": 20, "maurice": 10, "kids_gang": 10, "henderson": 10}}
+	register_quest_data(q9)
+
+# =============================================================================
+# EVENT-DRIVEN QUEST COMPLETION
+# =============================================================================
+
+func _on_dialogue_started_for_quests(dialogue) -> void:
+	# Find the dialogue_id from DialogueManager's loaded dialogues
+	var dialogue_id: String = ""
+	if dialogue:
+		for did in DialogueManager._dialogues:
+			if DialogueManager._dialogues[did] == dialogue:
+				dialogue_id = did
+				break
+
+	if dialogue_id.is_empty():
+		return
+
+	# Auto-start quests where this NPC is the quest giver (data-driven, no hardcoded map)
+	for qid in available_quests.keys():
+		var qdata: QuestData = available_quests[qid]
+		if qdata.quest_giver_id == dialogue_id and can_start_quest(qid):
+			# Reputation gate for Henderson quests (requires rep >= 30)
+			if dialogue_id == "henderson" and has_node("/root/GameManager"):
+				if get_node("/root/GameManager").get_reputation("henderson") < 30:
+					continue
+			start_quest(qid)
+			DebugLogger.log_system("Quest auto-started: %s (talked to %s)" % [qid, dialogue_id])
+
+	# Complete "talk to" objectives for active quests
+	_check_dialogue_objectives(dialogue_id)
+
+func _on_zone_entered_for_quests(zone_name: String) -> void:
+	_check_zone_objectives(zone_name)
+
+func _check_dialogue_objectives(dialogue_id: String) -> void:
+	for quest_id in active_quests.keys():
+		var quest: Quest = active_quests[quest_id]
+		for i in range(quest.objectives.size()):
+			var obj: QuestObjective = quest.objectives[i]
+			if obj.trigger_type == "dialogue" and obj.trigger_id == dialogue_id and not obj.is_completed():
+				# Check requires_prior_complete
+				if obj.requires_prior_complete:
+					var blocked = false
+					for j in range(i):
+						if not quest.objectives[j].is_completed():
+							blocked = true
+							break
+					if blocked:
+						continue
+				if obj.advance():
+					DebugLogger.log_system("Quest objective completed: %s [%d] — %s" % [quest_id, i, obj.description])
+					quest_updated.emit(quest_id, i)
+					Events.quest_updated.emit(quest_id, i)
+					if quest.all_objectives_completed():
+						complete_quest(quest_id)
+
+func _check_zone_objectives(zone_name: String) -> void:
+	for quest_id in active_quests.keys():
+		var quest: Quest = active_quests[quest_id]
+		for i in range(quest.objectives.size()):
+			var obj: QuestObjective = quest.objectives[i]
+			if obj.trigger_type == "zone" and obj.trigger_id == zone_name and not obj.is_completed():
+				# Check requires_prior_complete
+				if obj.requires_prior_complete:
+					var blocked = false
+					for j in range(i):
+						if not quest.objectives[j].is_completed():
+							blocked = true
+							break
+					if blocked:
+						continue
+				if obj.advance():
+					DebugLogger.log_system("Quest objective completed: %s [%d] — %s" % [quest_id, i, obj.description])
+					quest_updated.emit(quest_id, i)
+					Events.quest_updated.emit(quest_id, i)
+					if quest.all_objectives_completed():
+						complete_quest(quest_id)
+
+# =============================================================================
+# NEW TRIGGER TYPE HANDLERS (enemy_kill, item_collect)
+# =============================================================================
+
+func _on_enemy_defeated_for_quests(enemy: Node) -> void:
+	# Extract enemy type from script path: "res://characters/enemies/raccoon.gd" -> "raccoon"
+	var enemy_type: String = "unknown"
+	if enemy and is_instance_valid(enemy) and enemy.get_script():
+		enemy_type = enemy.get_script().resource_path.get_file().get_basename()
+	_check_enemy_kill_objectives(enemy_type)
+
+func _on_pickup_collected_for_quests(item_id: String, _amount: int) -> void:
+	_check_item_collect_objectives(item_id)
+
+func _check_enemy_kill_objectives(enemy_type: String) -> void:
+	for quest_id in active_quests.keys():
+		var quest: Quest = active_quests[quest_id]
+		for i in range(quest.objectives.size()):
+			var obj: QuestObjective = quest.objectives[i]
+			if obj.trigger_type == "enemy_kill" and not obj.is_completed():
+				# Check requires_prior_complete
+				if obj.requires_prior_complete:
+					var blocked = false
+					for j in range(i):
+						if not quest.objectives[j].is_completed():
+							blocked = true
+							break
+					if blocked:
+						continue
+				# "any" matches all enemy types, otherwise match specific type
+				if obj.trigger_id == "any" or obj.trigger_id == enemy_type:
+					if obj.advance():
+						DebugLogger.log_system("Quest objective advanced: %s [%d] — %s (%d/%d)" % [quest_id, i, obj.description, obj.current_count, obj.target_count])
+					quest_updated.emit(quest_id, i)
+					Events.quest_updated.emit(quest_id, i)
+					if quest.all_objectives_completed():
+						complete_quest(quest_id)
+
+func _check_item_collect_objectives(item_id: String) -> void:
+	for quest_id in active_quests.keys():
+		var quest: Quest = active_quests[quest_id]
+		for i in range(quest.objectives.size()):
+			var obj: QuestObjective = quest.objectives[i]
+			if obj.trigger_type == "item_collect" and obj.trigger_id == item_id and not obj.is_completed():
+				# Check requires_prior_complete
+				if obj.requires_prior_complete:
+					var blocked = false
+					for j in range(i):
+						if not quest.objectives[j].is_completed():
+							blocked = true
+							break
+					if blocked:
+						continue
+				if obj.advance():
+					DebugLogger.log_system("Quest objective completed: %s [%d] — %s" % [quest_id, i, obj.description])
+					quest_updated.emit(quest_id, i)
+					Events.quest_updated.emit(quest_id, i)
+					if quest.all_objectives_completed():
+						complete_quest(quest_id)
+

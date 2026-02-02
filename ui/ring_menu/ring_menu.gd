@@ -61,6 +61,9 @@ var RingItemScene: PackedScene = preload("res://ui/ring_menu/ring_item.tscn")
 ## Animation tween
 var open_tween: Tween
 
+## Quest log overlay (shown when selecting Quest Log from OPTIONS ring)
+var _quest_log_overlay: CanvasLayer = null
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
@@ -77,12 +80,20 @@ func _ready() -> void:
 
 func _setup_default_options() -> void:
 	rings[RingType.OPTIONS] = [
+		{"id": "quest_log", "name": "Quest Log", "type": "option", "desc": "View your quests"},
 		{"id": "save", "name": "Save Game", "type": "option", "desc": "Save your progress"},
 		{"id": "settings", "name": "Settings", "type": "option", "desc": "Audio and display options"},
 		{"id": "quit", "name": "Quit", "type": "option", "desc": "Return to title screen"},
 	]
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Close quest log if open
+	if _quest_log_overlay and is_instance_valid(_quest_log_overlay):
+		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("dodge") or event.is_action_pressed("ring_menu"):
+			_close_quest_log()
+			get_viewport().set_input_as_handled()
+			return
+
 	# Tab to toggle menu
 	if event.is_action_pressed("ring_menu"):
 		if is_open:
@@ -410,12 +421,14 @@ func _switch_companion(item: Dictionary) -> void:
 
 func _handle_option(item: Dictionary) -> void:
 	match item.get("id"):
+		"quest_log":
+			_open_quest_log()
 		"save":
-			print("[RingMenu] Save game")
+			DebugLogger.log_ui("[RingMenu] Save game")
 			if has_node("/root/SaveManager"):
 				get_node("/root/SaveManager").save_game()
 		"settings":
-			print("[RingMenu] Settings")
+			DebugLogger.log_ui("[RingMenu] Settings")
 		"quit":
 			close_menu()
 			get_tree().change_scene_to_file("res://ui/menus/title_screen.tscn")
@@ -449,3 +462,42 @@ func remove_ring_item(ring_type: RingType, item_id: String) -> void:
 	rings[ring_type] = rings[ring_type].filter(func(i): return i.get("id") != item_id)
 	if is_open and current_ring == ring_type:
 		_refresh_ring()
+
+# =============================================================================
+# QUEST LOG OVERLAY
+# =============================================================================
+
+func _open_quest_log() -> void:
+	if _quest_log_overlay and is_instance_valid(_quest_log_overlay):
+		_close_quest_log()
+		return
+
+	close_menu()  # Close ring menu first
+
+	_quest_log_overlay = CanvasLayer.new()
+	_quest_log_overlay.name = "QuestLogOverlay"
+	_quest_log_overlay.layer = 100
+	_quest_log_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
+
+	# Dark background
+	var bg = ColorRect.new()
+	bg.color = Color(0, 0, 0, 0.85)
+	bg.anchors_preset = Control.PRESET_FULL_RECT
+	_quest_log_overlay.add_child(bg)
+
+	# Quest log panel
+	var quest_log_scene = preload("res://ui/quest/quest_log.tscn")
+	var quest_log = quest_log_scene.instantiate()
+	_quest_log_overlay.add_child(quest_log)
+
+	add_child(_quest_log_overlay)
+
+	# Pause game while viewing
+	GameManager.pause_game()
+
+func _close_quest_log() -> void:
+	if _quest_log_overlay and is_instance_valid(_quest_log_overlay):
+		_quest_log_overlay.queue_free()
+		_quest_log_overlay = null
+	GameManager.resume_game()
+

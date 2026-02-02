@@ -156,10 +156,13 @@ func _create_quest_entry(quest, show_objectives: bool) -> VBoxContainer:
 			var objective = quest.objectives[i]
 			var obj_label = Label.new()
 
-			# Format: [✓] or [ ] + objective description
+			# Format: [✓] or [ ] + objective description + progress count
 			var checkbox = "✓" if objective.is_completed() else " "
 			var optional_tag = " (Optional)" if objective.is_optional() else ""
-			obj_label.text = "[%s] %s%s" % [checkbox, objective.description, optional_tag]
+			var progress_text = ""
+			if objective.target_count > 1:
+				progress_text = " (%d/%d)" % [objective.current_count, objective.target_count]
+			obj_label.text = "[%s] %s%s%s" % [checkbox, objective.description, progress_text, optional_tag]
 
 			# Color based on completion
 			if objective.is_completed():

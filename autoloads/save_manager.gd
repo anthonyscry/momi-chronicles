@@ -127,6 +127,9 @@ func _gather_save_data() -> Dictionary:
 	if TutorialManager:
 		data["tutorial"] = TutorialManager.get_save_data()
 
+	if QuestManager:
+		data["quests"] = QuestManager.get_save_data()
+
 	data["timestamp"] = Time.get_unix_time_from_system()
 
 	return data
@@ -175,6 +178,9 @@ func _apply_save_data(data: Dictionary) -> bool:
 
 	if data.has("tutorial") and TutorialManager:
 		TutorialManager.load_save_data(data["tutorial"])
+
+	if data.has("quests") and QuestManager:
+		QuestManager.load_save_data(data["quests"])
 
 	_pending_level = data.get("level", 1)
 	_pending_exp = data.get("total_exp", 0)

@@ -26,8 +26,12 @@ func _ready() -> void:
 	Events.quest_updated.connect(_on_quest_updated)
 	Events.quest_completed.connect(_on_quest_completed)
 
-	# Hide when ring menu opens
+	# Hide when ring menu opens, re-show when closed (if quest active)
 	Events.ring_menu_opened.connect(func(): visible = false)
+	Events.ring_menu_closed.connect(func():
+		if current_quest:
+			visible = true
+	)
 
 	# Initial state - hidden until quest is active
 	visible = false
@@ -47,7 +51,9 @@ func _on_active_quest_changed(quest_id: String) -> void:
 		_fade_out()
 		return
 
-	# Get the quest from QuestManager
+	# Get the quest from QuestManager (safety check for load order)
+	if not has_node("/root/QuestManager"):
+		return
 	current_quest = QuestManager.get_active_quest(quest_id)
 
 	if current_quest:
@@ -87,7 +93,10 @@ func _update_display() -> void:
 	# Update current objective
 	var current_objective = current_quest.get_current_objective()
 	if current_objective:
-		objective_label.text = current_objective.description
+		if current_objective.target_count > 1:
+			objective_label.text = "%s (%d/%d)" % [current_objective.description, current_objective.current_count, current_objective.target_count]
+		else:
+			objective_label.text = current_objective.description
 	else:
 		# No incomplete objectives - show completion message
 		objective_label.text = "All objectives complete!"

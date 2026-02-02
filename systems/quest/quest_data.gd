@@ -37,6 +37,21 @@ class_name QuestData
 ## Zone ID to unlock when this quest is completed (empty if no zone unlock)
 @export var zone_unlock: String = ""
 
+## Stable NPC identifier for the quest giver (used for quest markers and auto-start)
+@export var quest_giver_id: String = ""
+
+## Trigger types for each objective ("dialogue", "zone", "enemy_kill", "item_collect", "manual", "")
+@export var objective_trigger_types: Array[String] = []
+
+## Trigger IDs for each objective (dialogue_id, zone_name, etc.)
+@export var objective_trigger_ids: Array[String] = []
+
+## Target counts for each objective (default 1 = boolean completion)
+@export var objective_target_counts: Array[int] = []
+
+## Whether each objective requires all prior objectives to be complete before advancing
+@export var objective_requires_prior: Array[bool] = []
+
 # =============================================================================
 # QUEST CREATION
 # =============================================================================
@@ -50,12 +65,25 @@ func create_quest() -> Quest:
 	for i in range(objective_descriptions.size()):
 		var obj_description: String = objective_descriptions[i]
 		var is_optional: bool = false
+		var trigger_type: String = ""
+		var trigger_id: String = ""
+		var target_count: int = 1
 
 		# Check if this objective is marked as optional
 		if i < optional_objectives.size():
 			is_optional = optional_objectives[i]
+		if i < objective_trigger_types.size():
+			trigger_type = objective_trigger_types[i]
+		if i < objective_trigger_ids.size():
+			trigger_id = objective_trigger_ids[i]
+		if i < objective_target_counts.size():
+			target_count = objective_target_counts[i]
 
-		var objective: QuestObjective = QuestObjective.new(obj_description, false, is_optional)
+		var requires_prior: bool = false
+		if i < objective_requires_prior.size():
+			requires_prior = objective_requires_prior[i]
+
+		var objective: QuestObjective = QuestObjective.new(obj_description, false, is_optional, trigger_type, trigger_id, target_count, requires_prior)
 		quest.objectives.append(objective)
 
 	return quest

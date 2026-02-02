@@ -3,6 +3,7 @@ extends BaseZone
 ## Connected to the neighborhood via an alley.
 
 const CROW_MATRIARCH_SCENE = preload("res://characters/enemies/crow_matriarch.tscn")
+const QuestItemPickupScript = preload("res://components/quest_item_pickup/quest_item_pickup.gd")
 
 # =============================================================================
 # SPAWN POINTS
@@ -24,6 +25,9 @@ func _setup_zone() -> void:
 	
 	# Build mini-boss trigger (Crow Matriarch)
 	_build_mini_boss_trigger()
+	
+	# Build quest item pickups
+	_build_quest_pickups()
 	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
@@ -101,3 +105,24 @@ func _on_crow_matriarch_trigger(body: Node2D) -> void:
 	# Play boss music
 	if AudioManager.has_method("play_music"):
 		AudioManager.play_music("boss_fight_b")
+
+
+# =============================================================================
+# QUEST ITEM PICKUPS
+# =============================================================================
+
+func _build_quest_pickups() -> void:
+	_build_lost_ball_pickup()
+
+func _build_lost_ball_pickup() -> void:
+	# Lost ball for "Find the Lost Ball" quest (Kids Gang fetch quest)
+	# Placed in the backyard near the back area, away from the main path
+	var pickup = Area2D.new()
+	pickup.set_script(QuestItemPickupScript)
+	pickup.name = "LostBallPickup"
+	pickup.item_id = "lost_ball"
+	pickup.quest_id = "find_lost_ball"  # Only visible when quest is active
+	pickup.pickup_color = Color(0.9, 0.3, 0.3)  # Red ball
+	pickup.label_text = "Ball"
+	pickup.position = Vector2(300, 80)  # Back-right area of backyard
+	add_child(pickup)

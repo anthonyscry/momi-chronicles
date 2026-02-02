@@ -22,6 +22,12 @@ var save_indicator: Label
 ## Tutorial prompt overlay
 var tutorial_prompt = null  # TutorialPrompt instance
 
+## Quest objective tracker (top-right corner)
+var quest_tracker = null
+
+## Quest reward notification
+var reward_popup: Label = null
+
 ## Whether debug panel is visible
 var debug_visible: bool = DebugConfig.show_debug_ui
 
@@ -45,6 +51,12 @@ func _ready() -> void:
 
 	# Create tutorial prompt overlay
 	_setup_tutorial_prompt()
+
+	# Create quest tracker (top-right)
+	_setup_quest_tracker()
+
+	# Create quest reward notification
+	_setup_reward_popup()
 
 	# Connect to health changes
 	Events.player_health_changed.connect(_on_health_changed)
@@ -137,6 +149,60 @@ func _setup_tutorial_prompt() -> void:
 	# Center screen overlay
 	tutorial_prompt.anchors_preset = Control.PRESET_FULL_RECT
 	add_child(tutorial_prompt)
+
+
+func _setup_quest_tracker() -> void:
+	var tracker_scene = preload("res://ui/quest/quest_tracker.tscn")
+	quest_tracker = tracker_scene.instantiate()
+	quest_tracker.name = "QuestTracker"
+	add_child(quest_tracker)
+
+
+func _setup_reward_popup() -> void:
+	reward_popup = Label.new()
+	reward_popup.name = "RewardPopup"
+	reward_popup.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reward_popup.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	reward_popup.add_theme_font_size_override("font_size", 10)
+	reward_popup.add_theme_color_override("font_color", Color(1, 0.9, 0.3, 1))
+	reward_popup.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	reward_popup.add_theme_constant_override("outline_size", 2)
+	# Center of screen, slightly above middle
+	reward_popup.position = Vector2(92, 80)
+	reward_popup.size = Vector2(200, 40)
+	reward_popup.modulate.a = 0.0
+	reward_popup.z_index = 10
+	add_child(reward_popup)
+
+	# Connect to quest completion
+	Events.quest_completed.connect(_on_quest_completed_reward)
+
+
+func _on_quest_completed_reward(quest_id: String) -> void:
+	if not reward_popup:
+		return
+	# Build reward text from quest data
+	if not has_node("/root/QuestManager"):
+		return
+	var quest_data = QuestManager.available_quests.get(quest_id, null)
+	if not quest_data:
+		return
+	var rewards = quest_data.rewards
+	var parts: Array = ["Quest Complete!"]
+	if rewards.has("coins") and rewards["coins"] > 0:
+		parts.append("+%d Coins" % rewards["coins"])
+	if rewards.has("exp") and rewards["exp"] > 0:
+		parts.append("+%d EXP" % rewards["exp"])
+	reward_popup.text = " ".join(parts)
+
+	# Animate: slide up + fade in, hold, fade out
+	var tween = create_tween()
+	reward_popup.position.y = 90
+	reward_popup.modulate.a = 0.0
+	tween.tween_property(reward_popup, "modulate:a", 1.0, 0.3)
+	tween.parallel().tween_property(reward_popup, "position:y", 75, 0.3).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(2.0)
+	tween.tween_property(reward_popup, "modulate:a", 0.0, 0.5)
 
 
 func _setup_low_hp_vignette() -> void:
