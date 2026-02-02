@@ -27,6 +27,8 @@ const COLOR_SCRATCH := Color(0.25, 0.15, 0.12, 0.5)
 const COLOR_BOSS_DOOR := Color(0.3, 0.15, 0.1)
 const COLOR_BOSS_DOOR_FRAME := Color(0.2, 0.1, 0.08)
 
+const MINI_BOSSES_REQUIRED: int = 2  # Must defeat 2 of 4 mini-bosses to enter boss arena
+
 # =============================================================================
 # SPAWN POINTS
 # =============================================================================
@@ -714,6 +716,14 @@ func _build_enemies() -> void:
 		enemies_cont.add_child(rat)
 
 
+func _count_mini_bosses_defeated() -> int:
+	var count: int = 0
+	for key in GameManager.mini_bosses_defeated:
+		if GameManager.mini_bosses_defeated[key]:
+			count += 1
+	return count
+
+
 func _build_boss_door() -> void:
 	var boss_door_container = Node2D.new()
 	boss_door_container.name = "BossDoor"
@@ -752,6 +762,28 @@ func _build_boss_door() -> void:
 	warning_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3, 0.8))
 	warning_label.add_theme_font_size_override("font_size", 10)
 	boss_door_container.add_child(warning_label)
+	
+	# Mini-boss defeat status
+	var defeated_count = _count_mini_bosses_defeated()
+	var is_unlocked = defeated_count >= MINI_BOSSES_REQUIRED
+	
+	var status_label = Label.new()
+	status_label.name = "BossGateStatus"
+	status_label.position = frame_pos + Vector2(-30, -34)
+	status_label.add_theme_font_size_override("font_size", 7)
+	
+	if is_unlocked:
+		status_label.text = "ENTER..."
+		status_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3, 0.8))
+		# Door glows green when unlocked
+		door.color = Color(0.35, 0.25, 0.15)  # Slightly brighter
+	else:
+		status_label.text = "%d/%d BOSSES" % [defeated_count, MINI_BOSSES_REQUIRED]
+		status_label.add_theme_color_override("font_color", Color(1.0, 0.6, 0.2, 0.8))
+		# Door stays dark when locked
+		door.color = Color(0.15, 0.1, 0.08)  # Darker, clearly locked
+	
+	boss_door_container.add_child(status_label)
 
 
 func _build_zone_exits() -> void:
@@ -772,15 +804,16 @@ func _build_zone_exits() -> void:
 	to_neighborhood.target_spawn = "from_sewers"
 	exits_container.add_child(to_neighborhood)
 	
-	# Exit to boss room (at the boss door)
-	var to_boss = ZONE_EXIT_SCENE.instantiate()
-	to_boss.name = "ToBossRoom"
-	to_boss.position = Vector2(1020, 340)
-	to_boss.exit_id = "to_boss_room"
-	to_boss.target_zone = "boss_arena"
-	to_boss.target_spawn = "default"
-	to_boss.require_interaction = true  # Must press action to enter
-	exits_container.add_child(to_boss)
+	# Exit to boss room (at the boss door) — only if mini-boss gate met
+	if _count_mini_bosses_defeated() >= MINI_BOSSES_REQUIRED:
+		var to_boss = ZONE_EXIT_SCENE.instantiate()
+		to_boss.name = "ToBossRoom"
+		to_boss.position = Vector2(1020, 340)
+		to_boss.exit_id = "to_boss_room"
+		to_boss.target_zone = "boss_arena"
+		to_boss.target_spawn = "default"
+		to_boss.require_interaction = true  # Must press action to enter
+		exits_container.add_child(to_boss)
 
 
 func _build_boundaries() -> void:
