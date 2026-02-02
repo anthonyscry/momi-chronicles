@@ -2,20 +2,19 @@
 
 ## Current Position
 
-Phase: 42 — Quest Types Implementation
-Plan: 42-02 (complete)
-Status: Phase 42 COMPLETE — Quest engine extensions + 7 new quests + zone pickups.
-Last activity: 2026-02-01 - Phase 42 executed (new trigger types, 9 total quests, zone pickups)
+Phase: 42 — Quest Types Implementation (COMPLETE)
+Plan: All plans complete through v1.8
+Status: v1.8 COMPLETE — Game is feature-complete. Roadmap rewritten for v1.9-v2.0.
+Last activity: 2026-02-01 - Roadmap rewritten; v1.9 Stabilization & Audio next
 
-Progress: ██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ~40% (v1.8)
+Progress: ██████████████████████████████████████████░░░░░░░░░░░░░░░░ ~85% (to v2.0)
 
-## Current Milestone: v1.8 Quest System
+## Current Milestone: v1.9 Stabilization & Audio
 
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
-| 40 | Dialogue Expansion | 4 story NPCs + reputation system | ✅ COMPLETE |
-| 41 | Quest Tracking UI | Journal, objective tracker | ✅ COMPLETE |
-| 42 | Quest Types | Fetch, elimination, delivery, chain quests | ✅ COMPLETE |
+| 43 | Critical Bug Fixes | Merge conflict, export config, options menu, title screen | Not started |
+| 44 | Audio Completion | Curate tracks, fill zone gaps, SFX audit | Not started |
 
 ## Accumulated Decisions (from v1.0-v1.5)
 | Decision | Rationale |
@@ -40,11 +39,20 @@ Progress: ██████████░░░░░░░░░░░░░�
 | Programmatic quest definitions (code, not .tres) | Matches ItemDatabase/EquipmentDatabase pattern |
 | Event-driven quest objectives | dialogue_started + zone_entered signals drive completion |
 | NPC quest markers with hardcoded map | Simple for 2 quests, generalize in Phase 42 |
+| Companions already have unique abilities | Momi=Zoomies, Cinnamon=Overheat/Block, Philo=Motivation/Heal — no "ability expansion" needed |
+| AudioManager is feature-complete in code | 1079 lines: crossfade, health-based, combat, zone, time-of-day, A/B testing — needs audio assets not code |
 
 ## Session Continuity
 Last session: 2026-02-01
-Stopped at: Phase 42 COMPLETE — v1.8 Quest System milestone complete
-Next: Begin v1.9 milestone (Phase 43: Companion Ability Expansion)
+Stopped at: Roadmap rewritten for v1.9-v2.0 (5 phases remaining)
+Next: Phase 43 — Critical Bug Fixes (audio_manager merge conflict, export config, options menu)
+
+## Known Bugs (Phase 43 targets)
+| Bug | File | Severity |
+|-----|------|----------|
+| New Game shows placeholder instead of loading game | `ui/menus/title_screen.gd` L96+133 | BLOCKER |
+
+**False positives resolved:** audio_manager.gd has comment separators not merge conflicts; export_presets.cfg headers are correct; Options menu is fully implemented via settings_menu.gd (241 lines).
 
 ---
 
@@ -189,6 +197,7 @@ Next: Begin v1.9 milestone (Phase 43: Companion Ability Expansion)
 | v1.5 Integration & Quality Audit | 28-29 | ✅ COMPLETE |
 | v1.6 Visual Polish | 30-35 | ✅ COMPLETE |
 | v1.7 Rooftops Zone | 36-39 | ✅ COMPLETE |
+| v1.8 Quest System | 40-42 | ✅ COMPLETE |
 | 36-01 Pigeon Enemy | Flock behavior, aerial swoop | ✅ COMPLETE |
 | 36-02 Garden Gnome | Stationary turret, bomb throwing | ✅ COMPLETE |
 | 37-01 Zone Foundation | Rooftops layout + transitions | ✅ COMPLETE |

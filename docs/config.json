@@ -10,7 +10,7 @@
     "verifier": true
   },
   "git": {
-    "auto_commit": false,
+    "auto_commit": true,
     "branching_strategy": "none",
     "base_branch": "master"
   },
