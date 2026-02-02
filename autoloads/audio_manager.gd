@@ -82,6 +82,7 @@ const ZONE_TRACK_MAP: Dictionary = {
 	"backyard_shed": "backyard",   # Fallback to backyard
 	"boss_arena": "combat",
 	"sewers": "sewers",
+	"rooftops": "rooftops",
 }
 
 ## Maps zone names to base tracks (set on zone entry for fallback reference)
@@ -94,6 +95,7 @@ const ZONE_BASE_TRACK_MAP: Dictionary = {
 	"shed": "backyard_shed",
 	"backyard_shed": "backyard_shed",
 	"sewers": "sewers",
+	"rooftops": "rooftops",
 }
 
 # =============================================================================
@@ -173,6 +175,9 @@ var music_tracks: Dictionary = {
 	# Zone - Sewers
 	"sewers": "res://assets/audio/music/sewers.wav",
 
+	# Zone - Rooftops
+	"rooftops": "res://assets/audio/music/rooftops.wav",
+
 	# Zone variations - Neighborhood
 	"neighborhood_morning": "res://assets/audio/music/neighborhood_morning.wav",
 	"neighborhood_evening": "res://assets/audio/music/neighborhood_evening.wav",
@@ -251,7 +256,7 @@ var ab_tracks: Array[String] = [
 	"title", "neighborhood", "backyard", "combat", "game_over", "victory", "pause",
 	# Zone variations
 	"neighborhood_morning", "neighborhood_evening", "neighborhood_night",
-	"backyard_deep", "backyard_shed",
+	"backyard_deep", "backyard_shed", "sewers", "rooftops",
 	# Character themes
 	"crow_theme",
 	# Combat variations
@@ -1022,9 +1027,10 @@ func _on_charge_started_audio() -> void:
 	play_sfx("charge_start", SFX_VOL_CHARGE_START, SFX_PITCH_CHARGE_START)
 
 func _on_charge_released_audio(_damage: int, _charge_percent: float) -> void:
-	play_sfx("charge_release", 0.0, 0.1)
+	play_sfx("charge_release", SFX_VOL_CHARGE_RELEASE, SFX_PITCH_CHARGE_RELEASE)
 
-# ======================================================================# PHASE P6 EVENT HANDLERS - New SFX
+# =============================================================================
+# PHASE P6 EVENT HANDLERS - New SFX
 # =============================================================================
 
 # UI Menu Sounds
@@ -1074,5 +1080,4 @@ func _on_buff_applied(_effect_type: int, _value: float, _duration: float) -> voi
 
 func _on_buff_expired(_effect_type: int) -> void:
 	play_sfx("buff_expired", -3.0, 0.1)
-=======
-	play_sfx("charge_release", SFX_VOL_CHARGE_RELEASE, SFX_PITCH_CHARGE_RELEASE)
+

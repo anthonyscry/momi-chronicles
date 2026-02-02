@@ -7,7 +7,7 @@
 | **Engine** | Godot 4.5 / GDScript |
 | **Resolution** | 384x216 (16:9 pixel art) |
 | **Perspective** | 3/4 top-down |
-| **Current Milestone** | v1.9 Stabilization & Audio (Phase 43 next) |
+| **Current Milestone** | v2.0 Export & Release (Phase 45 next) |
 | **Last Updated** | 2026-02-01 |
 
 ---
@@ -49,7 +49,7 @@ Momi's Adventure has a complete gameplay loop across 42 phases of development:
 | **v1.6 Visual Polish** | 30-35 | Pixel art sprites replacing all placeholders |
 | **v1.7 Rooftops Zone** | 36-39 | New zone, 3 enemy types, Pigeon King, wave encounters, boss gating, victory screen |
 | **v1.8 Quest System** | 40-42 | NPCs, dialogue, reputation, quest engine, 9 quests, tracking UI |
-| **v1.9 Stabilization** | 43 | Title screen fix (in progress — audio completion next) |
+| **v1.9 Stabilization & Audio** | 43-44 | Title screen fix + audio completion ✅ |
 
 ---
 
@@ -85,7 +85,7 @@ Plans:
 ### Phase 44: Audio Completion
 **Goal**: Curate and wire audio assets so every zone and action has real audio
 
-**Status:** Not started
+**Status:** ✅ Complete
 
 **Current audio inventory:**
 - 34 SFX files (all .wav) — covers most actions
@@ -109,7 +109,7 @@ Plans:
 **Plans:** 1 plan in 1 wave
 
 Plans:
-- [ ] 44-01-PLAN.md — Wire rooftops audio mappings + catalog AI candidates + user picks tracks
+- [x] 44-01-PLAN.md — Wire rooftops audio mappings + catalog AI candidates + user picks tracks
 
 ---
 
@@ -280,4 +280,4 @@ Plans:
 ---
 
 *Roadmap last updated: 2026-02-01*
-*Next action: Plan Phase 43 (Critical Bug Fixes)*
+*Next action: Plan Phase 45 (Web Export)*

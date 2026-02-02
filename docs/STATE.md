@@ -2,19 +2,19 @@
 
 ## Current Position
 
-Phase: 43 — Title Screen Fix (COMPLETE)
-Plan: 43-01 (complete)
-Status: Phase 43 COMPLETE — Title screen New Game fixed, all paths verified.
-Last activity: 2026-02-01 - Fixed title screen placeholder, verified all game entry paths
+Phase: 44 — Audio Completion (COMPLETE)
+Plan: 44-01 (complete)
+Status: Phase 44 COMPLETE — All zones have music, orphaned files cleaned, AUDIO_README updated.
+Last activity: 2026-02-01 - Wired rooftops audio, assigned sewers+rooftops tracks, deleted 22 orphaned .txt files
 
-Progress: ██████████████████████████████████████████░░░░░░░░░░░░░░░░ ~87% (to v2.0)
+Progress: ████████████████████████████████████████████░░░░░░░░░░░░░░ ~89% (to v2.0)
 
 ## Current Milestone: v1.9 Stabilization & Audio
 
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
 | 43 | Title Screen Fix | Fix New Game placeholder, verify all paths | ✅ COMPLETE |
-| 44 | Audio Completion | Curate tracks, fill zone gaps, SFX audit | Not started |
+| 44 | Audio Completion | Curate tracks, fill zone gaps, SFX audit | ✅ COMPLETE |
 
 ## Accumulated Decisions (from v1.0-v1.5)
 | Decision | Rationale |
@@ -44,11 +44,33 @@ Progress: ███████████████████████�
 
 ## Session Continuity
 Last session: 2026-02-01
-Stopped at: Phase 43 COMPLETE — Title screen fixed
-Next: Phase 44 — Audio Completion (curate tracks, fill zone gaps, SFX audit)
+Stopped at: Phase 44 COMPLETE — Audio tracks assigned, all zones have music
+Next: Phase 45 — Web Export (browser build, save persistence, audio unlock)
 
 ## Known Bugs
 No known blockers. All previously identified bugs resolved or confirmed as false positives.
+
+---
+
+## Phase 44 Completed Summary
+
+**44-01 (Audio Completion):**
+- Wired rooftops zone in all 4 AudioManager mapping locations (ZONE_TRACK_MAP, ZONE_BASE_TRACK_MAP, music_tracks, ab_tracks)
+- Deleted 22 orphaned .wav.txt metadata files (no matching audio existed)
+- Cataloged 6 untitled Suno v5 tracks by reading generation prompts
+- Assigned sewers music: c57dcc13 → sewers_a.wav, e019e246 → sewers_b.wav (villain theme, jazzy minor key)
+- Assigned rooftops music: 2bce5495 → rooftops_a.wav, a6cf7d0f → rooftops_b.wav (heartfelt theme, piano+strings)
+- Updated AUDIO_README.md with full catalog and listening links
+- All 5 zones now have dedicated music with A/B variants
+
+---
+
+## Phase 43 Completed Summary
+
+**43-01 (Title Screen Fix):**
+- Replaced `_show_game_start_placeholder()` with `get_tree().change_scene_to_file("res://world/zones/neighborhood.tscn")`
+- Deleted 35 lines of dead placeholder code (Label, CenterContainer, disconnected lambda)
+- Verified all 4 game entry/exit paths: New Game, Continue, Quit, Pause→Title round-trip
 
 ---
 
