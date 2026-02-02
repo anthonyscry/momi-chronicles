@@ -1,0 +1,112 @@
+{
+  "dialogues": [
+    {
+      "id": "gertrude_start",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "Oh my, is that a French Bulldog? Come here, dearie! I haven't seen one of your kind on neighborhood watch before.",
+      "choices": [
+        {
+          "text": "What do you know about the troubles?",
+          "next_id": "gertrude_troubles"
+        },
+        {
+          "text": "Just passing through!",
+          "next_id": "gertrude_passing"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_troubles",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "Those dreadful raccoons have been rummaging through everyone's bins! And I swear I saw their leader... the Raccoon King himself, lurking in the sewers.",
+      "choices": [],
+      "next_id": "gertrude_hint",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_hint",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "If you're brave enough to face him, you'll need to prove yourself first. The mini-bosses guard the path... defeat them and the way will open.",
+      "choices": [
+        {
+          "text": "I'll take them all on!",
+          "next_id": "gertrude_brave"
+        },
+        {
+          "text": "That sounds dangerous...",
+          "next_id": "gertrude_caution"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_brave",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "That's the spirit! Here's a little something for your journey. Be careful out there, Momi!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_caution",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "A healthy dose of caution is wise. Train hard, get stronger, and come back when you're ready. I believe in you!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_passing",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "Well, don't be a stranger! Come chat with old Gertrude anytime. I've got stories about this neighborhood that would curl your ears!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_repeat",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "Back again? You remind me of my old dog, Biscuit. Always on patrol! The raccoons have been quieter since you've been around.",
+      "choices": [
+        {
+          "text": "Any new tips?",
+          "next_id": "gertrude_tip"
+        },
+        {
+          "text": "Just saying hello!",
+          "next_id": "gertrude_hello"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_tip",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "I heard the pigeons up on the rooftops have been acting strange. Some sort of king among them... Be wary if you climb up there.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_hello",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "Such a polite pup! Take care of yourself out there, dearie.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    }
+  ]
+}

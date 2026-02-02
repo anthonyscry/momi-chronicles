@@ -1,0 +1,139 @@
+{
+  "dialogues": [
+    {
+      "id": "maurice_start",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Hey there, pup! Name's Maurice. I deliver mail rain or shine... though lately I've been dodging raccoons more than raindrops!",
+      "choices": [
+        {
+          "text": "Having trouble with raccoons?",
+          "next_id": "maurice_raccoons"
+        },
+        {
+          "text": "Any interesting deliveries lately?",
+          "next_id": "maurice_deliveries"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_raccoons",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Trouble? They've knocked over three mailboxes this week! Mrs. Henderson hasn't gotten her knitting magazine in days. The whole neighborhood is on edge.",
+      "choices": [],
+      "next_id": "maurice_offer",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_deliveries",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Well, there's been a surge of 'anonymous' letters warning about some sort of underground raccoon operation. Sounds crazy, right?",
+      "choices": [
+        {
+          "text": "Not crazy at all...",
+          "next_id": "maurice_believe"
+        },
+        {
+          "text": "Sounds like a prank.",
+          "next_id": "maurice_prank"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_believe",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "You've seen them too, huh? I knew it! Something big is going on beneath our feet. The sewers... I've heard noises coming from down there.",
+      "choices": [],
+      "next_id": "maurice_offer",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_prank",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Ha! I wish it were a prank. But I've seen things on my route... strange shadows, overturned garbage, glowing eyes in the dark alleys.",
+      "choices": [],
+      "next_id": "maurice_offer",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_offer",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Listen, if you're the one patrolling this neighborhood, maybe you could help me out sometime? I've got deliveries that need safe passage!",
+      "choices": [
+        {
+          "text": "Count me in!",
+          "next_id": "maurice_accept"
+        },
+        {
+          "text": "Maybe later.",
+          "next_id": "maurice_later"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_accept",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Great! You're a real pal, Momi. I'll have something for you next time we meet. Stay safe out there!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_later",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "No worries! You know where to find me. I'm always on this route, rain or shine... or raccoons.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_repeat",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Momi! Good to see you. The mail's been flowing better since you started patrolling. Fewer raccoon ambushes on my route!",
+      "choices": [
+        {
+          "text": "Heard any news?",
+          "next_id": "maurice_news"
+        },
+        {
+          "text": "Stay safe, Maurice!",
+          "next_id": "maurice_bye"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_news",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Word on the street is those crows in the backyard answer to someone bigger. And the rats in the sewers? Organized. Someone's pulling the strings.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_bye",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "You too, pal! The neighborhood's counting on you!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    }
+  ]
+}

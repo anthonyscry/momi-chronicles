@@ -1,125 +1,22 @@
 extends Node
-class_name SaveManager
-## Manages game save/load operations.
-## Coordinates data collection from various managers and persists to JSON file.
-
-# ======================================================================# CONSTANTS
-# ======================================================================
-const SAVE_FILE_PATH = "user://save_data.json"
+## SaveManager - handles save/load operations for game state.
 
 # =============================================================================
-# STATE VARIABLES
-# ======================================================================
-## Pending data for player after zone loads
+# CONSTANTS
+# =============================================================================
+
+const SAVE_FILE_PATH = "user://save_data.json"
+const BACKUP_PATH = "user://save_data.backup.json"
+const SAVE_VERSION = 3
+
+# =============================================================================
+# STATE
+# =============================================================================
+
 var _pending_level: int = 1
 var _pending_exp: int = 0
-=======
-## Singleton managing save/load operations for game state persistence.
-## Uses ConfigFile to save to user://save_data.cfg and emits Events signals.
 
-## Save file path
-const SAVE_PATH = "user://save_data.cfg"
-
-## ConfigFile instance
-var config: ConfigFile = ConfigFile.new()
-
-
-func _ready() -> void:
-	DebugLogger.log_system("SaveManager initialized")
-
-
-## Save current game state to disk
-func save_game() -> void:
-	# Collect data from GameManager
-	var game_data = GameManager.save_game()
-
-	# Save GameManager data
-	config.set_value("game", "coins", game_data.get("coins", 0))
-	config.set_value("game", "current_zone", game_data.get("current_zone", ""))
-
-	if game_data.has("player_position"):
-		var pos = game_data["player_position"]
-		config.set_value("game", "player_x", pos.get("x", 0.0))
-		config.set_value("game", "player_y", pos.get("y", 0.0))
-
-	# Save current difficulty
-	config.set_value("game", "difficulty", DifficultyManager.get_difficulty())
-
-	# Write to disk
-	var error = config.save(SAVE_PATH)
-	if error != OK:
-		DebugLogger.log_system("Failed to save game: Error %d" % error)
-		return
-
-	DebugLogger.log_system("Game saved successfully to %s" % SAVE_PATH)
-	Events.game_saved.emit()
-
-
-## Load game state from disk
-func load_game() -> bool:
-	# Check if save file exists
-	if not FileAccess.file_exists(SAVE_PATH):
-		DebugLogger.log_system("No save file found at %s" % SAVE_PATH)
-		return false
-
-	# Load config file
-	var error = config.load(SAVE_PATH)
-	if error != OK:
-		DebugLogger.log_system("Failed to load save file: Error %d" % error)
-		return false
-
-	# Restore difficulty first (before loading other data that might depend on it)
-	if config.has_section_key("game", "difficulty"):
-		var difficulty = config.get_value("game", "difficulty", DifficultySettings.Difficulty.NORMAL)
-		DifficultyManager.set_difficulty(difficulty)
-
-	# Restore GameManager state
-	var save_data = {
-		"coins": config.get_value("game", "coins", 0),
-		"current_zone": config.get_value("game", "current_zone", ""),
-		"player_position": {
-			"x": config.get_value("game", "player_x", 0.0),
-			"y": config.get_value("game", "player_y", 0.0)
-		}
-	}
-
-	GameManager.load_game(save_data)
-
-	DebugLogger.log_system("Game loaded successfully from %s" % SAVE_PATH)
-	Events.game_loaded.emit()
-
-	return true
-
-
-## Check if a save file exists
-func has_save_file() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
-
-
-## Load game state (returns true if successful)
-func load_game() -> bool:
-	var data = _read_save_file()
-	if data.is_empty():
-		DebugLogger.log_error("SaveManager: load_game failed — no valid save data found")
-		return false
-	var success = _apply_save_data(data)
-	if not success:
-		DebugLogger.log_error("SaveManager: load_game failed — could not apply save data")
-	return success
-
-## Delete save file (for new game)
-func delete_save() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(SAVE_PATH)
-	if FileAccess.file_exists(BACKUP_PATH):
-		DirAccess.remove_absolute(BACKUP_PATH)
-
-## Get save data without applying (for display)
-func get_save_info() -> Dictionary:
-	return _read_save_file()
-
-# ======================================================================# PRIVATE METHODS — SAVE DATA STRUCTURE
-=======
+# =============================================================================
 # LIFECYCLE
 # =============================================================================
 
@@ -127,116 +24,179 @@ func _ready() -> void:
 	DebugLogger.log_system("SaveManager initialized")
 
 # =============================================================================
-# PRIVATE METHODS — DATA GATHERING
-# ======================================================================
+# PUBLIC API
+# =============================================================================
+
+func save_exists() -> bool:
+	return has_save_file()
+
+func has_save() -> bool:
+	return has_save_file()
+
+func has_save_file() -> bool:
+	return FileAccess.file_exists(SAVE_FILE_PATH)
+
+func delete_save() -> bool:
+	var ok = true
+	if FileAccess.file_exists(SAVE_FILE_PATH):
+		var err = DirAccess.remove_absolute(SAVE_FILE_PATH)
+		if err != OK:
+			DebugLogger.log_error("SaveManager: Failed to delete save file: %s" % str(err))
+			ok = false
+	if FileAccess.file_exists(BACKUP_PATH):
+		var err_backup = DirAccess.remove_absolute(BACKUP_PATH)
+		if err_backup != OK:
+			DebugLogger.log_error("SaveManager: Failed to delete backup save file: %s" % str(err_backup))
+			ok = false
+	return ok
+
+func save_game() -> bool:
+	var data = _gather_save_data()
+	return _write_save_file(data)
+
+func load_game() -> bool:
+	var data = _read_save_file()
+	if data.is_empty():
+		DebugLogger.log_error("SaveManager: load_game failed - no valid save data found")
+		return false
+	var success = _apply_save_data(data)
+	if not success:
+		DebugLogger.log_error("SaveManager: load_game failed - could not apply save data")
+	return success
+
+func get_save_info() -> Dictionary:
+	return _read_save_file()
+
+# =============================================================================
+# PRIVATE METHODS - DATA
+# =============================================================================
+
+func _get_default_data() -> Dictionary:
+	return {
+		"version": SAVE_VERSION,
+		"level": 1,
+		"total_exp": 0,
+		"coins": 0,
+		"difficulty": 1,
+		"current_zone": "neighborhood",
+		"boss_defeated": false,
+		"mini_bosses_defeated": {
+			"alpha_raccoon": false,
+			"crow_matriarch": false,
+			"rat_king": false,
+		},
+		"unlocked_zones": [],
+		"player_position": {"x": 0.0, "y": 0.0},
+	}
+
 func _gather_save_data() -> Dictionary:
 	var data = _get_default_data()
 
-	# Get player progression
+	var game_data = GameManager.save_game()
+	data["coins"] = game_data.get("coins", data["coins"])
+	if DifficultyManager:
+		data["difficulty"] = DifficultyManager.get_difficulty()
+	data["current_zone"] = game_data.get("current_zone", data["current_zone"])
+	data["player_position"] = game_data.get("player_position", data["player_position"])
+	data["unlocked_zones"] = game_data.get("unlocked_zones", data["unlocked_zones"])
+	data["npc_reputation"] = game_data.get("npc_reputation", {})
+
+	data["boss_defeated"] = GameManager.boss_defeated
+	data["mini_bosses_defeated"] = GameManager.mini_bosses_defeated.duplicate()
+
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.progression:
-		data.level = player.progression.current_level
-		data.total_exp = player.progression.total_exp
+		data["level"] = player.progression.current_level
+		data["total_exp"] = player.progression.total_exp
 
-	# Get global state from GameManager
-	data.coins = GameManager.coins
-	data.current_zone = GameManager.current_zone if GameManager.current_zone != "" else "neighborhood"
-	data.boss_defeated = GameManager.boss_defeated
-	data.mini_bosses_defeated = GameManager.mini_bosses_defeated.duplicate()
-
-	# Get sub-system state (with null safety for Phase 16 managers)
 	if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
-		data.equipment = GameManager.equipment_manager.get_save_data()
+		data["equipment"] = GameManager.equipment_manager.get_save_data()
 	else:
 		DebugLogger.log_error("SaveManager: equipment_manager not valid during save")
 
 	if GameManager.inventory and is_instance_valid(GameManager.inventory):
-		data.inventory = GameManager.inventory.get_save_data()
+		data["inventory"] = GameManager.inventory.get_save_data()
 	else:
 		DebugLogger.log_error("SaveManager: inventory not valid during save")
 
 	if GameManager.party_manager and is_instance_valid(GameManager.party_manager):
-		data.party = GameManager.party_manager.get_save_data()
+		data["party"] = GameManager.party_manager.get_save_data()
 	else:
 		DebugLogger.log_error("SaveManager: party_manager not valid during save")
 
-	data.timestamp = Time.get_unix_time_from_system()
+	if TutorialManager:
+		data["tutorial"] = TutorialManager.get_save_data()
+
+	data["timestamp"] = Time.get_unix_time_from_system()
 
 	return data
 
-# =============================================================================
-# PRIVATE METHODS — DATA APPLICATION
-# =============================================================================
-
 func _apply_save_data(data: Dictionary) -> bool:
-	# Validate version
-	if not data.has("version") or data.version > SAVE_VERSION:
-		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(data.get("version", "missing")), SAVE_VERSION])
+	var version = data.get("version", 1)
+	if version > SAVE_VERSION:
+		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(version), SAVE_VERSION])
 		return false
 
-	# Apply to GameManager
-	GameManager.coins = data.get("coins", 0)
-	GameManager.boss_defeated = data.get("boss_defeated", false)
+	if data.has("difficulty") and DifficultyManager:
+		DifficultyManager.set_difficulty(data["difficulty"])
 
-	# Version migration: add mini_bosses_defeated for v1 saves
+	GameManager.set_coins(data.get("coins", 0))
+	GameManager.boss_defeated = data.get("boss_defeated", false)
 	GameManager.mini_bosses_defeated = data.get("mini_bosses_defeated", {
 		"alpha_raccoon": false,
 		"crow_matriarch": false,
 		"rat_king": false,
 	})
+	GameManager.unlocked_zones = data.get("unlocked_zones", [])
 
-	# Restore sub-system state (v3+, graceful fallback for v2 saves)
+	# Restore NPC reputation
+	var rep_data = data.get("npc_reputation", {})
+	for npc_id in rep_data:
+		GameManager.npc_reputation[npc_id] = int(rep_data[npc_id])
+
+	var pos_data = data.get("player_position", {})
+	if pos_data.has("x") and pos_data.has("y"):
+		GameManager.player_position = Vector2(pos_data["x"], pos_data["y"])
+
+	var target_zone = data.get("current_zone", "neighborhood")
+	GameManager.current_zone = target_zone
+
 	var equipment_data = data.get("equipment", {})
-	if not equipment_data.is_empty():
-		if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
-			GameManager.equipment_manager.load_save_data(equipment_data)
-		else:
-			DebugLogger.log_error("SaveManager: equipment_manager not valid during load")
+	if not equipment_data.is_empty() and GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
+		GameManager.equipment_manager.load_save_data(equipment_data)
 
 	var inventory_data = data.get("inventory", {})
-	if not inventory_data.is_empty():
-		if GameManager.inventory and is_instance_valid(GameManager.inventory):
-			GameManager.inventory.load_save_data(inventory_data)
-		else:
-			DebugLogger.log_error("SaveManager: inventory not valid during load")
+	if not inventory_data.is_empty() and GameManager.inventory and is_instance_valid(GameManager.inventory):
+		GameManager.inventory.load_save_data(inventory_data)
 
 	var party_data = data.get("party", {})
-	if not party_data.is_empty():
-		if GameManager.party_manager and is_instance_valid(GameManager.party_manager):
-			GameManager.party_manager.load_save_data(party_data)
-		else:
-			DebugLogger.log_error("SaveManager: party_manager not valid during load")
+	if not party_data.is_empty() and GameManager.party_manager and is_instance_valid(GameManager.party_manager):
+		GameManager.party_manager.load_save_data(party_data)
 
-	# Store zone for transition (GameManager handles zone loading)
-	var target_zone = data.get("current_zone", "neighborhood")
+	if data.has("tutorial") and TutorialManager:
+		TutorialManager.load_save_data(data["tutorial"])
 
-	# Store level/exp for player to pick up after zone loads
 	_pending_level = data.get("level", 1)
 	_pending_exp = data.get("total_exp", 0)
 
-	# Connect to zone_entered to apply progression after player spawns
 	if not Events.zone_entered.is_connected(_on_zone_entered_after_load):
 		Events.zone_entered.connect(_on_zone_entered_after_load, CONNECT_ONE_SHOT)
 
-	# Load the zone
 	GameManager.load_zone(target_zone, "default")
-
 	Events.game_loaded.emit()
 	return true
 
 # =============================================================================
-# PRIVATE METHODS — FILE I/O (Atomic Write with Backup)
+# PRIVATE METHODS - FILE I/O
 # =============================================================================
 
 func _write_save_file(data: Dictionary) -> bool:
-	# Create backup of existing save first
-	if FileAccess.file_exists(SAVE_PATH):
+	if FileAccess.file_exists(SAVE_FILE_PATH):
 		if FileAccess.file_exists(BACKUP_PATH):
 			DirAccess.remove_absolute(BACKUP_PATH)
-		DirAccess.copy_absolute(SAVE_PATH, BACKUP_PATH)
+		DirAccess.copy_absolute(SAVE_FILE_PATH, BACKUP_PATH)
 
-	# Write to temp file first (atomic write pattern)
-	var temp_path = SAVE_PATH + ".tmp"
+	var temp_path = SAVE_FILE_PATH + ".tmp"
 	var file = FileAccess.open(temp_path, FileAccess.WRITE)
 	if not file:
 		DebugLogger.log_error("SaveManager: Failed to open temp file for writing: %s" % temp_path)
@@ -246,21 +206,17 @@ func _write_save_file(data: Dictionary) -> bool:
 	file.store_string(json_string)
 	file.close()
 
-	# Move temp to actual save path (atomic)
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(SAVE_PATH)
-	DirAccess.rename_absolute(temp_path, SAVE_PATH)
+	if FileAccess.file_exists(SAVE_FILE_PATH):
+		DirAccess.remove_absolute(SAVE_FILE_PATH)
+	DirAccess.rename_absolute(temp_path, SAVE_FILE_PATH)
 
 	Events.game_saved.emit()
 	DebugLogger.log_save("Game saved successfully")
 	return true
 
 func _read_save_file() -> Dictionary:
-	var file_path = SAVE_PATH
-
-	# Try main save first
+	var file_path = SAVE_FILE_PATH
 	if not FileAccess.file_exists(file_path):
-		# Try backup
 		if FileAccess.file_exists(BACKUP_PATH):
 			file_path = BACKUP_PATH
 			DebugLogger.log_save("Using backup save file")
@@ -275,50 +231,35 @@ func _read_save_file() -> Dictionary:
 	var json_string = file.get_as_text()
 	file.close()
 
-	# Parse JSON
 	var json = JSON.new()
 	var error = json.parse(json_string)
 	if error != OK:
-		DebugLogger.log_error("SaveManager: Failed to parse save file — corrupt data at %s" % file_path)
+		DebugLogger.log_error("SaveManager: Failed to parse save file - corrupt data at %s" % file_path)
 		Events.save_corrupted.emit()
 		return {}
 
 	var data = json.get_data()
 	if not data is Dictionary:
-		DebugLogger.log_error("SaveManager: Save file format invalid — expected Dictionary at %s" % file_path)
-		Events.save_corrupted.emit()
-		return {}
-
-	# Validate required fields
-	if not _validate_save_data(data):
+		DebugLogger.log_error("SaveManager: Save file format invalid - expected Dictionary at %s" % file_path)
 		Events.save_corrupted.emit()
 		return {}
 
 	return data
-
-func _validate_save_data(data: Dictionary) -> bool:
-	var required_fields = ["version", "level", "total_exp", "coins", "current_zone"]
-	for field in required_fields:
-		if not data.has(field):
-			DebugLogger.log_error("SaveManager: Missing required field: " + field)
-			return false
-	return true
 
 # =============================================================================
 # SIGNAL HANDLERS
 # =============================================================================
 
 func _on_zone_entered_after_load(_zone_name: String) -> void:
-	# Apply progression to player after spawn
-	await get_tree().process_frame  # Wait for player to initialize
-	await get_tree().process_frame  # Extra frame for safety
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 	var player = get_tree().get_first_node_in_group("player")
 	if not player or not is_instance_valid(player):
-		DebugLogger.log_error("SaveManager: Player not found after load — progression not restored")
+		DebugLogger.log_error("SaveManager: Player not found after load - progression not restored")
 		return
 	if not player.progression:
-		DebugLogger.log_error("SaveManager: Player has no progression component — progression not restored")
+		DebugLogger.log_error("SaveManager: Player has no progression component - progression not restored")
 		return
 
 	player.progression.current_level = _pending_level
@@ -326,410 +267,9 @@ func _on_zone_entered_after_load(_zone_name: String) -> void:
 	player.progression.current_exp = player.progression.get_exp_progress()
 	player._apply_level_stats()
 
-	# Emit signals so UI updates
 	player.progression.level_changed.emit(_pending_level)
 	player.progression.exp_changed.emit(
 		player.progression.get_exp_progress(),
 		player.progression.get_exp_to_next_level()
 	)
-	DebugLogger.log_save("Game loaded — level %d, exp %d restored" % [_pending_level, _pending_exp])
-=======
-# SAVE OPERATIONS
-# =============================================================================
-
-## Collect all save data from game managers and return as Dictionary
-func get_save_data() -> Dictionary:
-	var save_data = {}
-
-	# Tutorial progress
-	if TutorialManager:
-		save_data["tutorial"] = TutorialManager.get_save_data()
-
-	# TODO: Add other manager data as needed
-	# save_data["player"] = PlayerManager.get_save_data()
-	# save_data["inventory"] = InventoryManager.get_save_data()
-	# save_data["quests"] = QuestManager.get_save_data()
-
-	DebugLogger.log_system("Save data collected")
-	return save_data
-
-## Save game data to file
-func save_game() -> bool:
-	var save_data = get_save_data()
-
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
-	if file == null:
-		DebugLogger.log_error("Failed to open save file for writing: %s" % SAVE_FILE_PATH)
-		return false
-
-	var json_string = JSON.stringify(save_data, "\t")
-	file.store_string(json_string)
-	file.close()
-
-	DebugLogger.log_system("Game saved to: %s" % SAVE_FILE_PATH)
-	Events.game_saved.emit()
-	return true
-
-# =============================================================================
-# LOAD OPERATIONS
-# =============================================================================
-
-## Load game data from file and distribute to managers
-func load_game() -> bool:
-	if not FileAccess.file_exists(SAVE_FILE_PATH):
-		DebugLogger.log_warning("Save file does not exist: %s" % SAVE_FILE_PATH)
-		return false
-
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
-	if file == null:
-		DebugLogger.log_error("Failed to open save file for reading: %s" % SAVE_FILE_PATH)
-		return false
-
-	var json_string = file.get_as_text()
-	file.close()
-
-	var json = JSON.new()
-	var parse_result = json.parse(json_string)
-	if parse_result != OK:
-		DebugLogger.log_error("Failed to parse save file JSON")
-		return false
-
-	var save_data = json.data
-	if typeof(save_data) != TYPE_DICTIONARY:
-		DebugLogger.log_error("Save data is not a dictionary")
-		return false
-
-	load_save_data(save_data)
-	return true
-
-## Distribute save data to appropriate managers
-func load_save_data(data: Dictionary) -> void:
-	# Tutorial progress
-	if data.has("tutorial") and TutorialManager:
-		TutorialManager.load_save_data(data["tutorial"])
-
-	# TODO: Add other manager loading as needed
-	# if data.has("player") and PlayerManager:
-	#     PlayerManager.load_save_data(data["player"])
-	# if data.has("inventory") and InventoryManager:
-	#     InventoryManager.load_save_data(data["inventory"])
-
-	DebugLogger.log_system("Save data loaded and distributed to managers")
-	Events.game_loaded.emit()
-
-# =============================================================================
-# UTILITY
-# =============================================================================
-
-## Check if a save file exists
-func has_save_file() -> bool:
-	return FileAccess.file_exists(SAVE_FILE_PATH)
-
-## Delete the save file
-func delete_save() -> bool:
-	if not has_save_file():
-		return false
-
-	var dir = DirAccess.open("user://")
-	if dir == null:
-		DebugLogger.log_error("Failed to access user directory")
-		return false
-
-	var result = dir.remove(SAVE_FILE_PATH.get_file())
-	if result == OK:
-		DebugLogger.log_system("Save file deleted")
-		return true
-	else:
-		DebugLogger.log_error("Failed to delete save file")
-		return false
-=======
-## Delete the save file
-func delete_save() -> void:
-	if FileAccess.file_exists(SAVE_PATH):
-		DirAccess.remove_absolute(SAVE_PATH)
-		DebugLogger.log_system("Save file deleted")
-=======
-## SaveManager: Autoload singleton for game save/load functionality.
-##
-## This autoload handles saving and loading game state to/from disk,
-## including player data, quest progress, inventory, and game settings.
-## Emits signals via Events autoload to notify other systems.
-
-# =============================================================================
-# CONSTANTS
-# =============================================================================
-
-## Save file path
-const SAVE_FILE_PATH: String = "user://savegame.save"
-
-## Save file version for future compatibility
-const SAVE_VERSION: int = 1
-
-# =============================================================================
-# PROPERTIES
-# =============================================================================
-
-## Whether autosave is enabled
-var autosave_enabled: bool = true
-
-## Autosave interval in seconds
-var autosave_interval: float = 300.0  # 5 minutes
-
-## Time since last autosave
-var _time_since_autosave: float = 0.0
-
-# =============================================================================
-# INITIALIZATION
-# =============================================================================
-
-func _ready() -> void:
-	# Enable process for autosave timer
-	set_process(autosave_enabled)
-
-# =============================================================================
-# PROCESS
-# =============================================================================
-
-func _process(delta: float) -> void:
-	if not autosave_enabled:
-		return
-
-	_time_since_autosave += delta
-	if _time_since_autosave >= autosave_interval:
-		_time_since_autosave = 0.0
-		save_game()
-
-# =============================================================================
-# SAVE GAME
-# =============================================================================
-
-## Save the current game state to disk
-## Returns true if save was successful, false otherwise
-func save_game() -> bool:
-	var save_data: Dictionary = _collect_save_data()
-
-	# Attempt to write save file
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
-	if file == null:
-		push_error("SaveManager: Failed to open save file for writing: %s" % FileAccess.get_open_error())
-		return false
-
-	# Write save data as JSON
-	var json_string = JSON.stringify(save_data, "\t")
-	file.store_string(json_string)
-	file.close()
-
-	# Emit save event
-	if has_node("/root/Events"):
-		var events = get_node("/root/Events")
-		if events.has_signal("game_saved"):
-			events.game_saved.emit()
-
-	return true
-
-## Collect save data from all relevant systems
-func _collect_save_data() -> Dictionary:
-	var data: Dictionary = {
-		"version": SAVE_VERSION,
-		"timestamp": Time.get_unix_time_from_system(),
-		"quests": {},
-		"player": {},
-		"game_state": {}
-	}
-
-	# Collect quest data from QuestManager
-	if has_node("/root/QuestManager"):
-		var quest_manager = get_node("/root/QuestManager")
-		if quest_manager.has_method("get_save_data"):
-			data["quests"] = quest_manager.get_save_data()
-
-	# Collect game state from GameManager
-	if has_node("/root/GameManager"):
-		var game_manager = get_node("/root/GameManager")
-		if game_manager.has_method("get_save_data"):
-			data["game_state"] = game_manager.get_save_data()
-
-	# Collect player data
-	data["player"] = _collect_player_data()
-
-	return data
-
-## Collect player-specific save data
-func _collect_player_data() -> Dictionary:
-	var player_data: Dictionary = {}
-
-	# Get player node from scene tree
-	var player = get_tree().get_first_node_in_group("player")
-	if not player:
-		return player_data
-
-	# Basic position data
-	player_data["position"] = {
-		"x": player.global_position.x,
-		"y": player.global_position.y
-	}
-
-	# Health data
-	var health_comp = player.get_node_or_null("HealthComponent")
-	if health_comp:
-		player_data["health"] = {
-			"current": health_comp.current_health,
-			"max": health_comp.max_health
-		}
-
-	# Progression data
-	var progression_comp = player.get_node_or_null("ProgressionComponent")
-	if progression_comp:
-		player_data["progression"] = {
-			"level": progression_comp.current_level,
-			"exp": progression_comp.current_exp if progression_comp.has("current_exp") else 0
-		}
-
-	# Guard data
-	var guard_comp = player.get_node_or_null("GuardComponent")
-	if guard_comp:
-		player_data["guard"] = {
-			"current": guard_comp.current_guard,
-			"max": guard_comp.max_guard
-		}
-
-	return player_data
-
-# =============================================================================
-# LOAD GAME
-# =============================================================================
-
-## Load game state from disk
-## Returns true if load was successful, false otherwise
-func load_game() -> bool:
-	# Check if save file exists
-	if not FileAccess.file_exists(SAVE_FILE_PATH):
-		push_warning("SaveManager: No save file found at %s" % SAVE_FILE_PATH)
-		return false
-
-	# Attempt to read save file
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
-	if file == null:
-		push_error("SaveManager: Failed to open save file for reading: %s" % FileAccess.get_open_error())
-		return false
-
-	# Parse JSON
-	var json_string = file.get_as_text()
-	file.close()
-
-	var json = JSON.new()
-	var parse_result = json.parse(json_string)
-	if parse_result != OK:
-		push_error("SaveManager: Failed to parse save file JSON: %s" % json.get_error_message())
-		return false
-
-	var save_data: Dictionary = json.data
-
-	# Validate save version
-	if not save_data.has("version") or save_data["version"] != SAVE_VERSION:
-		push_warning("SaveManager: Save file version mismatch (expected %d)" % SAVE_VERSION)
-		# Could implement migration logic here in the future
-
-	# Apply save data to all systems
-	_apply_save_data(save_data)
-
-	# Wait for player to spawn after zone load
-	await get_tree().process_frame
-	await get_tree().process_frame
-
-	# Emit load event
-	if has_node("/root/Events"):
-		var events = get_node("/root/Events")
-		if events.has_signal("game_loaded"):
-			events.game_loaded.emit()
-
-	return true
-
-## Apply loaded save data to all relevant systems
-func _apply_save_data(data: Dictionary) -> void:
-	# Apply quest data to QuestManager
-	if data.has("quests") and has_node("/root/QuestManager"):
-		var quest_manager = get_node("/root/QuestManager")
-		if quest_manager.has_method("load_save_data"):
-			quest_manager.load_save_data(data["quests"])
-
-	# Apply game state to GameManager
-	if data.has("game_state") and has_node("/root/GameManager"):
-		var game_manager = get_node("/root/GameManager")
-		if game_manager.has_method("load_save_data"):
-			game_manager.load_save_data(data["game_state"])
-
-	# Apply player data
-	if data.has("player"):
-		_apply_player_data(data["player"])
-
-## Apply player-specific save data
-func _apply_player_data(player_data: Dictionary) -> void:
-	# Get player node from scene tree
-	var player = get_tree().get_first_node_in_group("player")
-	if not player:
-		push_warning("SaveManager: No player found in scene tree, cannot apply player data")
-		return
-
-	# Restore position
-	if player_data.has("position"):
-		var pos_data = player_data["position"]
-		player.global_position = Vector2(pos_data["x"], pos_data["y"])
-
-	# Restore health
-	if player_data.has("health"):
-		var health_comp = player.get_node_or_null("HealthComponent")
-		if health_comp:
-			var health_data = player_data["health"]
-			health_comp.max_health = health_data["max"]
-			health_comp.current_health = health_data["current"]
-
-	# Restore progression
-	if player_data.has("progression"):
-		var progression_comp = player.get_node_or_null("ProgressionComponent")
-		if progression_comp:
-			var prog_data = player_data["progression"]
-			if progression_comp.has_method("set_level"):
-				progression_comp.set_level(prog_data["level"])
-			if prog_data.has("exp") and progression_comp.has("current_exp"):
-				progression_comp.current_exp = prog_data["exp"]
-
-	# Restore guard
-	if player_data.has("guard"):
-		var guard_comp = player.get_node_or_null("GuardComponent")
-		if guard_comp:
-			var guard_data = player_data["guard"]
-			guard_comp.max_guard = guard_data["max"]
-			guard_comp.current_guard = guard_data["current"]
-
-# =============================================================================
-# UTILITIES
-# =============================================================================
-
-## Check if a save file exists
-func has_save_file() -> bool:
-	return FileAccess.file_exists(SAVE_FILE_PATH)
-
-## Delete the current save file
-## Returns true if deletion was successful, false otherwise
-func delete_save_file() -> bool:
-	if not has_save_file():
-		return true
-
-	var error = DirAccess.remove_absolute(SAVE_FILE_PATH)
-	if error != OK:
-		push_error("SaveManager: Failed to delete save file: %s" % error)
-		return false
-
-	return true
-
-## Enable or disable autosave
-func set_autosave_enabled(enabled: bool) -> void:
-	autosave_enabled = enabled
-	set_process(enabled)
-	_time_since_autosave = 0.0
-
-## Set autosave interval in seconds
-func set_autosave_interval(interval: float) -> void:
-	autosave_interval = max(interval, 10.0)  # Minimum 10 seconds
-	_time_since_autosave = 0.0
+	DebugLogger.log_save("Game loaded - level %d, exp %d restored" % [_pending_level, _pending_exp])

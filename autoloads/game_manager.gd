@@ -43,6 +43,14 @@ var mini_bosses_defeated: Dictionary = {
 var pending_spawn_point: String = ""
 var player_position: Vector2 = Vector2.ZERO
 
+## NPC reputation tracking (0-100 scale, affects dialogue choices)
+var npc_reputation: Dictionary = {
+	"gertrude": 20,
+	"maurice": 20,
+	"kids_gang": 30,
+	"henderson": 0,
+}
+
 var inventory = null
 var equipment_manager = null
 var party_manager = null
@@ -170,6 +178,29 @@ func spend_coins(amount: int) -> bool:
 	return false
 
 # =============================================================================
+# PUBLIC API - REPUTATION SYSTEM
+# =============================================================================
+
+func get_reputation(npc_id: String) -> int:
+	return npc_reputation.get(npc_id, 0)
+
+func set_reputation(npc_id: String, value: int) -> void:
+	var old_value = npc_reputation.get(npc_id, 0)
+	var new_value = clampi(value, 0, 100)
+	npc_reputation[npc_id] = new_value
+	if old_value != new_value:
+		Events.reputation_changed.emit(npc_id, old_value, new_value)
+		DebugLogger.log_system("Reputation changed: %s %d -> %d" % [npc_id, old_value, new_value])
+
+func add_reputation(npc_id: String, amount: int) -> void:
+	set_reputation(npc_id, get_reputation(npc_id) + amount)
+
+func boost_all_reputation(amount: int) -> void:
+	for npc_id in npc_reputation.keys():
+		add_reputation(npc_id, amount)
+	DebugLogger.log_system("All NPC reputation boosted by %d" % amount)
+
+# =============================================================================
 # ZONE MANAGEMENT
 # =============================================================================
 
@@ -207,6 +238,7 @@ func save_game() -> Dictionary:
 			"y": player_position.y,
 		},
 		"unlocked_zones": unlocked_zones.duplicate(),
+		"npc_reputation": npc_reputation.duplicate(),
 	}
 
 func load_game(save_data: Dictionary) -> void:
@@ -223,6 +255,12 @@ func load_game(save_data: Dictionary) -> void:
 			unlocked_zones.append(zone_id)
 	if unlocked_zones.is_empty():
 		unlock_zone("neighborhood")
+
+	# Restore NPC reputation from save
+	if save_data.has("npc_reputation"):
+		var rep_data = save_data["npc_reputation"]
+		for npc_id in rep_data:
+			npc_reputation[npc_id] = int(rep_data[npc_id])
 
 # =============================================================================
 # PRIVATE METHODS
@@ -318,6 +356,8 @@ func _on_boss_defeated(_boss: Node) -> void:
 func _on_mini_boss_defeated(_boss: Node, boss_key: String) -> void:
 	if mini_bosses_defeated.has(boss_key):
 		mini_bosses_defeated[boss_key] = true
+	# Defeating mini-bosses boosts all NPC reputation
+	boost_all_reputation(10)
 
 func _on_zone_entered_autosave(zone_name: String) -> void:
 	await get_tree().process_frame
@@ -353,6 +393,12 @@ func reset_game() -> void:
 		"crow_matriarch": false,
 		"rat_king": false,
 		"pigeon_king": false,
+	}
+	npc_reputation = {
+		"gertrude": 20,
+		"maurice": 20,
+		"kids_gang": 30,
+		"henderson": 0,
 	}
 	reset_zones()
 	DebugLogger.log_system("Game state reset")

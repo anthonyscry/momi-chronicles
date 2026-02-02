@@ -7,7 +7,7 @@
 | **Engine** | Godot 4.5 / GDScript |
 | **Resolution** | 384×216 (16:9 pixel art) |
 | **Perspective** | 3/4 top-down |
-| **Current Milestone** | v1.7 Rooftops Zone COMPLETE — Next: v1.8 Quest System |
+| **Current Milestone** | v1.8 Quest System — Phase 40 complete, Phases 41-42 pending |
 | **Last Updated** | 2026-02-01 |
 
 ---
@@ -105,13 +105,13 @@ Plans:
 ### Phase 40: Dialogue System Expansion
 **Goal**: Rich NPC interactions beyond shopkeeper — 4 story NPCs with branching dialogue and reputation system
 
-**Status:** 📋 Planned (2 plans)
+**Status:** ✅ Complete
 
-**Plans:** 2 plans in 1 wave (parallel)
+**Plans:** 2 plans executed
 
 Plans:
-- [ ] 40-01-PLAN.md — DialogueNPC base + Gertrude & Maurice (NPCs + dialogue JSON + zone placement)
-- [ ] 40-02-PLAN.md — Kids Gang & Henderson + reputation system (remaining NPCs + GameManager reputation tracking)
+- [x] 40-01 — DialogueNPC base + all 4 story NPCs (dialogue JSONs + zone placement)
+- [x] 40-02 — Reputation system (GameManager tracking + save/load + Henderson gating)
 
 **Already exists:** DialogueManager autoload, DialogueResource, DialogueData JSON loader, DialogueBox UI (typewriter + choices), NPCBase class, ShopNPC (Nutkin), Events signals for dialogue/quest
 
@@ -125,10 +125,16 @@ Plans:
 **Deliverables:**
 - ~~Dialogue tree system with branching choices~~ ✅ Already exists
 - ~~NPC base class extended for dialogue interaction~~ ✅ Already exists
-- Reusable DialogueNPC script (Area2D pattern like ShopNPC)
-- 4 NPCs with unique dialogue trees (5-7 nodes each)
-- Reputation/friendliness system (0-100 scale, saved, affects Henderson's dialogue)
-- Mini-boss defeats boost all NPC reputation (+10 per boss)
+- ~~Reusable DialogueNPC script (Area2D pattern like ShopNPC)~~ ✅ Complete
+- ~~4 NPCs with unique dialogue trees (5-7 nodes each)~~ ✅ Complete
+- ~~Reputation/friendliness system (0-100 scale, saved, affects Henderson's dialogue)~~ ✅ Complete
+- ~~Mini-boss defeats boost all NPC reputation (+10 per boss)~~ ✅ Complete
+
+**Key artifacts:**
+- `characters/npcs/dialogue_npc.gd` — Reusable story NPC (Area2D, programmatic visuals)
+- `resources/dialogues/{gertrude,maurice,kids_gang,henderson}.json` — Dialogue trees
+- `autoloads/game_manager.gd` — npc_reputation Dictionary + API
+- `autoloads/events.gd` — reputation_changed signal
 
 ---
 

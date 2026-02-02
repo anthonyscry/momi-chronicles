@@ -1,0 +1,139 @@
+{
+  "dialogues": [
+    {
+      "id": "kids_start",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Whoa, it's MOMI! The legendary neighborhood watch dog! We're your biggest fans!",
+      "choices": [
+        {
+          "text": "Thanks, kids!",
+          "next_id": "kids_thanks"
+        },
+        {
+          "text": "You should stay inside where it's safe.",
+          "next_id": "kids_safe"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_thanks",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Can we join the Bulldog Squad? Pleeeease? We've been practicing our battle stances!",
+      "choices": [
+        {
+          "text": "Maybe when you're older!",
+          "next_id": "kids_older"
+        },
+        {
+          "text": "Show me what you've got!",
+          "next_id": "kids_show"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_safe",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Aww, but we found something cool! We were playing near the park and saw raccoons sneaking around carrying shiny things!",
+      "choices": [],
+      "next_id": "kids_clue",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_older",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Okay, okay... but we can still help! We see EVERYTHING from the playground. Like secret agents!",
+      "choices": [],
+      "next_id": "kids_clue",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_show",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "HI-YAH! ...We might need more practice. But we have good eyes! We spot things the grown-ups miss!",
+      "choices": [],
+      "next_id": "kids_clue",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_clue",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Oh! We almost forgot! We saw a HUGE raccoon near the park last night. Bigger than a dog! It went towards the manhole in the sidewalk.",
+      "choices": [
+        {
+          "text": "Thanks for the tip, scouts!",
+          "next_id": "kids_scouts"
+        },
+        {
+          "text": "Stay away from that manhole!",
+          "next_id": "kids_warning"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_scouts",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "We're the Junior Bulldog Squad! We'll keep watching and report anything suspicious. Go get 'em, Momi!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_warning",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "We know, we know! We just watch from far away. Promise! Go show those raccoons who's boss, Momi!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_repeat",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "MOMI'S BACK! Did you beat up any bad guys? We've been keeping score!",
+      "choices": [
+        {
+          "text": "Any new sightings?",
+          "next_id": "kids_sightings"
+        },
+        {
+          "text": "Keep up the good work, scouts!",
+          "next_id": "kids_goodbye"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_sightings",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "We saw pigeons flying in formation over the rooftops! Like an army! And one of them was wearing a tiny crown... probably.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "kids_goodbye",
+      "character": "Kids Gang",
+      "portrait": "",
+      "text": "Aye aye, Captain Momi! Junior Bulldog Squad, reporting for duty!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    }
+  ]
+}

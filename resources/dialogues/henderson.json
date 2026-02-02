@@ -1,0 +1,157 @@
+{
+  "dialogues": [
+    {
+      "id": "henderson_grumpy",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Hmph! Another stray mutt running around the neighborhood. Don't you dare dig up my garden!",
+      "choices": [
+        {
+          "text": "I'm on neighborhood watch!",
+          "next_id": "henderson_watch"
+        },
+        {
+          "text": "Sorry to bother you.",
+          "next_id": "henderson_bother"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_watch",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Neighborhood watch? BAH! Back in my day, we didn't need dogs to keep order. Get off my lawn!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_bother",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "You SHOULD be sorry! These raccoons are bad enough without dogs trampling my flower beds. Now shoo!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_grumpy_repeat",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "You again?! I told you to stay away from my property! ...Though I suppose the raccoon problem IS getting worse...",
+      "choices": [
+        {
+          "text": "I can help with the raccoons.",
+          "next_id": "henderson_grudge_help"
+        },
+        {
+          "text": "I'll be going.",
+          "next_id": "henderson_grudge_leave"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_grudge_help",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Help? Hmph. I doubt it. But... fine. If you can clear out those pests, maybe I'll think about being... less hostile. Maybe.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_grudge_leave",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Good. And don't come back until you've done something useful for once!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_warming",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Oh... it's you. I heard you took down one of those mini-boss creatures. I suppose that's... somewhat impressive.",
+      "choices": [
+        {
+          "text": "Told you I could help!",
+          "next_id": "henderson_warming_told"
+        },
+        {
+          "text": "Just doing my job.",
+          "next_id": "henderson_warming_humble"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_warming_told",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Don't get cocky, mutt. But... the raccoons haven't touched my garden since. So... thanks. I guess.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_warming_humble",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Hmph. Modest too. You know, you remind me of a dog I had as a boy. Good dog, that one. Kept the foxes out of the henhouse.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_friendly",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Momi! There you are. I've been keeping an eye out for you. The garden's been safe thanks to your patrols.",
+      "choices": [
+        {
+          "text": "Glad to hear it, Mr. Henderson!",
+          "next_id": "henderson_friendly_glad"
+        },
+        {
+          "text": "Any trouble I should know about?",
+          "next_id": "henderson_friendly_trouble"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_friendly_glad",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Call me... well, just Henderson is fine. I left some treats by my front door. For the neighborhood watch. Don't tell anyone I'm going soft!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_friendly_trouble",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "Actually, yes. I've noticed suspicious activity near the old buildings. Strange noises at night. You might want to investigate the rooftops.",
+      "choices": [],
+      "next_id": "henderson_friendly_advice",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_friendly_advice",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "And Momi? Be careful up there. I've grown rather fond of having you around. Not that I'd ever say that to your face!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    }
+  ]
+}

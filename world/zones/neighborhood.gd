@@ -3,6 +3,7 @@ extends BaseZone
 ## A vibrant area with houses, stores, a park, and patrolling enemies.
 
 const ALPHA_RACCOON_SCENE = preload("res://characters/enemies/alpha_raccoon.tscn")
+const DialogueNPCScript = preload("res://characters/npcs/dialogue_npc.gd")
 
 # =============================================================================
 # SPAWN POINTS
@@ -19,6 +20,7 @@ var spawn_points: Dictionary = {
 	"road_west": Vector2(50, 300),          # West end of main road
 	"road_east": Vector2(680, 300),         # East end of main road
 	"shop": Vector2(380, 350),              # Near Nutkin's shop
+	"from_rooftops": Vector2(680, 180),     # Returning from rooftops via ladder
 }
 
 # =============================================================================
@@ -31,8 +33,18 @@ func _setup_zone() -> void:
 	# Build manhole entrance to sewers
 	_build_manhole()
 	
+	# Build ladder to rooftops
+	_build_rooftop_ladder()
+	
 	# Build mini-boss trigger (Alpha Raccoon)
 	_build_mini_boss_trigger()
+	
+	# Build story NPCs
+	_load_npc_dialogues()
+	_build_gertrude()
+	_build_maurice()
+	_build_kids_gang()
+	_build_henderson()
 	
 	# Check if we have a pending spawn from zone transition
 	var pending_spawn = GameManager.get_pending_spawn()
@@ -101,6 +113,62 @@ func _build_manhole() -> void:
 	exit.position = manhole_pos
 	exit.exit_id = "to_sewers"
 	exit.target_zone = "sewers"
+	exit.target_spawn = "from_neighborhood"
+	exit.require_interaction = true
+	add_child(exit)
+
+
+# =============================================================================
+# ROOFTOP LADDER (to Rooftops)
+# =============================================================================
+
+## Build ladder visual and ZoneExit for rooftops access
+func _build_rooftop_ladder() -> void:
+	var ladder_pos = Vector2(680, 180)  # East side, near a building
+	
+	# Ladder visual — two side rails + rungs
+	var left_rail = ColorRect.new()
+	left_rail.name = "RooftopLadderRailL"
+	left_rail.position = ladder_pos + Vector2(-5, -15)
+	left_rail.size = Vector2(2, 30)
+	left_rail.color = Color(0.45, 0.35, 0.2)
+	left_rail.z_index = 2
+	add_child(left_rail)
+	
+	var right_rail = ColorRect.new()
+	right_rail.name = "RooftopLadderRailR"
+	right_rail.position = ladder_pos + Vector2(5, -15)
+	right_rail.size = Vector2(2, 30)
+	right_rail.color = Color(0.45, 0.35, 0.2)
+	right_rail.z_index = 2
+	add_child(right_rail)
+	
+	# 5 rungs spaced evenly
+	for i in range(5):
+		var rung = ColorRect.new()
+		rung.name = "RooftopLadderRung_%d" % i
+		rung.position = ladder_pos + Vector2(-3, -13 + i * 6)
+		rung.size = Vector2(8, 2)
+		rung.color = Color(0.45, 0.35, 0.2)
+		rung.z_index = 2
+		add_child(rung)
+	
+	# Label "ROOFTOPS" above ladder
+	var label = Label.new()
+	label.name = "RooftopLadderLabel"
+	label.position = ladder_pos + Vector2(-18, -28)
+	label.text = "ROOFTOPS"
+	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8, 0.6))
+	label.z_index = 2
+	add_child(label)
+	
+	# ZoneExit — press E to climb to rooftops
+	var exit = preload("res://components/zone_exit/zone_exit.tscn").instantiate()
+	exit.name = "ToRooftops"
+	exit.position = ladder_pos
+	exit.exit_id = "to_rooftops"
+	exit.target_zone = "rooftops"
 	exit.target_spawn = "from_neighborhood"
 	exit.require_interaction = true
 	add_child(exit)
@@ -178,3 +246,78 @@ func _on_alpha_raccoon_trigger(body: Node2D) -> void:
 	# Play boss music
 	if AudioManager.has_method("play_music"):
 		AudioManager.play_music("boss_fight_b")
+
+
+# =============================================================================
+# STORY NPCs (Dialogue System)
+# =============================================================================
+
+## Henderson NPC reference (for reputation-gated dialogue updates)
+var _henderson_npc: Area2D = null
+
+func _load_npc_dialogues() -> void:
+	DialogueManager.load_dialogue_file("res://resources/dialogues/gertrude.json")
+	DialogueManager.load_dialogue_file("res://resources/dialogues/maurice.json")
+	DialogueManager.load_dialogue_file("res://resources/dialogues/kids_gang.json")
+	DialogueManager.load_dialogue_file("res://resources/dialogues/henderson.json")
+	DebugLogger.log_zone("Story NPC dialogues loaded")
+
+
+func _create_dialogue_npc(npc_name_text: String, npc_dialogue_id: String, npc_color: Color, npc_pos: Vector2) -> Area2D:
+	var npc = Area2D.new()
+	npc.set_script(DialogueNPCScript)
+	npc.name = npc_name_text.replace(" ", "").replace(".", "")
+	npc.npc_name = npc_name_text
+	npc.dialogue_id = npc_dialogue_id
+	npc.npc_color = npc_color
+	npc.position = npc_pos
+	add_child(npc)
+	return npc
+
+
+func _build_gertrude() -> void:
+	# Old Lady Gertrude — near houses, hints about Raccoon King
+	_create_dialogue_npc(
+		"Gertrude",
+		"gertrude_start",
+		Color(0.7, 0.5, 0.7),  # Lavender — grandmotherly
+		Vector2(120, 220)
+	)
+
+
+func _build_maurice() -> void:
+	# Mailman Maurice — main road, delivery quest hooks
+	_create_dialogue_npc(
+		"Maurice",
+		"maurice_start",
+		Color(0.3, 0.5, 0.8),  # Blue — mail carrier uniform
+		Vector2(400, 300)
+	)
+
+
+func _build_kids_gang() -> void:
+	# Kids Gang — park area, playful fans
+	_create_dialogue_npc(
+		"Kids Gang",
+		"kids_start",
+		Color(0.9, 0.6, 0.2),  # Orange — energetic
+		Vector2(180, 480)
+	)
+
+
+func _build_henderson() -> void:
+	# Grumpy Mr. Henderson — north houses, reputation-gated dialogue
+	# Dialogue changes based on reputation: grumpy (0-29), warming (30-59), friendly (60+)
+	var rep = GameManager.get_reputation("henderson")
+	var dialogue_id = "henderson_grumpy"
+	if rep >= 60:
+		dialogue_id = "henderson_friendly"
+	elif rep >= 30:
+		dialogue_id = "henderson_warming"
+
+	_henderson_npc = _create_dialogue_npc(
+		"Mr. Henderson",
+		dialogue_id,
+		Color(0.5, 0.4, 0.3),  # Brown — earthy, grumpy old man
+		Vector2(280, 180)
+	)
