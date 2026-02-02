@@ -132,8 +132,10 @@ Plans:
 - Viewport scaling / fullscreen button for browser window
 - Input display adapts to keyboard (no gamepad prompts in web)
 
+**Plans:** 1 plan in 1 wave
+
 Plans:
-- [ ] TBD — created by /gsd-plan-phase
+- [ ] 45-01-PLAN.md — Web export build + compatibility guards + browser testing
 
 ---
 
