@@ -1,5 +1,8 @@
 .env
 
+# Windows reserved device names
+nul
+
 # Auto Claude data directory
 .auto-claude/
 

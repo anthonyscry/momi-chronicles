@@ -25,7 +25,7 @@ class_name EnemyBase
 
 @export var exp_value: int = 10  # Base EXP for generic enemy
 
-@onready var sprite: Polygon2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var state_machine: StateMachine = $StateMachine
 @onready var hitbox: Hitbox = $Hitbox
@@ -111,6 +111,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_F3:
 			if hitbox_visualizer:
 				hitbox_visualizer.toggle()
+
+
+func _physics_process(delta: float) -> void:
+	_update_animation()
+
+func _update_animation() -> void:
+	if not sprite or not is_alive():
+		return
+
+	var new_animation: String = "idle"
+	if state_machine and state_machine.current_state_name:
+		var state_name = state_machine.current_state_name
+		if state_name in ["Patrol", "Wander"]:
+			new_animation = "walk"
+		elif state_name == "Chase":
+			new_animation = "walk"
+		elif state_name == "Attack":
+			new_animation = "attack"
+		elif state_name == "Hurt":
+			new_animation = "hurt"
+
+	if sprite.animation != new_animation:
+		sprite.play(new_animation)
+
+	if velocity.x < 0:
+		sprite.flip_h = true
+	elif velocity.x > 0:
+		sprite.flip_h = false
 
 
 func _process(delta: float) -> void:
@@ -288,7 +316,7 @@ func get_direction_to_target() -> Vector2:
 ## Get separation force from nearby enemies to prevent stacking
 func get_separation_force() -> Vector2:
 	var separation = Vector2.ZERO
-	var neighbors = get_tree().get_nodes_in_group("enemies")
+	var neighbors = EntityRegistry.get_enemies()
 	for enemy in neighbors:
 		if enemy == self or not is_instance_valid(enemy):
 			continue
@@ -336,8 +364,35 @@ func update_facing(direction: Vector2) -> void:
 		sprite.scale.x = -1 if facing_left else 1
 
 func flash_damage() -> void:
-	var original_color = sprite.color
-	sprite.color = Color(1, 0.3, 0.3, 1)
+	var original_color = sprite.modulate
+	sprite.modulate = Color(1, 0.3, 0.3, 1)
 	await get_tree().create_timer(0.1).timeout
 	if is_instance_valid(self) and sprite:
-		sprite.color = original_color
+		sprite.modulate = original_color
+
+# ==============================================================================
+# FLOCK MANAGEMENT (for flying enemies like pigeons)
+# ==============================================================================
+
+## Override in subclass to enable flock behavior
+var flock_id: int = -1
+var flock_position: int = 0
+var is_lead_pigeon: bool = false
+
+## Get all members of this enemy's flock
+func get_flock_members() -> Array:
+	if flock_id < 0:
+		return []
+	return get_tree().get_nodes_in_group("pigeon_flock_" + str(flock_id))
+
+## Get the lead pigeon of this flock
+func get_flock_lead() -> Node:
+	var flock = get_flock_members()
+	for member in flock:
+		if member.is_lead_pigeon:
+			return member
+	return null
+
+## Get attack target (override in subclasses for special targeting)
+func get_attack_target() -> Node:
+	return target

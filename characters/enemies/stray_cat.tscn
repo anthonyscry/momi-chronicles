@@ -28,14 +28,54 @@ size = Vector2(14, 10)
 radius = 6.0
 height = 14.0
 
-[node name="StrayCat" type="CharacterBody2D"]
-collision_layer = 4
-collision_mask = 1
-script = ExtResource("1_stray_cat")
+[sub_resource type="SpriteFrames" id="SpriteFrames_stray_cat"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_idle.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_stealth.png"
+}],
+"loop": true,
+"name": &"stealth"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_pounce.png"
+}],
+"loop": false,
+"name": &"attack"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_idle.png"
+}],
+"loop": true,
+"name": &"walk"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_idle.png"
+}],
+"loop": true,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/stray_cat_idle.png"
+}],
+"loop": false,
+"name": &"death"
+}]
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.85, 0.55, 0.2, 1)
-polygon = PackedVector2Array(-6, -5, -4, -9, -2, -5, 2, -5, 4, -9, 6, -5, 7, 0, 5, 7, -5, 7, -7, 0)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_stray_cat")
+centered = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)

@@ -8,6 +8,8 @@ const CHARGE_THRESHOLD: float = 0.25
 
 func enter() -> void:
 	attack_hold_time = 0.0
+	if player.sprite:
+		player.sprite.play("run")
 
 func physics_update(delta: float) -> void:
 	# Check for bot actions first

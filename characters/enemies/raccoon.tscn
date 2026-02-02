@@ -26,14 +26,52 @@ size = Vector2(12, 10)
 radius = 7.0
 height = 16.0
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_raccoon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/raccoon_idle.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/raccoon_attack.png"
+}],
+"loop": false,
+"name": &"attack"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/raccoon_idle.png"
+}],
+"loop": true,
+"name": &"walk"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/raccoon_idle.png"
+}],
+"loop": true,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/raccoon_idle.png"
+}],
+"loop": false,
+"name": &"death"
+}]
+
 [node name="Raccoon" type="CharacterBody2D"]
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_raccoon")
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.5, 0.4, 0.35, 1)
-polygon = PackedVector2Array(-7, -7, 7, -7, 7, 7, -7, 7)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_raccoon")
+centered = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)

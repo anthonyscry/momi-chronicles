@@ -36,40 +36,6 @@ func _ready() -> void:
 	# Bigger raccoon (1.8x scale)
 	if sprite:
 		sprite.scale = Vector2(1.8, 1.8)
-		sprite.color = Color(0.35, 0.3, 0.4)  # Dark purple-grey
-	
-	_setup_alpha_appearance()
-
-# =============================================================================
-# APPEARANCE
-# =============================================================================
-
-func _setup_alpha_appearance() -> void:
-	if not sprite:
-		return
-	
-	# Crown on top (gold triangle points)
-	var crown = Polygon2D.new()
-	crown.polygon = PackedVector2Array([
-		Vector2(-4, -8),
-		Vector2(-2, -12),
-		Vector2(0, -9),
-		Vector2(2, -12),
-		Vector2(4, -8)
-	])
-	crown.color = Color(1, 0.85, 0.2)  # Gold
-	sprite.add_child(crown)
-	
-	# Scar across face (battle-worn look)
-	var scar = Polygon2D.new()
-	scar.polygon = PackedVector2Array([
-		Vector2(-3, -3),
-		Vector2(-2, -4),
-		Vector2(3, 1),
-		Vector2(2, 2),
-	])
-	scar.color = Color(0.5, 0.3, 0.3, 0.6)
-	sprite.add_child(scar)
 
 # =============================================================================
 # DROPS

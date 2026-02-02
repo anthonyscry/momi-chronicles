@@ -15,6 +15,10 @@ func enter() -> void:
 	flash_timer = 0.0
 	sprite_visible = true
 	
+	# Play hurt animation
+	if player.sprite:
+		player.sprite.play("hurt")
+	
 	if player.hurtbox:
 		player.hurtbox.start_invincibility(INVINCIBILITY_DURATION)
 

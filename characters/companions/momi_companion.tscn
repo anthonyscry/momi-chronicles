@@ -1,25 +1,131 @@
-[gd_scene load_steps=5 format=3 uid="uid://cmomicomp001"]
+[gd_scene load_steps=2 format=3 uid="uid://cmomicomp001"]
 
 [ext_resource type="Script" path="res://characters/companions/momi_companion.gd" id="1_comp"]
-[ext_resource type="Script" path="res://systems/party/companion_ai.gd" id="2_ai"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
-radius = 6.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 10.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 7.0
-
-[node name="MomiCompanion" type="CharacterBody2D"]
+[node name="MomiCompanion" type="CharacterBody2D" groups=["player"]]
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("1_comp")
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.85, 0.75, 0.55, 1)
-polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+centered = true
+sprite_frames = SubResource("SpriteFrames_momi")
+speed_scale = 1.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_momi"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_idle.png"
+}],
+"loop": false,
+"name": &"idle",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_walk.png"
+}],
+"loop": false,
+"name": &"walk",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_run.png"
+}],
+"loop": false,
+"name": &"run",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_attack.png"
+}],
+"loop": false,
+"name": &"attack",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_charge.png"
+}],
+"loop": false,
+"name": &"charge",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_ground_pound.png"
+}],
+"loop": false,
+"name": &"ground_pound",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_dodge.png"
+}],
+"loop": false,
+"name": &"dodge",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_block.png"
+}],
+"loop": false,
+"name": &"block",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_hurt.png"
+}],
+"loop": false,
+"name": &"hurt",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_death.png"
+}],
+"loop": false,
+"name": &"death",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_chomp.png"
+}],
+"loop": false,
+"name": &"chomp",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_dig.png"
+}],
+"loop": false,
+"name": &"dig",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_happy.png"
+}],
+"loop": false,
+"name": &"happy",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/momi_bark.png"
+}],
+"loop": false,
+"name": &"bark",
+"speed_scale": 1.0
+}]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_companion")
@@ -42,3 +148,12 @@ shape = SubResource("CircleShape2D_hurtbox")
 
 [node name="CompanionAI" type="Node" parent="."]
 script = ExtResource("2_ai")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
+radius = 6.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 7.0

@@ -8,6 +8,10 @@ func enter() -> void:
 	player.velocity = Vector2.ZERO
 	death_timer = 0.0
 	
+	# Play death animation
+	if player.sprite:
+		player.sprite.play("death")
+	
 	if player.hitbox:
 		player.hitbox.disable()
 	if player.hurtbox:
@@ -34,13 +38,13 @@ func _dramatic_death_sequence() -> void:
 		var sprite_tween = player.create_tween()
 		sprite_tween.set_ignore_time_scale(true)
 		# Flash white briefly
-		sprite_tween.tween_property(player.sprite, "color", Color(1, 1, 1, 1), 0.05)
+		sprite_tween.tween_property(player.sprite, "modulate", Color(1, 1, 1, 1), 0.05)
 		# Turn red
-		sprite_tween.tween_property(player.sprite, "color", Color(1, 0.15, 0.15, 1), 0.15)
+		sprite_tween.tween_property(player.sprite, "modulate", Color(1, 0.15, 0.15, 1), 0.15)
 		# Hold red
 		sprite_tween.tween_interval(0.3)
 		# Fade out
-		sprite_tween.tween_property(player.sprite, "color", Color(1, 0.15, 0.15, 0), 0.5)
+		sprite_tween.tween_property(player.sprite, "modulate", Color(1, 0.15, 0.15, 0), 0.5)
 	
 	# 5. Restore time scale smoothly after the dramatic pause
 	var time_tween = create_tween()

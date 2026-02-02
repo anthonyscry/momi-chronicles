@@ -280,18 +280,19 @@ func _create_item_row(row_width: int) -> Panel:
 	row_style.corner_radius_bottom_left = 2
 	row.add_theme_stylebox_override("panel", row_style)
 	
-	# Color swatch (6x6)
-	var swatch = ColorRect.new()
+	# Icon (10x10 TextureRect)
+	var swatch = TextureRect.new()
 	swatch.name = "Swatch"
-	swatch.position = Vector2(3, 4)
-	swatch.size = Vector2(6, 6)
-	swatch.color = Color.WHITE
+	swatch.position = Vector2(2, 2)
+	swatch.size = Vector2(10, 10)
+	swatch.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	swatch.custom_minimum_size = Vector2(10, 10)
 	row.add_child(swatch)
 	
 	# Item name
 	var name_lbl = Label.new()
 	name_lbl.name = "ItemName"
-	name_lbl.position = Vector2(12, 0)
+	name_lbl.position = Vector2(16, 0)
 	name_lbl.size = Vector2(row_width - 70, ROW_HEIGHT)
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_lbl.add_theme_font_size_override("font_size", 6)
@@ -527,10 +528,15 @@ func _update_rows() -> void:
 		if row_style:
 			row_style.bg_color = COLOR_ROW_SELECTED if is_selected else COLOR_ROW_NORMAL
 		
-		# Swatch color
-		var swatch = row.get_node("Swatch") as ColorRect
+		# Swatch icon
+		var swatch = row.get_node("Swatch") as TextureRect
 		if swatch:
-			swatch.color = item.get("color", Color.WHITE)
+			var icon_path = item.get("icon", "")
+			if icon_path and ResourceLoader.exists(icon_path):
+				swatch.texture = load(icon_path)
+			else:
+				swatch.texture = null
+				swatch.modulate = item.get("color", Color.WHITE)
 		
 		# Item name
 		var name_lbl = row.get_node("ItemName") as Label

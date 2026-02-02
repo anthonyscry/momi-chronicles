@@ -1,0 +1,59 @@
+{
+  "project_type": "single",
+  "services": {
+    "momi-chronicles": {
+      "path": ".",
+      "tech_stack": ["gdscript", "godot-4.5"],
+      "port": null,
+      "dev_command": "godot --path . --editor",
+      "run_command": "godot --path .",
+      "test_command": null,
+      "notes": "Desktop Godot game - no server, no port. Testing via AutoBot (F1) and UITester (F2)."
+    }
+  },
+  "infrastructure": {
+    "docker": false,
+    "database": null,
+    "ci_cd": false,
+    "notes": "Self-contained Godot project. Save system uses JSON files (user://save.dat). No external dependencies."
+  },
+  "conventions": {
+    "linter": null,
+    "formatter": null,
+    "testing": "manual",
+    "testing_tools": ["AutoBot (F1)", "UITester (F2)", "Test Zone (test_zone.tscn)"],
+    "code_style": {
+      "section_headers": "# =============================================================================",
+      "constants": "ALL_CAPS with type annotations and ## doc comments",
+      "null_safety": "is_instance_valid() for nodes, guard clauses with early return",
+      "signals": "Events autoload signal bus, past-tense naming (player_damaged)",
+      "preloading": "const ClassName = preload('res://path/to/script.gd')",
+      "logging": "DebugLogger autoload with category-based filtering"
+    }
+  },
+  "architecture": {
+    "pattern": "Component-based with autoload singletons, state machines, and signal bus",
+    "autoloads": [
+      "DebugLogger", "Events", "ItemDatabase", "EquipmentDatabase",
+      "CompanionData", "GameManager", "AudioManager", "EffectsManager",
+      "AutoBot", "SaveManager", "AudioDebug", "UITester", "RingMenu",
+      "ShopCatalog", "ShopUI"
+    ],
+    "key_directories": {
+      "autoloads/": "Global singleton managers (8 GDScript files)",
+      "characters/": "Player, companions, enemies, NPCs with state machines",
+      "components/": "Reusable systems: health, hitbox, hurtbox, guard, state_machine, effects",
+      "systems/": "Game systems: inventory, equipment, party, shop",
+      "ui/": "HUD, menus, ring menu, shop UI",
+      "world/": "Zone definitions and level management"
+    },
+    "total_files": 116,
+    "total_loc": 20652
+  },
+  "project_state": {
+    "version": "v1.6",
+    "milestone": "Visual Polish",
+    "current_phase": 32,
+    "next_phases": "33-35 (Sprite Integration)"
+  }
+}

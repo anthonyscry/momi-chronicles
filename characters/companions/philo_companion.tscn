@@ -1,25 +1,107 @@
-[gd_scene load_steps=5 format=3 uid="uid://cphilocomp001"]
+[gd_scene load_steps=2 format=3 uid="uid://cphilocomp001"]
 
 [ext_resource type="Script" path="res://characters/companions/philo_companion.gd" id="1_comp"]
-[ext_resource type="Script" path="res://systems/party/companion_ai.gd" id="2_ai"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
-radius = 5.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 9.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 6.0
-
-[node name="PhiloCompanion" type="CharacterBody2D"]
+[node name="PhiloCompanion" type="CharacterBody2D" groups=["player"]]
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("1_comp")
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.3, 0.3, 0.35, 1)
-polygon = PackedVector2Array(-7, -7, 7, -7, 7, 7, -7, 7)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+centered = true
+sprite_frames = SubResource("SpriteFrames_philo")
+speed_scale = 1.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_philo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_idle.png"
+}],
+"loop": false,
+"name": &"idle",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_walk.png"
+}],
+"loop": false,
+"name": &"walk",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_attack.png"
+}],
+"loop": false,
+"name": &"attack",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_lazy.png"
+}],
+"loop": false,
+"name": &"lazy",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_motivated.png"
+}],
+"loop": false,
+"name": &"motivated",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_motivated_run.png"
+}],
+"loop": false,
+"name": &"motivated_run",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_hurt.png"
+}],
+"loop": false,
+"name": &"hurt",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_death.png"
+}],
+"loop": false,
+"name": &"death",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_bark.png"
+}],
+"loop": false,
+"name": &"bark",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_jealous.png"
+}],
+"loop": false,
+"name": &"jealous",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/philo_happy.png"
+}],
+"loop": false,
+"name": &"happy",
+"speed_scale": 1.0
+}]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_companion")
@@ -42,3 +124,12 @@ shape = SubResource("CircleShape2D_hurtbox")
 
 [node name="CompanionAI" type="Node" parent="."]
 script = ExtResource("2_ai")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
+radius = 5.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 6.0

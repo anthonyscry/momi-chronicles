@@ -36,44 +36,6 @@ func _ready() -> void:
 	# Larger crow (1.5x scale)
 	if sprite:
 		sprite.scale = Vector2(1.5, 1.5)
-		sprite.color = Color(0.1, 0.08, 0.15)  # Very dark purple-black
-	
-	_setup_matriarch_appearance()
-
-# =============================================================================
-# APPEARANCE
-# =============================================================================
-
-func _setup_matriarch_appearance() -> void:
-	if not sprite:
-		return
-	
-	# Feathered crest on top
-	var crest = Polygon2D.new()
-	crest.polygon = PackedVector2Array([
-		Vector2(-2, -8),
-		Vector2(0, -14),
-		Vector2(2, -8),
-		Vector2(1, -11),
-		Vector2(-1, -11),
-	])
-	crest.color = Color(0.2, 0.15, 0.3)  # Dark purple crest
-	sprite.add_child(crest)
-	
-	# Glowing red eyes
-	var left_eye = Polygon2D.new()
-	left_eye.polygon = PackedVector2Array([
-		Vector2(-3, -2), Vector2(-2, -3), Vector2(-1, -2), Vector2(-2, -1)
-	])
-	left_eye.color = Color(1.0, 0.3, 0.2)  # Glowing red
-	sprite.add_child(left_eye)
-	
-	var right_eye = Polygon2D.new()
-	right_eye.polygon = PackedVector2Array([
-		Vector2(1, -2), Vector2(2, -3), Vector2(3, -2), Vector2(2, -1)
-	])
-	right_eye.color = Color(1.0, 0.3, 0.2)
-	sprite.add_child(right_eye)
 
 # =============================================================================
 # DROPS

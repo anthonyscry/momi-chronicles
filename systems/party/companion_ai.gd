@@ -101,7 +101,7 @@ func _update_target() -> void:
 		return
 	
 	# Find closest enemy
-	var enemies = owner_node.get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	var closest: Node2D = null
 	var closest_dist: float = INF
 	

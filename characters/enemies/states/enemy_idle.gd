@@ -12,7 +12,8 @@ var spawn_position: Vector2 = Vector2.ZERO
 func enter() -> void:
 	player.velocity = Vector2.ZERO
 	idle_timer = 0.0
-	# Remember spawn position for wandering
+	if player.sprite:
+		player.sprite.play("idle")
 	if spawn_position == Vector2.ZERO:
 		spawn_position = player.global_position
 

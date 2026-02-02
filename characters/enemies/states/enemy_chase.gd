@@ -8,7 +8,8 @@ const MIN_DISTANCE: float = 16.0
 const CIRCLE_DISTANCE: float = 24.0
 
 func enter() -> void:
-	pass
+	if player.sprite:
+		player.sprite.play("walk")
 
 func physics_update(delta: float) -> void:
 	# Can't act while stunned

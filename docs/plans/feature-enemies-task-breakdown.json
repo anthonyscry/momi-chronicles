@@ -1,0 +1,139 @@
+{
+  "feature": "enemies",
+  "short_name": "enemies",
+  "tasks": [
+    {
+      "id": "EN-1",
+      "title": "Locate rooftop spawner integration point",
+      "description": "Find the actual rooftop spawner scene or script and the entry point that instantiates enemies.",
+      "files": [
+        "world/rooftop_spawners.gd",
+        "world/rooftops/*.tscn"
+      ],
+      "deps": [],
+      "tests": [
+        "manual: confirm gnome scene can be instantiated in rooftop context"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "EN-2",
+      "title": "Create gnome enemy script with stats and telegraph helpers",
+      "description": "Add gnome.gd extending EnemyBase with stationary stats and telegraph helper methods.",
+      "files": [
+        "characters/enemies/gnome.gd"
+      ],
+      "deps": ["EN-1"],
+      "tests": [
+        "manual: run gnome scene and confirm idle and telegraph mapping"
+      ],
+      "risk_level": "low"
+    },
+    {
+      "id": "EN-3",
+      "title": "Create gnome scene structure",
+      "description": "Build gnome.tscn with sprite, collision, detection area, telegraph node, and state machine.",
+      "files": [
+        "characters/enemies/gnome.tscn"
+      ],
+      "deps": ["EN-2"],
+      "tests": [
+        "manual: open gnome.tscn and verify node structure and collision layers"
+      ],
+      "risk_level": "low"
+    },
+    {
+      "id": "EN-4",
+      "title": "Implement gnome state scripts",
+      "description": "Create idle, telegraph, throw, cooldown, hurt, and death states using StateMachine patterns.",
+      "files": [
+        "characters/enemies/states/gnome_idle.gd",
+        "characters/enemies/states/gnome_telegraph.gd",
+        "characters/enemies/states/gnome_throw.gd",
+        "characters/enemies/states/gnome_cooldown.gd",
+        "characters/enemies/states/gnome_hurt.gd",
+        "characters/enemies/states/gnome_death.gd"
+      ],
+      "deps": ["EN-2", "EN-3"],
+      "tests": [
+        "manual: run gnome behavior cycle and verify state transitions"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "EN-5",
+      "title": "Implement gnome bomb projectile",
+      "description": "Add gnome_bomb.gd with arc trajectory, fuse, and AOE explosion; create gnome_bomb.tscn.",
+      "files": [
+        "characters/enemies/projectiles/gnome_bomb.gd",
+        "characters/enemies/projectiles/gnome_bomb.tscn"
+      ],
+      "deps": ["EN-2"],
+      "tests": [
+        "manual: verify bomb arc, fuse explosion, and AOE damage"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "EN-6",
+      "title": "Add gnome events signals",
+      "description": "Add gnome signal declarations to autoloads/events.gd and emit from states/projectile.",
+      "files": [
+        "autoloads/events.gd"
+      ],
+      "deps": ["EN-2", "EN-5"],
+      "tests": [
+        "manual: verify gnome signals fire in debug logs"
+      ],
+      "risk_level": "low"
+    },
+    {
+      "id": "EN-7",
+      "title": "Integrate gnome into rooftop spawners",
+      "description": "Add gnome scene instantiation to rooftop spawner or zone scene with fixed positions.",
+      "files": [
+        "world/rooftop_spawners.gd",
+        "world/rooftops/*.tscn"
+      ],
+      "deps": ["EN-1", "EN-3", "EN-6"],
+      "tests": [
+        "manual: confirm gnome spawns at expected rooftop positions"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "EN-8",
+      "title": "Add gnome sprite sheets and SpriteFrames",
+      "description": "Add gnome sprite sheets and configure SpriteFrames animations in gnome.tscn.",
+      "files": [
+        "art/generated/enemies/gnome_*.png",
+        "characters/enemies/gnome.tscn"
+      ],
+      "deps": ["EN-3"],
+      "tests": [
+        "manual: verify gnome animations play correctly"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "EN-9",
+      "title": "Add test scene and verification notes",
+      "description": "Add or update a test scene and document manual verification steps for gnome behaviors.",
+      "files": [
+        "tests/test_enemy.tscn",
+        "tests/test_enemy.gd",
+        "tests/README_TEST_ENEMY.md"
+      ],
+      "deps": ["EN-7", "EN-8"],
+      "tests": [
+        "headless: godot --headless tests/test_enemy.tscn",
+        "manual: rooftop encounter checklist"
+      ],
+      "risk_level": "low"
+    }
+  ],
+  "notes": [
+    "Use EnemyBase and StateMachine patterns for all behavior.",
+    "Confirm DamageEvent availability or adjust damage application if missing."
+  ]
+}

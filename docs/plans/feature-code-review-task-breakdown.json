@@ -1,0 +1,117 @@
+{
+  "feature": "code-review",
+  "short_name": "code-review",
+  "tasks": [
+    {
+      "id": "CR-1",
+      "title": "Create review findings and baseline docs",
+      "description": "Document performance hotspots, modularization targets, UI audit, and test gaps.",
+      "files": [
+        "docs/review/code-review-findings.md",
+        "docs/review/perf-baseline.md",
+        "docs/review/ui-audit.md",
+        "docs/review/testing-gap-analysis.md"
+      ],
+      "deps": [],
+      "tests": [
+        "manual: review findings with maintainers"
+      ],
+      "risk_level": "low"
+    },
+    {
+      "id": "CR-2",
+      "title": "Resolve merge artifacts and duplicate logic",
+      "description": "Normalize SaveManager/GameManager/Events to a single authoritative implementation and remove merge separators.",
+      "files": [
+        "autoloads/save_manager.gd",
+        "autoloads/game_manager.gd",
+        "autoloads/events.gd"
+      ],
+      "deps": ["CR-1"],
+      "tests": [
+        "manual: run core scenes and check console for errors",
+        "manual: save/load cycle"
+      ],
+      "risk_level": "high"
+    },
+    {
+      "id": "CR-3",
+      "title": "Add EntityRegistry and cache group lookups",
+      "description": "Introduce EntityRegistry autoload to avoid repeated get_nodes_in_group calls in hot paths.",
+      "files": [
+        "autoloads/entity_registry.gd",
+        "project.godot",
+        "characters/player/player.gd",
+        "autoloads/audio_manager.gd",
+        "autoloads/effects_manager.gd",
+        "autoloads/auto_bot.gd",
+        "systems/party/companion_ai.gd",
+        "characters/enemies/enemy_base.gd",
+        "components/health/health_pickup.gd",
+        "components/pickup/coin_pickup.gd",
+        "characters/enemies/projectiles/gnome_bomb.gd"
+      ],
+      "deps": ["CR-1"],
+      "tests": [
+        "manual: spawn enemies and verify registry counts",
+        "manual: run combat and check no null references"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "CR-4",
+      "title": "Modularize combat damage helpers",
+      "description": "Add shared damage context/util helpers and update projectile/attack code to use them.",
+      "files": [
+        "components/combat/damage_context.gd",
+        "components/combat/damage_utils.gd",
+        "characters/enemies/states/pigeon_swoop_attack.gd",
+        "characters/enemies/projectiles/gnome_bomb.gd"
+      ],
+      "deps": ["CR-1"],
+      "tests": [
+        "manual: verify player damage from swoop and bombs"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "CR-5",
+      "title": "Expand E2E testing coverage",
+      "description": "Add headless E2E runner and expand UITester scenarios to cover UI and workflow edge cases.",
+      "files": [
+        "autoloads/ui_tester.gd",
+        "tests/e2e_full_suite.gd",
+        "tests/e2e_full_suite.tscn",
+        "tests/E2E_VERIFICATION_GUIDE.md",
+        "tests/run_tests.sh",
+        "tests/run_tests.bat"
+      ],
+      "deps": ["CR-2", "CR-3"],
+      "tests": [
+        "headless: godot --headless tests/e2e_full_suite.tscn",
+        "manual: review E2E report output"
+      ],
+      "risk_level": "medium"
+    },
+    {
+      "id": "CR-6",
+      "title": "Workflow and UI optimization",
+      "description": "Add workflow scripts and reduce per-frame UI allocations; apply HUD theme resource.",
+      "files": [
+        "scripts/run_e2e.sh",
+        "scripts/run_e2e.bat",
+        "tests/README.md",
+        "ui/themes/hud_theme.tres",
+        "ui/hud/game_hud.tscn",
+        "ui/hud/coin_counter.gd",
+        "ui/hud/combo_counter.gd"
+      ],
+      "deps": ["CR-3"],
+      "tests": [
+        "manual: verify HUD visual parity",
+        "manual: observe combo/coin animations"
+      ],
+      "risk_level": "medium"
+    }
+  ]
+}

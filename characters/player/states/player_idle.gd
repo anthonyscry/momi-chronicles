@@ -9,6 +9,8 @@ const CHARGE_THRESHOLD: float = 0.25  # Hold this long to start charging
 func enter() -> void:
 	player.velocity = Vector2.ZERO
 	attack_hold_time = 0.0
+	if player.sprite:
+		player.sprite.play("idle")
 
 func physics_update(delta: float) -> void:
 	# Check for bot actions first

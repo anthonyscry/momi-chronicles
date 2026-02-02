@@ -190,6 +190,16 @@ func run_all_tests() -> void:
 	var s5_passed = await test_scenario_new_features()
 	test_results.append({"scenario": "New Features Smoke", "passed": s5_passed})
 	log_test("SCENARIO RESULT: New Features Smoke - " + ("PASS" if s5_passed else "FAIL"))
+
+	# Scenario 6: Ring Menu Flow
+	var s6_passed = await test_scenario_ring_menu()
+	test_results.append({"scenario": "Ring Menu Flow", "passed": s6_passed})
+	log_test("SCENARIO RESULT: Ring Menu Flow - " + ("PASS" if s6_passed else "FAIL"))
+
+	# Scenario 7: Save/Load Smoke Test
+	var s7_passed = await test_scenario_save_load_smoke()
+	test_results.append({"scenario": "Save/Load Smoke", "passed": s7_passed})
+	log_test("SCENARIO RESULT: Save/Load Smoke - " + ("PASS" if s7_passed else "FAIL"))
 	
 	# Print final summary
 	print_test_summary()
@@ -1125,6 +1135,90 @@ func test_scenario_new_features() -> bool:
 		log_test("INFO: SaveManager not available for direct testing")
 	
 	log_scenario_end("New Features Smoke Test", scenario_passed, scenario_failed)
+	return all_passed
+
+
+## Scenario 6: Ring Menu Flow
+## Tests ring menu open/close and visibility state
+func test_scenario_ring_menu() -> bool:
+	log_scenario_start("Ring Menu Flow")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+
+	var ring_menu = RingMenu if is_instance_valid(RingMenu) else null
+	if not ring_menu:
+		log_failure("Ring Menu", "RingMenu autoload not found")
+		failed_count += 1
+		return false
+
+	# Open ring menu
+	ring_menu.open_menu()
+	await get_tree().create_timer(0.3).timeout
+	var open_visible = ring_menu.visible and ring_menu.is_open
+	log_check("VISIBLE: Ring menu open", str(open_visible), "true", open_visible)
+	if open_visible:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+		await capture_screenshot("ring_menu_not_open")
+
+	# Close ring menu
+	ring_menu.close_menu()
+	await get_tree().create_timer(0.3).timeout
+	var closed = (not ring_menu.visible) and (not ring_menu.is_open)
+	log_check("VISIBLE: Ring menu closed", str(closed), "true", closed)
+	if closed:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+		await capture_screenshot("ring_menu_not_closed")
+
+	log_scenario_end("Ring Menu Flow", scenario_passed, scenario_failed)
+	return all_passed
+
+
+## Scenario 7: Save/Load Smoke Test
+## Verifies save and load return success
+func test_scenario_save_load_smoke() -> bool:
+	log_scenario_start("Save/Load Smoke")
+	var all_passed = true
+	var scenario_passed = 0
+	var scenario_failed = 0
+
+	if not is_instance_valid(SaveManager):
+		log_failure("Save/Load", "SaveManager autoload not found")
+		failed_count += 1
+		return false
+
+	var save_ok = SaveManager.save_game()
+	log_check("FUNC: SaveManager.save_game()", str(save_ok), "true", save_ok)
+	if save_ok:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+
+	await get_tree().create_timer(0.5).timeout
+	var load_ok = SaveManager.load_game()
+	log_check("FUNC: SaveManager.load_game()", str(load_ok), "true", load_ok)
+	if load_ok:
+		passed_count += 1
+		scenario_passed += 1
+	else:
+		failed_count += 1
+		scenario_failed += 1
+		all_passed = false
+
+	log_scenario_end("Save/Load Smoke", scenario_passed, scenario_failed)
 	return all_passed
 
 

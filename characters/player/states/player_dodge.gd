@@ -23,18 +23,22 @@ func enter() -> void:
 	
 	dodge_direction = dodge_direction.normalized()
 	
+	# Play dodge animation
+	if player.sprite:
+		player.sprite.play("dodge")
+	
 	if player.hurtbox:
 		player.hurtbox.start_invincibility(INVINCIBILITY_DURATION)
 	
 	if player.sprite:
-		player.sprite.color.a = 0.5
+		player.sprite.modulate.a = 0.5
 	
 	# Emit dodge event for audio
 	Events.player_dodged.emit()
 
 func exit() -> void:
 	if player.sprite:
-		player.sprite.color.a = 1.0
+		player.sprite.modulate.a = 1.0
 
 func physics_update(delta: float) -> void:
 	dodge_timer += delta

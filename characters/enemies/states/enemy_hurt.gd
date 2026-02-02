@@ -7,14 +7,12 @@ var hurt_timer: float = 0.0
 
 func enter() -> void:
 	hurt_timer = 0.0
-	
-	# Flash effect
+	if player.sprite:
+		player.sprite.play("hurt")
 	player.flash_damage()
 	
-	# Visual stagger - quick squash/stretch and shake
 	_apply_hit_stagger()
 	
-	# Brief invincibility
 	if player.hurtbox:
 		player.hurtbox.start_invincibility(0.3)
 

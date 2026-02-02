@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2l8y3d4n5p6q"]
+
+[ext_resource type="Script" path="res://entities/npc/npc_base.gd" id="1_npc_base"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interaction"]
+radius = 32.0
+
+[node name="NPCBase" type="CharacterBody2D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_npc_base")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("CircleShape2D_interaction")
+debug_color = Color(0, 0.6, 0.7, 0.42)

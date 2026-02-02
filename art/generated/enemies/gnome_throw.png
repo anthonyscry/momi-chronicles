@@ -1,0 +1,13 @@
+# Garden Gnome Throw Sprite Placeholder
+
+## Required: gnome_throw.png (32x32, 4 frames)
+
+**Animation:** 4 frames, 0.15s each
+**Content:** Arm motion throwing bomb
+**Frame breakdown:**
+- Frame 0: Arm down
+- Frame 1: Arm back (wind up)
+- Frame 2: Arm forward (release point)
+- Frame 3: Arm returning to side
+
+**Action:** Throwing explosive bomb toward player

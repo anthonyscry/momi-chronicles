@@ -10,7 +10,7 @@ A 3/4 perspective pixel art action RPG. Momi the French Bulldog leads the Bulldo
 | **Perspective** | 3/4 top-down (Stardew Valley style) |
 | **Rendering** | Nearest-neighbor filtering (pixel-perfect) |
 | **Current Milestone** | v1.6 Visual Polish — replacing placeholder shapes with pixel art |
-| **Planning Docs** | `.planning/PROJECT.md`, `.planning/STATE.md`, `.planning/ROADMAP.md` |
+| **Docs** | `docs/PROJECT.md`, `docs/STATE.md`, `docs/ROADMAP.md` |
 
 ---
 
@@ -19,20 +19,27 @@ A 3/4 perspective pixel art action RPG. Momi the French Bulldog leads the Bulldo
 ### Key Paths
 
 ```
-prod/                          # Game source code root
-├── autoloads/                 # Global singletons (Events, GameManager, etc.)
-├── entities/player/           # Player scene, states, components
-├── entities/enemies/          # Enemy scenes and AI
-├── entities/companions/       # Cinnamon, Philo
-├── systems/                   # Inventory, equipment, party, shop, save
-├── ui/                        # HUD, ring menu, shop UI, menus
-├── zones/                     # Neighborhood, Backyard, Sewers, Boss Arena
-└── components/                # Reusable: HitboxComponent, HealthComponent, etc.
 project.godot                  # Engine config, autoloads, input map, layers
-.planning/config.json          # GSD workflow settings (source of truth)
-.planning/STATE.md             # Project state, decisions, session continuity
-.planning/ROADMAP.md           # Phase breakdown with milestones
-.auto-claude/specs/            # Auto-Claude task specs and plans
+├── autoloads/                 # Global singletons (Events, GameManager, etc.)
+├── characters/                # Player, enemies, NPCs, companions
+│   ├── player/
+│   ├── enemies/
+│   ├── npcs/
+│   └── companions/
+├── components/                # Reusable: HitboxComponent, HealthComponent, etc.
+├── systems/                   # Inventory, equipment, party, shop, dialogue, etc.
+├── ui/                        # HUD, ring menu, shop UI, menus, dialogue, etc.
+├── world/                     # Zones: Neighborhood, Backyard, Sewers, Boss Arena
+├── resources/                 # Static data: dialogue JSONs, etc.
+├── art/                       # Art assets, prompts, generated images
+│   ├── generated/             # AI-generated sprites
+│   └── reference/
+├── assets/                    # Raw assets: audio, tiles
+├── lib/                       # Build tools and utilities
+├── tests/                     # E2E tests, test scenes
+├── build/                     # Build output
+├── docs/                      # Project documentation
+└── .auto-claude/              # Auto-Claude specs and configs
 ```
 
 ### Commands
@@ -66,10 +73,10 @@ godot --path .                 # Run the game
 
 ## GSD Settings
 
-GSD (Get Shit Done) workflow settings live in `.planning/config.json`. These settings are
+GSD (Get Shit Done) workflow settings live in `docs/config.json`. These settings are
 the **source of truth** for how agents should behave when working on this project.
 
-**Current values** (read `.planning/config.json` to verify):
+**Current values** (read `docs/config.json` to verify):
 
 | Setting | Value | Meaning |
 |---------|-------|---------|
@@ -95,7 +102,7 @@ the **source of truth** for how agents should behave when working on this projec
 ## GSD ↔ Auto-Claude Settings Mapping
 
 When configuring Auto-Claude `task_metadata.json` for new tasks, derive values from
-`.planning/config.json` using this mapping:
+`docs/config.json` using this mapping:
 
 | GSD Setting | Auto-Claude Equivalent | Behavior |
 |-------------|----------------------|----------|
@@ -112,7 +119,7 @@ When configuring Auto-Claude `task_metadata.json` for new tasks, derive values f
 | `workflow.verifier: true` | QA phase enabled (qa_reviewer + qa_fixer) | Post-implementation verification loop |
 | `git.branching_strategy: "none"` | `baseBranch: "master"`, commits directly | No feature branches created |
 
-> **Note:** Auto-Claude does NOT programmatically read `.planning/config.json`. This
+> **Note:** Auto-Claude does NOT programmatically read `docs/config.json`. This
 > mapping is enforced through CLAUDE.md instructions (loaded into every agent session)
 > and by manually setting `task_metadata.json` values to match the GSD profile.
 
@@ -240,7 +247,7 @@ Entity (CharacterBody2D)
 - **Build UI programmatically** in `_ready()` — match the ring menu pattern
 - **Use `.get()` with defaults** when reading save data — backward compatibility
 - **Verify your work** — run the game, check for errors, test the change
-- **Read `.planning/config.json`** before starting — know the current GSD settings
+- **Read `docs/config.json`** before starting — know the current GSD settings
 
 ### DON'T / NEVER
 
@@ -250,7 +257,7 @@ Entity (CharacterBody2D)
 - **NEVER reference autoloads directly from components** — use signals or dependency injection
 - **NEVER use uncached `load()` during gameplay** — preload or cache at init
 - **NEVER modify `.auto-claude/.env`** or existing `task_metadata.json` files directly
-- **NEVER modify `.planning/ROADMAP.md`** or `.planning/STATE.md` without explicit instruction
+- **NEVER modify `docs/ROADMAP.md`** or `docs/STATE.md` without explicit instruction
 - **NEVER auto-commit** — `git.auto_commit` is `false`; wait for instructions
 - **NEVER create deep inheritance hierarchies** — use composition
 - **NEVER add game logic to autoloads** — autoloads are for coordination, not behavior

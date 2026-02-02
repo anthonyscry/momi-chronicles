@@ -7,6 +7,8 @@ var death_timer: float = 0.0
 func enter() -> void:
 	player.velocity = Vector2.ZERO
 	death_timer = 0.0
+	if player.sprite:
+		player.sprite.play("death")
 	
 	if player.hitbox:
 		player.hitbox.disable()
@@ -24,4 +26,4 @@ func physics_update(delta: float) -> void:
 func _fade_out() -> void:
 	if player.sprite:
 		var tween = player.create_tween()
-		tween.tween_property(player.sprite, "color:a", 0.0, DEATH_DURATION)
+		tween.tween_property(player.sprite, "modulate:a", 0.0, DEATH_DURATION)

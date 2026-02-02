@@ -1,0 +1,11 @@
+# Garden Gnome Death Sprite Placeholder
+
+## Required: gnome_death.png (32x32, 4 frames)
+
+**Animation:** 4 frames, 0.2s each
+**Content:** Death animation
+**Frame breakdown:**
+- Frames 0-1: Tip over (rotation + position shift)
+- Frames 2-3: Fade out (alpha reduction)
+
+**Visual effect:** Falling over and fading out

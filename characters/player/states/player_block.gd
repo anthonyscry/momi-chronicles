@@ -27,9 +27,13 @@ func enter() -> void:
 	player.guard.start_blocking()
 	player.velocity = Vector2.ZERO
 	
+	# Play block animation
+	if player.sprite:
+		player.sprite.play("block")
+	
 	# Visual: darken sprite slightly to show blocking stance
 	if player.sprite:
-		player.sprite.color = Color(0.7, 0.7, 0.8, 1.0)
+		player.sprite.modulate = Color(0.7, 0.7, 0.8, 1.0)
 	
 	Events.player_block_started.emit()
 
@@ -37,9 +41,9 @@ func exit() -> void:
 	if player.guard:
 		player.guard.stop_blocking()
 	
-	# Restore sprite color (original tan color)
+	# Restore sprite modulate
 	if player.sprite:
-		player.sprite.color = Color(0.85, 0.7, 0.45, 1.0)
+		player.sprite.modulate = Color.WHITE
 	
 	Events.player_block_ended.emit()
 

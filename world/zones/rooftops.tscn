@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://world/zones/rooftops.gd" id="1_rooftops"]
+[ext_resource type="PackedScene" uid="uid://c1kpwx5v8mh5r" path="res://characters/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://dkp7q2m8x5w1r" path="res://ui/hud/game_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://cxr7k3m2p5w8q" path="res://ui/menus/pause_menu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" uid="uid://bm5qk2p8x1w7r" path="res://ui/menus/game_over.tscn" id="5_game_over"]
+
+[node name="Rooftops" type="Node2D"]
+script = ExtResource("1_rooftops")
+zone_size = Vector2(1200, 700)
+zone_id = "rooftops"
+player_spawn = Vector2(60, 460)
+
+;; ============================================================================
+;; PLAYER
+;; ============================================================================
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(60, 460)
+
+;; ============================================================================
+;; CONTAINERS (populated programmatically by rooftops.gd)
+;; ============================================================================
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="ZoneExits" type="Node2D" parent="."]
+
+;; ============================================================================
+;; UI
+;; ============================================================================
+
+[node name="UI" type="Node" parent="."]
+
+[node name="GameHUD" parent="UI" instance=ExtResource("3_hud")]
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("4_pause")]
+
+[node name="GameOver" parent="UI" instance=ExtResource("5_game_over")]

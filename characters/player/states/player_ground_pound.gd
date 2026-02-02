@@ -81,6 +81,10 @@ func enter() -> void:
 	phase_timer = 0.0
 	original_y = player.global_position.y
 	
+	# Play ground pound animation
+	if player.sprite:
+		player.sprite.play("ground_pound")
+	
 	# Start jump animation
 	_start_jump()
 	

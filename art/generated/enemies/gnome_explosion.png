@@ -1,0 +1,19 @@
+# Gnome Explosion Sprite Placeholder
+
+## Required: gnome_explosion.png (64x64, 8 frames)
+
+**Animation:** 8 frames, 0.08s each
+**Content:** Orange/red explosion expanding
+**Frame breakdown:**
+- Frames 0-2: Small spark expanding outward
+- Frames 3-5: Full blast, brightest point
+- Frames 6-8: Fading, smoke effect
+
+**Visual effect:** Expanding explosion blast
+**AOE Radius:** 64 pixels
+
+**Style:**
+- Orange explosion with yellow core
+- Expanding blast radius
+- Fading smoke effect
+- 64x64 canvas for full explosion

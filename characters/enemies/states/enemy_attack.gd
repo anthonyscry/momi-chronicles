@@ -17,21 +17,18 @@ func enter() -> void:
 	player.velocity = Vector2.ZERO
 	attack_timer = 0.0
 	hitbox_active = false
-	
-	# Face the target
+	if player.sprite:
+		player.sprite.play("attack")
 	if player.target:
 		var direction = player.get_direction_to_target()
 		player.update_facing(direction)
 		_position_hitbox(direction)
 	
-	# Reset hitbox
 	if player.hitbox:
 		player.hitbox.reset()
 	
-	# Start cooldown
 	player.start_attack_cooldown()
 	
-	# Telegraph: visual warning before attack
 	_show_telegraph()
 
 func exit() -> void:

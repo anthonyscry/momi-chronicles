@@ -12,8 +12,21 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-REM Run the test scene
+REM Run tutorial persistence tests
 godot --headless tests/test_tutorial_persistence.tscn
+
+set EXIT_CODE=%ERRORLEVEL%
+
+if %EXIT_CODE% NEQ 0 (
+    echo.
+    echo Tutorial tests failed with exit code: %EXIT_CODE%
+    exit /b %EXIT_CODE%
+)
+
+REM Run E2E full suite
+echo.
+echo Running E2E Full Suite...
+godot --headless tests/e2e_full_suite.tscn
 
 set EXIT_CODE=%ERRORLEVEL%
 

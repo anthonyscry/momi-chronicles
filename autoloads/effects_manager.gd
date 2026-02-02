@@ -1832,7 +1832,7 @@ func _create_damage_direction_indicator(player_node: Node2D) -> void:
 	var nearest_enemy: Node2D = null
 	var nearest_dist: float = INF
 
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in EntityRegistry.get_enemies():
 		if not is_instance_valid(enemy) or not enemy is Node2D:
 			continue
 		var dist = player_node.global_position.distance_to(enemy.global_position)

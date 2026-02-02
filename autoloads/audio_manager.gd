@@ -555,7 +555,7 @@ func _update_dynamic_music() -> void:
 		player_health_percent = health.get_health_percent()
 
 	# Count enemies
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	total_enemy_count = 0
 	nearby_enemy_count = 0
 
@@ -885,7 +885,7 @@ func _on_enemy_defeated(_enemy: Node) -> void:
 
 	# Check if all enemies defeated
 	await get_tree().process_frame  # Wait a frame for enemy to be removed
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	var living = 0
 	for e in enemies:
 		if is_instance_valid(e) and e.has_method("is_alive") and e.is_alive():

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momi's Adventure — Sprite Batch Comparison</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #f7c948;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .controls button {
+    padding: 8px 16px;
+    border: 1px solid #444;
+    background: #2a2a4a;
+    color: #eee;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .controls button:hover { background: #3a3a6a; }
+  .controls button.active {
+    background: #f7c948;
+    color: #1a1a2e;
+    border-color: #f7c948;
+    font-weight: bold;
+  }
+  .zoom-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .zoom-controls label { color: #888; font-size: 13px; }
+  .zoom-controls input[type=range] { width: 200px; }
+  .zoom-controls span { color: #f7c948; font-size: 13px; min-width: 40px; }
+  .bg-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .bg-toggle button {
+    padding: 6px 12px;
+    border: 1px solid #444;
+    background: #2a2a4a;
+    color: #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .bg-toggle button.active { background: #555; border-color: #888; }
+
+  .category-header {
+    font-size: 20px;
+    color: #f7c948;
+    border-bottom: 2px solid #333;
+    padding-bottom: 8px;
+    margin: 32px 0 16px 0;
+  }
+
+  .sprite-group {
+    margin-bottom: 32px;
+    background: #222244;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #333;
+  }
+  .sprite-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ccc;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sprite-name .id-tag {
+    font-size: 11px;
+    background: #3a3a5a;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #999;
+    font-weight: normal;
+  }
+
+  .batch-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .batch-cell {
+    text-align: center;
+    position: relative;
+  }
+  .batch-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 6px;
+    font-weight: bold;
+  }
+  .batch-cell img {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    image-rendering: auto;
+  }
+  .batch-cell img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(247, 201, 72, 0.3);
+  }
+  .batch-cell img.selected {
+    outline: 3px solid #4ade80;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+  }
+  .batch-cell .pick-btn {
+    display: block;
+    margin: 6px auto 0;
+    padding: 4px 12px;
+    font-size: 11px;
+    background: #2a2a4a;
+    color: #aaa;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .batch-cell .pick-btn:hover { background: #3a3a6a; color: #eee; }
+  .batch-cell .pick-btn.picked {
+    background: #166534;
+    color: #4ade80;
+    border-color: #4ade80;
+  }
+
+  .bg-white img { background: #ffffff; }
+  .bg-checker img {
+    background-image:
+      linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  }
+  .bg-dark img { background: #1a1a1a; }
+  .bg-green img { background: #2d5a1e; }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 95vh;
+    image-rendering: pixelated;
+    border-radius: 8px;
+  }
+  .lightbox .lb-label {
+    position: absolute;
+    bottom: 20px;
+    color: #f7c948;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+
+  /* Export panel */
+  .export-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #16213e;
+    border-top: 2px solid #f7c948;
+    padding: 12px 20px;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 500;
+  }
+  .export-panel.show { display: flex; }
+  .export-panel .count { color: #f7c948; font-weight: bold; }
+  .export-panel button {
+    padding: 8px 20px;
+    background: #f7c948;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .export-panel button:hover { background: #fde68a; }
+  .export-panel .clear-btn {
+    background: transparent;
+    color: #888;
+    border: 1px solid #444;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .batch-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<h1>🐾 Momi's Adventure — Sprite Comparison</h1>
+<p class="subtitle">Click an image to zoom. Click ✓ Pick to select your favorite from each row. Export picks when done.</p>
+
+<div class="controls" id="categoryFilters"></div>
+
+<div class="bg-toggle">
+  <span style="color:#888;font-size:12px;">Background:</span>
+  <button onclick="setBg('white')" class="active" id="bg-white">White</button>
+  <button onclick="setBg('checker')" id="bg-checker">Checker</button>
+  <button onclick="setBg('dark')" id="bg-dark">Dark</button>
+  <button onclick="setBg('green')" id="bg-green">Grass</button>
+</div>
+
+<div id="spriteGrid"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lb-img" src="" alt="">
+  <div class="lb-label" id="lb-label"></div>
+</div>
+
+<!-- Export panel -->
+<div class="export-panel" id="exportPanel">
+  <div>
+    <span class="count" id="pickCount">0</span> / <span id="pickTotal">0</span> sprites picked
+  </div>
+  <div>
+    <button onclick="exportPicks()">📋 Copy Pick List</button>
+    <button onclick="exportScript()">⚡ Copy Move Script</button>
+    <button class="clear-btn" onclick="clearPicks()">Clear All</button>
+  </div>
+</div>
+
+<script>
+const BATCHES = ['batch_1', 'batch_2', 'batch_3', 'batch_4'];
+
+const SPRITES = {
+  characters: [
+    'momi_idle', 'momi_walk', 'momi_run', 'momi_chomp', 'momi_bark',
+    'momi_dig', 'momi_hurt', 'momi_death', 'momi_happy',
+    'cinnamon_idle', 'cinnamon_walk', 'cinnamon_overheat', 'cinnamon_slam',
+    'cinnamon_hurt', 'cinnamon_death', 'cinnamon_happy',
+    'philo_idle', 'philo_walk', 'philo_motivated_run', 'philo_bark',
+    'philo_jealous', 'philo_hurt', 'philo_death', 'philo_happy'
+  ],
+  enemies: [
+    'roomba_idle', 'roomba_attack',
+    'gnome_idle', 'gnome_attack',
+    'goose_idle', 'goose_attack',
+    'squirrel_idle', 'squirrel_attack'
+  ]
+};
+
+// Folder mapping for each category
+const FOLDER_MAP = { characters: 'characters', enemies: 'enemies' };
+
+const picks = {}; // spriteId -> batchName
+let currentBg = 'white';
+let activeCategory = 'all';
+
+function getFilename(category, sprite) {
+  if (category === 'tiles' && typeof sprite === 'object') return sprite.file + '.png';
+  return sprite + '.png';
+}
+function getSpriteId(category, sprite) {
+  if (typeof sprite === 'object') return sprite.id;
+  return sprite;
+}
+function getCharName(id) {
+  if (id.startsWith('momi_')) return 'Momi';
+  if (id.startsWith('cinnamon_')) return 'Cinnamon';
+  if (id.startsWith('philo_')) return 'Philo';
+  return '';
+}
+
+function buildGrid() {
+  const grid = document.getElementById('spriteGrid');
+  grid.innerHTML = '';
+
+  for (const [category, sprites] of Object.entries(SPRITES)) {
+    if (activeCategory !== 'all' && activeCategory !== category) continue;
+
+    const header = document.createElement('h2');
+    header.className = 'category-header';
+    header.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+    grid.appendChild(header);
+
+    const folder = FOLDER_MAP[category];
+
+    for (const sprite of sprites) {
+      const spriteId = getSpriteId(category, sprite);
+      const filename = getFilename(category, sprite);
+
+      const group = document.createElement('div');
+      group.className = `sprite-group bg-${currentBg}`;
+      group.dataset.category = category;
+
+      const charName = getCharName(spriteId);
+      const displayName = spriteId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+      group.innerHTML = `
+        <div class="sprite-name">
+          ${charName ? `<span style="color:#f7c948">${charName}</span> — ` : ''}${displayName}
+          <span class="id-tag">${spriteId}</span>
+        </div>
+        <div class="batch-row">
+          ${BATCHES.map((batch, i) => `
+            <div class="batch-cell">
+              <div class="batch-label">Batch ${i + 1}</div>
+              <img
+                src="${batch}/${folder}/${filename}"
+                alt="${spriteId} batch ${i + 1}"
+                class="${picks[spriteId] === batch ? 'selected' : ''}"
+                onclick="openLightbox('${batch}/${folder}/${filename}', '${displayName} — Batch ${i + 1}')"
+                onerror="this.style.opacity='0.2'; this.title='Missing'"
+              />
+              <button
+                class="pick-btn ${picks[spriteId] === batch ? 'picked' : ''}"
+                onclick="togglePick('${spriteId}', '${batch}', '${folder}', '${filename}', this)"
+              >${picks[spriteId] === batch ? '✓ Picked' : '✓ Pick'}</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(group);
+    }
+  }
+  updateExportPanel();
+}
+
+function togglePick(spriteId, batch, folder, filename, btn) {
+  // Deselect if clicking same
+  if (picks[spriteId] === batch) {
+    delete picks[spriteId];
+  } else {
+    picks[spriteId] = batch;
+    picks[spriteId + '__folder'] = folder;
+    picks[spriteId + '__file'] = filename;
+  }
+  buildGrid();
+}
+
+function setBg(bg) {
+  currentBg = bg;
+  document.querySelectorAll('.bg-toggle button').forEach(b => b.classList.remove('active'));
+  document.getElementById('bg-' + bg).classList.add('active');
+  document.querySelectorAll('.sprite-group').forEach(g => {
+    g.className = g.className.replace(/bg-\w+/, 'bg-' + bg);
+  });
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  document.querySelectorAll('#categoryFilters button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  buildGrid();
+}
+
+function openLightbox(src, label) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb-label').textContent = label;
+  lb.classList.add('show');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function updateExportPanel() {
+  const total = Object.values(SPRITES).reduce((a, s) => a + s.length, 0);
+  const picked = Object.keys(picks).filter(k => !k.includes('__')).length;
+  document.getElementById('pickCount').textContent = picked;
+  document.getElementById('pickTotal').textContent = total;
+  document.getElementById('exportPanel').classList.toggle('show', picked > 0);
+}
+
+function exportPicks() {
+  const lines = [];
+  for (const [key, batch] of Object.entries(picks)) {
+    if (key.includes('__')) continue;
+    const folder = picks[key + '__folder'];
+    const file = picks[key + '__file'];
+    lines.push(`${key}: ${batch}/${folder}/${file}`);
+  }
+  navigator.clipboard.writeText(lines.join('\n'));
+  alert(`Copied ${lines.length} picks to clipboard!`);
+}
+
+function exportScript() {
+  const lines = ['# PowerShell: Copy picked sprites to final folders', ''];
+  lines.push('$base = "C:\\Users\\major\\momi-chronicles\\art\\generated"');
+  lines.push('New-Item "$base\\characters" -ItemType Directory -Force | Out-Null');
+  lines.push('New-Item "$base\\enemies" -ItemType Directory -Force | Out-Null');
+  lines.push('');
+
+  for (const [key, batch] of Object.entries(picks)) {
+    if (key.includes('__')) continue;
+    const folder = picks[key + '__folder'];
+    const file = picks[key + '__file'];
+    lines.push(`Copy-Item "$base\\${batch}\\${folder}\\${file}" "$base\\${folder}\\${file}" -Force`);
+  }
+  lines.push('');
+  lines.push(`Write-Host "Done! Copied ${Object.keys(picks).filter(k => !k.includes('__')).length} sprites to final folders"`);
+
+  navigator.clipboard.writeText(lines.join('\n'));
+  alert('Copied PowerShell script to clipboard!\\nPaste into terminal to copy your picks.');
+}
+
+function clearPicks() {
+  for (const key of Object.keys(picks)) delete picks[key];
+  buildGrid();
+}
+
+// Build category filters
+const filtersEl = document.getElementById('categoryFilters');
+['all', 'characters', 'enemies'].forEach(cat => {
+  const btn = document.createElement('button');
+  btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+  btn.className = cat === 'all' ? 'active' : '';
+  btn.onclick = () => setCategory(cat);
+  filtersEl.appendChild(btn);
+});
+
+// Initial render
+buildGrid();
+</script>
+</body>
+</html>

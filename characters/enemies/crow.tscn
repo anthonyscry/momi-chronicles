@@ -26,14 +26,47 @@ size = Vector2(10, 8)
 radius = 6.0
 height = 14.0
 
-[node name="Crow" type="CharacterBody2D"]
-collision_layer = 4
-collision_mask = 0
-script = ExtResource("1_crow")
+[sub_resource type="SpriteFrames" id="SpriteFrames_crow"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/crow_idle.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/crow_dive.png"
+}],
+"loop": false,
+"name": &"attack"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/crow_idle.png"
+}],
+"loop": true,
+"name": &"walk"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/crow_idle.png"
+}],
+"loop": true,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/crow_idle.png"
+}],
+"loop": false,
+"name": &"death"
+}]
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.2, 0.15, 0.25, 1)
-polygon = PackedVector2Array(-6, -6, 6, -6, 6, 6, -6, 6)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_crow")
+centered = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)

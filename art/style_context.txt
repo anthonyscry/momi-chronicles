@@ -1,0 +1,36 @@
+[STYLE CONTEXT]
+This is for "Momi's Adventure," a 2D action RPG built in Godot 4. The aesthetic is warm SNES-era pixel art — imagine Earthbound's quirky charm blended with Studio Ghibli's heartfelt warmth. The game uses a 3/4 top-down perspective, where the camera looks down at roughly 30 degrees above horizontal, showing both the top and front of characters.
+
+Generate at high quality and native resolution. Do NOT try to create tiny pixel art — generate a clean, detailed illustration in pixel art style at full output resolution. The sprites will be downscaled to game resolution (32x32 characters, 16x16 items) in post-processing, which naturally produces crisp pixel edges.
+
+Use a consistent limited color palette with a clean 1px black outline around the entire silhouette of every sprite. Lighting is always consistent from the top-left.
+
+[RENDERING STYLE]
+- Outlines: Clean 1px black outline around the entire silhouette of each sprite. No broken or missing outline pixels.
+- Shading: Cel-shading with 2-3 value steps per color (base, shadow, highlight). No smooth gradients — distinct value bands only.
+- Fur Texture: Use stippling/dithering patterns for brindle and patterned fur. Alternate dark and light pixels in a scattered pattern to suggest mixed-color fur coats. This is especially important for Momi's brindle pattern and Cinnamon's black-and-tan markings.
+- Lighting: Consistent top-left light source on all sprites. Highlights land on the upper-left edges of forms. Shadows fall on the lower-right.
+- Readability: All silhouettes must read clearly at small sizes (32x32 and below). Expressive eyes are critical — they should be the focal point and convey personality even at thumbnail scale.
+
+All sprites must be on a pure white (#FFFFFF) background for easy extraction. Do NOT include ground shadows, gradients, scenery, speech bubbles, text labels, watermarks, or any elements outside the sprite boundary. Do NOT use anti-aliasing or soft gradients — keep edges sharp and pixel-clean.
+
+If generating animation frames, lay them out as a horizontal strip with evenly spaced frames, loop-ready so the last frame flows seamlessly back into the first.
+
+[ART DIRECTION]
+Characters should be expressive and readable even at small game sizes. Use natural language descriptions to convey personality and motion — not tag lists. Maintain consistent proportions, colors, and style across all sprites in the set. Items and equipment should be simple, iconic, and instantly recognizable. Effects should be bold and clear. Zone tiles should tile seamlessly where noted.
+
+[CHARACTER IDENTITY — MOMI]
+Momi is a 5-year-old female French Bulldog. Her coat is PRIMARILY BLACK with subtle dark brown brindle streaks mixed in — she is a DARK/BLACK dog, NOT a brown dog, NOT a light-colored dog. The black DOMINATES — at least 80% of her fur is BLACK. The dark brown brindle is barely visible subtle secondary striping, only noticeable up close. Use stippling/dithering to convey the brindle texture but keep the overall value DARK. Her face is ALL BLACK except for a small patch of white on her chin. She has a white tuxedo chest patch. She has BIG, round, adorable brown eyes — her most important feature. They should be large, shiny, and ultra-expressive with visible highlights/catchlights. Her eyes are what make her a cutie and they MUST stand out against the dark face as the clear focal point of every sprite. Think Puss in Boots level of cute, expressive eye energy. She has classic bat ears (dark, rounded), a compact sturdy body. TAIL: She has NO real tail — just a tiny crooked nub, like a little hatch that covers her butt. It's barely visible, just a small curved bump on her rear end. It is NOT a short tail — it's a stub/nub that barely protrudes. Do NOT draw any tail longer than a few pixels. No collar, no harness, no bandana, no accessories of ANY kind — she is completely unequipped by default. Do NOT add any clothing, gear, collars, scarves, or decorative items. She is fierce, startles easily, and loves with her whole body.
+COLOR CRITICAL: Momi MUST read as a BLACK dog from any distance. Her base fur color is near-black (#1a1a1a to #2a2a2a range). The brown brindle streaks are dark brown (#3a2a1a range), NOT medium or light brown. Do NOT make her look brown, tan, chocolate, or light-colored in any way. If the sprite looks brown overall, it is WRONG — darken it significantly. Her face is entirely black/dark — no tan, no light patches on forehead or cheeks. Only white on her face is the small chin patch. ABSOLUTELY NO accessories — no collar, no tags, no nothing.
+
+[CHARACTER IDENTITY — CINNAMON]
+Cinnamon is a female English Bulldog. She has black and tan coloring (dark base with tan points on her eyebrows, cheeks, legs, and chest), a white blaze on her face and chest, a wrinkly face with a pronounced underbite showing her bottom teeth, and a stocky tank build with a wide barrel chest and short bowed legs. TAIL: English Bulldogs have naturally short, stumpy tails — Cinnamon's is a short thick stub that hangs low. It is NOT a long tail, NOT curled up, just a short thick nub. No harness, no vest, no collar, no bandana, no accessories of ANY kind — she is completely unequipped by default. Do NOT add any clothing, gear, or decorative items. She's sassy and independent but fiercely loyal underneath.
+
+[CHARACTER IDENTITY — PHILO]
+Philo is a senior male Boston Terrier. He has a classic black and white tuxedo pattern, a grey muzzle showing his age, wise patient eyes, pointed ears (one often slightly more perked than the other), and a slim compact build. TAIL: Boston Terriers have naturally short tails — Philo's is a short nub, slightly longer than Momi's but still clearly a stub. It looks like it got cut off — just a few inches long, sticking straight out or slightly down. It is NOT a full-length tail. No bandana, no collar, no scarf, no accessories of ANY kind — he is completely unequipped by default. Do NOT add any clothing, gear, or decorative items. He's dignified and wise, but secretly mischievous about stealing toys.
+
+[ENEMY STYLE]
+Enemies should look mischievous and threatening but not gruesome — this is a lighthearted dog adventure game. They should have personality readable at small sizes and fit the suburban San Diego setting.
+
+[BOSS STYLE]
+Bosses are larger, more detailed versions of their enemy type. They should look imposing and powerful but still match the game's warm pixel art style.

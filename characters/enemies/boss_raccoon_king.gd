@@ -51,10 +51,6 @@ func _ready() -> void:
 		health.max_health = BOSS_MAX_HP
 		health.current_health = BOSS_MAX_HP
 	
-	# Boss is bigger - scale up
-	if sprite:
-		sprite.scale = Vector2(2.5, 2.5)
-	
 	# Customize appearance
 	_setup_boss_appearance()
 	
@@ -66,20 +62,8 @@ func _setup_boss_appearance() -> void:
 	if not sprite:
 		return
 	
-	# Darker, more menacing raccoon colors
-	sprite.color = Color(0.25, 0.22, 0.3)  # Dark purple-gray
-	
-	# Crown indicator (add yellow accent at top)
-	var crown = Polygon2D.new()
-	crown.polygon = PackedVector2Array([
-		Vector2(-4, -8),
-		Vector2(-2, -12),
-		Vector2(0, -9),
-		Vector2(2, -12),
-		Vector2(4, -8)
-	])
-	crown.color = Color(1, 0.85, 0.2)  # Gold
-	sprite.add_child(crown)
+	# Boss is bigger - scale up
+	sprite.scale = Vector2(2.5, 2.5)
 
 # =============================================================================
 # COMBAT AI
@@ -117,8 +101,9 @@ func _enter_enrage() -> void:
 	chase_speed = BOSS_SPEED * 2.5
 	attack_damage = BOSS_DAMAGE + 15  # 50 damage in enrage
 	
-	# Visual feedback
+	# Visual feedback - switch to enrage animation
 	if sprite:
+		sprite.play("idle_enrage")
 		sprite.modulate = Color(1.3, 0.8, 0.8)  # Red tint
 	
 	# Screen shake

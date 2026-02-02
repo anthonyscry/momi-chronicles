@@ -1,25 +1,83 @@
-[gd_scene load_steps=5 format=3 uid="uid://ccinnacomp001"]
+[gd_scene load_steps=2 format=3 uid="uid://ccinnacomp001"]
 
 [ext_resource type="Script" path="res://characters/companions/cinnamon_companion.gd" id="1_comp"]
-[ext_resource type="Script" path="res://systems/party/companion_ai.gd" id="2_ai"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
-radius = 7.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 11.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 8.0
-
-[node name="CinnamonCompanion" type="CharacterBody2D"]
+[node name="CinnamonCompanion" type="CharacterBody2D" groups=["player"]]
 collision_layer = 2
 collision_mask = 1
 script = ExtResource("1_comp")
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.75, 0.5, 0.3, 1)
-polygon = PackedVector2Array(-9, -9, 9, -9, 9, 9, -9, 9)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+centered = true
+sprite_frames = SubResource("SpriteFrames_cinnamon")
+speed_scale = 1.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cinnamon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_idle.png"
+}],
+"loop": false,
+"name": &"idle",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_walk.png"
+}],
+"loop": false,
+"name": &"walk",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_attack.png"
+}],
+"loop": false,
+"name": &"attack",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_overheat.png"
+}],
+"loop": false,
+"name": &"overheat",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_hurt.png"
+}],
+"loop": false,
+"name": &"hurt",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_death.png"
+}],
+"loop": false,
+"name": &"death",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_slam.png"
+}],
+"loop": false,
+"name": &"slam",
+"speed_scale": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/characters/cinnamon_happy.png"
+}],
+"loop": false,
+"name": &"happy",
+"speed_scale": 1.0
+}]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_companion")
@@ -42,3 +100,12 @@ shape = SubResource("CircleShape2D_hurtbox")
 
 [node name="CompanionAI" type="Node" parent="."]
 script = ExtResource("2_ai")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_companion"]
+radius = 7.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 8.0

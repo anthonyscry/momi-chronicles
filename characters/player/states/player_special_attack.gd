@@ -56,8 +56,9 @@ func enter() -> void:
 	# Scale up hitbox for spin attack (hits in all directions)
 	_setup_spin_hitbox()
 	
-	# Visual feedback - player charges up
+	# Play special attack animation and visual feedback
 	if player.sprite:
+		player.sprite.play("special_attack")
 		player.sprite.modulate = Color(1.2, 1.0, 0.8, 1.0)  # Slight glow
 	
 	# Emit special attack event

@@ -14,9 +14,8 @@ func enter() -> void:
 	pounce_timer = 0.0
 	hitbox_active = false
 	player.is_stealthed = false
-	
-	# Fully reveal from stealth
 	if player.sprite:
+		player.sprite.play("pounce")
 		player.sprite.modulate.a = 1.0
 	
 	# Calculate lunge direction

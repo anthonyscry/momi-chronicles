@@ -43,7 +43,7 @@ func _ready() -> void:
 	# Largest mini-boss (2.0x scale)
 	if sprite:
 		sprite.scale = Vector2(2.0, 2.0)
-		sprite.color = Color(0.3, 0.28, 0.2)  # Dirty brown
+		sprite.modulate = Color(0.3, 0.28, 0.2)  # Dirty brown
 	
 	_setup_rat_king_appearance()
 
@@ -54,44 +54,6 @@ func _ready() -> void:
 func _setup_rat_king_appearance() -> void:
 	if not sprite:
 		return
-	
-	# Crown of smaller rat shapes on top
-	for i in range(3):
-		var rat_nub = Polygon2D.new()
-		var x_offset = (i - 1) * 4.0
-		rat_nub.polygon = PackedVector2Array([
-			Vector2(x_offset - 1, -8),
-			Vector2(x_offset, -11),
-			Vector2(x_offset + 1, -8),
-		])
-		rat_nub.color = Color(0.4, 0.35, 0.25)  # Lighter brown
-		sprite.add_child(rat_nub)
-	
-	# Glowing green eyes (poison theme)
-	var left_eye = Polygon2D.new()
-	left_eye.polygon = PackedVector2Array([
-		Vector2(-3, -2), Vector2(-2, -3), Vector2(-1, -2), Vector2(-2, -1)
-	])
-	left_eye.color = Color(0.5, 1.0, 0.3)  # Toxic green
-	sprite.add_child(left_eye)
-	
-	var right_eye = Polygon2D.new()
-	right_eye.polygon = PackedVector2Array([
-		Vector2(1, -2), Vector2(2, -3), Vector2(3, -2), Vector2(2, -1)
-	])
-	right_eye.color = Color(0.5, 1.0, 0.3)
-	sprite.add_child(right_eye)
-	
-	# Tail (long, curved line)
-	var tail = Polygon2D.new()
-	tail.polygon = PackedVector2Array([
-		Vector2(0, 7), Vector2(1, 7),
-		Vector2(4, 10), Vector2(5, 10),
-		Vector2(7, 8), Vector2(6, 8),
-		Vector2(3, 9), Vector2(2, 9),
-	])
-	tail.color = Color(0.35, 0.3, 0.22)
-	sprite.add_child(tail)
 
 # =============================================================================
 # SPLIT MECHANIC (50% HP)

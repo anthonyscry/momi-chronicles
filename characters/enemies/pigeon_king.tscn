@@ -1,0 +1,142 @@
+[gd_scene load_steps=13 format=3 uid="uid://pigeon_king_001"]
+
+[ext_resource type="Script" path="res://characters/enemies/pigeon_king.gd" id="1_pigeon_king"]
+[ext_resource type="Script" path="res://components/state_machine/state_machine.gd" id="2_sm"]
+[ext_resource type="Script" path="res://characters/enemies/states/mini_boss_idle.gd" id="3_idle"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_king_swoop_dive.gd" id="4_swoop"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_king_reinforcement.gd" id="5_reinforce"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_chase.gd" id="6_chase"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_hurt.gd" id="7_hurt"]
+[ext_resource type="Script" path="res://characters/enemies/states/enemy_death.gd" id="8_death"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="9_hitbox"]
+[ext_resource type="Script" path="res://components/hurtbox/hurtbox.gd" id="10_hurtbox"]
+[ext_resource type="Script" path="res://components/health/health_component.gd" id="11_health"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 10.0
+height = 24.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 180.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(18, 16)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurtbox"]
+radius = 12.0
+height = 28.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pigeon_king"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": false,
+"name": &"attack"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": true,
+"name": &"walk"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": false,
+"name": &"summon"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": true,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/crow_matriarch.png"
+}],
+"loop": false,
+"name": &"death"
+}]
+
+[node name="PigeonKing" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_pigeon_king")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_pigeon_king")
+centered = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 3)
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_sm")
+initial_state_path = NodePath("MiniBossIdle")
+
+[node name="MiniBossIdle" type="Node" parent="StateMachine"]
+script = ExtResource("3_idle")
+
+[node name="PigeonKingSwoopDive" type="Node" parent="StateMachine"]
+script = ExtResource("4_swoop")
+
+[node name="PigeonKingReinforcement" type="Node" parent="StateMachine"]
+script = ExtResource("5_reinforce")
+
+[node name="Chase" type="Node" parent="StateMachine"]
+script = ExtResource("6_chase")
+
+[node name="Hurt" type="Node" parent="StateMachine"]
+script = ExtResource("7_hurt")
+
+[node name="Death" type="Node" parent="StateMachine"]
+script = ExtResource("8_death")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_detection")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("9_hitbox")
+damage = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(14, 0)
+shape = SubResource("RectangleShape2D_hitbox")
+disabled = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("10_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, 3)
+shape = SubResource("CapsuleShape2D_hurtbox")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("11_health")
+max_health = 120

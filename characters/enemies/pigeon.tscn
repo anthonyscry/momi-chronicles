@@ -1,0 +1,126 @@
+[gd_scene load_steps=17 format=3 uid="uid://pigeon_enemy"]
+
+[ext_resource type="Script" path="res://characters/enemies/pigeon.gd" id="1_pigeon"]
+[ext_resource type="Script" path="res://components/state_machine/state_machine.gd" id="2_state_machine"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_flock_idle.gd" id="3_flock_idle"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_flock_chase.gd" id="4_flock_chase"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_swoop_attack.gd" id="5_swoop_attack"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_hurt.gd" id="6_hurt"]
+[ext_resource type="Script" path="res://characters/enemies/states/pigeon_death.gd" id="7_death"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="8_hitbox"]
+[ext_resource type="Script" path="res://components/hurtbox/hurtbox.gd" id="9_hurtbox"]
+[ext_resource type="Script" path="res://components/health/health_component.gd" id="10_health"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 8.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 256.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hitbox"]
+radius = 4.0
+height = 24.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 12.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pigeon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/pigeon_idle.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/pigeon_fly.png"
+}],
+"loop": true,
+"name": &"fly"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/pigeon_swoop.png"
+}],
+"loop": false,
+"name": &"swoop"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/pigeon_hurt.png"
+}],
+"loop": false,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/pigeon_death.png"
+}],
+"loop": false,
+"name": &"death"
+}]
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_pigeon")
+animation = &"idle"
+centered = true
+offset = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_state_machine")
+initial_state_path = NodePath("FlockIdle")
+
+[node name="FlockIdle" type="Node" parent="StateMachine"]
+script = ExtResource("3_flock_idle")
+
+[node name="FlockChase" type="Node" parent="StateMachine"]
+script = ExtResource("4_flock_chase")
+
+[node name="SwoopAttack" type="Node" parent="StateMachine"]
+script = ExtResource("5_swoop_attack")
+
+[node name="Hurt" type="Node" parent="StateMachine"]
+script = ExtResource("6_hurt")
+
+[node name="Death" type="Node" parent="StateMachine"]
+script = ExtResource("7_death")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_detection")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("8_hitbox")
+damage = 15.0
+knockback_force = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, 8)
+shape = SubResource("CapsuleShape2D_hitbox")
+disabled = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("9_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("10_health")
+max_health = 30

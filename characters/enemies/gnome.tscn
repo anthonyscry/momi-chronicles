@@ -1,0 +1,148 @@
+[gd_scene load_steps=16 format=3 uid="uid://cqx8k5m4p2n7r"]
+
+[ext_resource type="Script" path="res://characters/enemies/gnome.gd" id="1_gnome"]
+[ext_resource type="Script" path="res://components/health/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="3_hitbox"]
+[ext_resource type="Script" path="res://components/hurtbox/hurtbox.gd" id="4_hurtbox"]
+[ext_resource type="Script" path="res://components/state_machine/state_machine.gd" id="5_state_machine"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_idle.gd" id="6_gnome_idle"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_telegraph.gd" id="7_gnome_telegraph"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_throw.gd" id="8_gnome_throw"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_cooldown.gd" id="9_gnome_cooldown"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_hurt.gd" id="10_gnome_hurt"]
+[ext_resource type="Script" path="res://characters/enemies/states/gnome_death.gd" id="11_gnome_death"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 200.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 12.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gnome"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_idle.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_telegraph.png"
+}],
+"loop": true,
+"name": &"telegraph"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_throw.png"
+}],
+"loop": false,
+"name": &"throw"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_hurt.png"
+}],
+"loop": false,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_death.png"
+}],
+"loop": false,
+"name": &"death"
+}]
+
+[node name="Gnome" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_gnome")
+wall_min_slide_angle = 0.0
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_gnome")
+animation = &"idle"
+centered = true
+offset = Vector2(0, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_detection")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = false
+monitorable = false
+script = ExtResource("3_hitbox")
+damage = 25
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_hitbox")
+disabled = true
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 60
+
+[node name="TelegraphSprite" type="Node2D" parent="."]
+visible = false
+position = Vector2(0, -32)
+
+[node name="Label" type="Label" parent="TelegraphSprite"]
+offset_left = -8.0
+offset_top = -12.0
+offset_right = 8.0
+offset_bottom = 12.0
+theme_override_colors/font_color = Color(1, 0.5, 0, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.1, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 12
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("5_state_machine")
+initial_state_path = NodePath("GnomeIdle")
+
+[node name="GnomeIdle" type="Node" parent="StateMachine"]
+script = ExtResource("6_gnome_idle")
+
+[node name="GnomeTelegraph" type="Node" parent="StateMachine"]
+script = ExtResource("7_gnome_telegraph")
+
+[node name="GnomeThrow" type="Node" parent="StateMachine"]
+script = ExtResource("8_gnome_throw")
+
+[node name="GnomeCooldown" type="Node" parent="StateMachine"]
+script = ExtResource("9_gnome_cooldown")
+
+[node name="Hurt" type="Node" parent="StateMachine"]
+script = ExtResource("10_gnome_hurt")
+
+[node name="Death" type="Node" parent="StateMachine"]
+script = ExtResource("11_gnome_death")

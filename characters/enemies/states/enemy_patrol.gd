@@ -8,8 +8,9 @@ var is_temporary_wander: bool = false
 
 func enter() -> void:
 	target_point = player.get_current_patrol_point()
-	# Check if this is a temporary wander (single point)
 	is_temporary_wander = player.patrol_points.size() == 1
+	if player.sprite:
+		player.sprite.play("walk")
 
 func physics_update(delta: float) -> void:
 	# Check for stun

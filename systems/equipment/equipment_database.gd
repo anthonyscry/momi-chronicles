@@ -42,7 +42,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COLLAR,
 		"stats": {StatType.MAX_HEALTH: 5},
 		"min_level": 1,
-		"color": Color(0.8, 0.4, 0.2),  # Brown leather
+		"color": Color(0.8, 0.4, 0.2),
+		"icon": "res://art/generated/equipment/basic_collar.png",
 	},
 	# Tier 2 (Level 3)
 	"spiked_collar": {
@@ -53,7 +54,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COLLAR,
 		"stats": {StatType.ATTACK_DAMAGE: 3},
 		"min_level": 3,
-		"color": Color(0.3, 0.3, 0.3),  # Dark metal
+		"color": Color(0.3, 0.3, 0.3),
+		"icon": "res://art/generated/equipment/spiked_collar.png",
 	},
 	# Tier 3 (Level 5)
 	"lucky_collar": {
@@ -64,7 +66,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COLLAR,
 		"stats": {StatType.EXP_BONUS: 10},
 		"min_level": 5,
-		"color": Color(1.0, 0.84, 0.0),  # Gold
+		"color": Color(1.0, 0.84, 0.0),
+		"icon": "res://art/generated/equipment/lucky_collar.png",
 	},
 	
 	# === HARNESSES ===
@@ -77,7 +80,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HARNESS,
 		"stats": {StatType.MAX_HEALTH: 10},
 		"min_level": 1,
-		"color": Color(0.2, 0.5, 0.8),  # Blue
+		"color": Color(0.2, 0.5, 0.8),
+		"icon": "res://art/generated/equipment/training_harness.png",
 	},
 	# Tier 2 (Level 3)
 	"padded_harness": {
@@ -88,7 +92,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HARNESS,
 		"stats": {StatType.DEFENSE: 10},
 		"min_level": 3,
-		"color": Color(0.6, 0.4, 0.6),  # Purple
+		"color": Color(0.6, 0.4, 0.6),
+		"icon": "res://art/generated/equipment/padded_harness.png",
 	},
 	# Tier 3 (Level 5)
 	"tactical_harness": {
@@ -99,7 +104,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HARNESS,
 		"stats": {StatType.ATTACK_DAMAGE: 5, StatType.MAX_HEALTH: 5},
 		"min_level": 5,
-		"color": Color(0.3, 0.35, 0.3),  # Olive
+		"color": Color(0.3, 0.35, 0.3),
+		"icon": "res://art/generated/equipment/tactical_harness.png",
 	},
 	
 	# === LEASHES ===
@@ -112,7 +118,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.LEASH,
 		"stats": {StatType.MOVE_SPEED: 5},
 		"min_level": 1,
-		"color": Color(0.9, 0.1, 0.1),  # Red
+		"color": Color(0.9, 0.1, 0.1),
+		"icon": "res://art/generated/equipment/retractable_leash.png",
 	},
 	# Tier 2 (Level 3)
 	"chain_leash": {
@@ -123,7 +130,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.LEASH,
 		"stats": {StatType.ATTACK_DAMAGE: 5},
 		"min_level": 3,
-		"color": Color(0.7, 0.7, 0.75),  # Silver
+		"color": Color(0.7, 0.7, 0.75),
+		"icon": "res://art/generated/equipment/chain_leash.png",
 	},
 	# Tier 3 (Level 5)
 	"bungee_leash": {
@@ -134,7 +142,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.LEASH,
 		"stats": {StatType.MOVE_SPEED: 8},
 		"min_level": 5,
-		"color": Color(0.0, 0.8, 0.4),  # Green
+		"color": Color(0.0, 0.8, 0.4),
+		"icon": "res://art/generated/equipment/bungee_leash.png",
 	},
 	
 	# === COATS ===
@@ -147,7 +156,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COAT,
 		"stats": {StatType.MAX_HEALTH: 15},
 		"min_level": 1,
-		"color": Color(1.0, 0.9, 0.2),  # Yellow
+		"color": Color(1.0, 0.9, 0.2),
+		"icon": "res://art/generated/equipment/raincoat.png",
 	},
 	# Tier 2 (Level 3)
 	"sweater": {
@@ -158,7 +168,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COAT,
 		"stats": {StatType.DEFENSE: 5, StatType.MAX_HEALTH: 5},
 		"min_level": 3,
-		"color": Color(0.9, 0.5, 0.5),  # Pink
+		"color": Color(0.9, 0.5, 0.5),
+		"icon": "res://art/generated/equipment/sweater.png",
 	},
 	# Tier 3 (Level 5)
 	"leather_jacket": {
@@ -169,7 +180,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COAT,
 		"stats": {StatType.ATTACK_DAMAGE: 8},
 		"min_level": 5,
-		"color": Color(0.15, 0.1, 0.1),  # Black
+		"color": Color(0.15, 0.1, 0.1),
+		"icon": "res://art/generated/equipment/leather_jacket.png",
 	},
 	
 	# === HATS ===
@@ -182,7 +194,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HAT,
 		"stats": {StatType.MOVE_SPEED: 3},
 		"min_level": 1,
-		"color": Color(0.8, 0.2, 0.2),  # Red
+		"color": Color(0.8, 0.2, 0.2),
+		"icon": "res://art/generated/equipment/baseball_cap.png",
 	},
 	# Tier 2 (Level 3)
 	"bandana": {
@@ -193,7 +206,7 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HAT,
 		"stats": {StatType.ATTACK_DAMAGE: 2, StatType.MOVE_SPEED: 2},
 		"min_level": 3,
-		"color": Color(0.1, 0.3, 0.6),  # Navy
+		"color": Color(0.1, 0.3, 0.6),
 	},
 	# Tier 3 (Level 5)
 	"guard_helmet": {
@@ -204,7 +217,7 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HAT,
 		"stats": {StatType.DEFENSE: 10, StatType.GUARD_REGEN: 5},
 		"min_level": 5,
-		"color": Color(0.5, 0.5, 0.55),  # Steel
+		"color": Color(0.5, 0.5, 0.55),
 	},
 	
 	# === MINI-BOSS LOOT (RARE — no level requirement, earned through combat) ===
@@ -216,7 +229,7 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.HAT,
 		"stats": {StatType.MAX_HEALTH: 15, StatType.ATTACK_DAMAGE: 5},
 		"min_level": 1,
-		"color": Color(1.0, 0.85, 0.2),  # Gold crown
+		"color": Color(1.0, 0.85, 0.2),
 	},
 	"crow_feather_coat": {
 		"id": "crow_feather_coat",
@@ -226,7 +239,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COAT,
 		"stats": {StatType.MOVE_SPEED: 10, StatType.DEFENSE: 10},
 		"min_level": 1,
-		"color": Color(0.1, 0.08, 0.15),  # Dark purple-black
+		"color": Color(0.1, 0.08, 0.15),
+		"icon": "res://art/generated/equipment/crow_feather_coat.png",
 	},
 	"rat_king_collar": {
 		"id": "rat_king_collar",
@@ -236,7 +250,8 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COLLAR,
 		"stats": {StatType.ATTACK_DAMAGE: 8, StatType.GUARD_REGEN: 5},
 		"min_level": 1,
-		"color": Color(0.4, 0.35, 0.2),  # Dirty brown
+		"color": Color(0.4, 0.35, 0.2),
+		"icon": "res://art/generated/equipment/rat_king_collar.png",
 	},
 	
 	# === BOSS LOOT (LEGENDARY — earned from final boss) ===
@@ -248,7 +263,7 @@ const EQUIPMENT: Dictionary = {
 		"slot": Slot.COAT,
 		"stats": {StatType.ATTACK_DAMAGE: 12, StatType.MAX_HEALTH: 20, StatType.DEFENSE: 10},
 		"min_level": 1,
-		"color": Color(0.6, 0.1, 0.8),  # Royal purple
+		"color": Color(0.6, 0.1, 0.8),
 	},
 }
 

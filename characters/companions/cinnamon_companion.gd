@@ -4,12 +4,52 @@ class_name CinnamonCompanion
 ## Overheat state
 var is_blocking: bool = false
 var is_overheated: bool = false
+var is_slamming: bool = false
 const OVERHEAT_COOLDOWN: float = 3.0
 var overheat_timer: float = 0.0
 
 func _ready() -> void:
 	companion_id = "cinnamon"
 	super._ready()
+	if sprite:
+		sprite.play("idle")
+
+func _physics_process(delta: float) -> void:
+	super._physics_process(delta)
+	_update_animation()
+	
+	# Block input
+	if is_player_controlled and not is_overheated:
+		is_blocking = Input.is_action_pressed("block")
+	elif not is_player_controlled and ai:
+		is_blocking = ai.should_block() and not is_overheated
+
+func _update_animation() -> void:
+	if not sprite or is_knocked_out:
+		return
+	
+	var new_animation: String = "idle"
+	
+	# Priority states
+	if is_slamming:
+		new_animation = "slam"
+	elif is_overheated:
+		new_animation = "overheat"
+	elif velocity.length() > 5:
+		new_animation = "walk"
+	elif is_attacking:
+		new_animation = "attack"
+	elif is_blocking:
+		new_animation = "block"  # Add block animation if available
+	
+	if sprite.animation != new_animation:
+		sprite.play(new_animation)
+	
+	# Facing
+	if velocity.x < 0:
+		sprite.flip_h = true
+	elif velocity.x > 0:
+		sprite.flip_h = false
 
 func _update_meter(delta: float) -> void:
 	if is_overheated:
@@ -30,15 +70,6 @@ func _update_meter(delta: float) -> void:
 		meter_value = max(0, meter_value - meter_drain_rate * delta)
 	
 	meter_changed.emit(meter_value, meter_max)
-
-func _physics_process(delta: float) -> void:
-	super._physics_process(delta)
-	
-	# Block input
-	if is_player_controlled and not is_overheated:
-		is_blocking = Input.is_action_pressed("block")
-	elif not is_player_controlled and ai:
-		is_blocking = ai.should_block() and not is_overheated
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	var damage = 0
@@ -63,11 +94,11 @@ func _on_hurtbox_area_entered(area: Area2D) -> void:
 		
 		meter_changed.emit(meter_value, meter_max)
 		
-		# Block flash
+		# Block flash - use overlay instead of replacing animation
 		if sprite:
 			sprite.modulate = Color(0.7, 0.7, 1.0)
 			await get_tree().create_timer(0.1).timeout
-			if sprite:
+			if sprite and not is_overheated:
 				sprite.modulate = Color.WHITE
 	else:
 		take_damage(damage)
@@ -81,5 +112,43 @@ func _trigger_overheat() -> void:
 	# Visual feedback
 	if sprite:
 		sprite.modulate = Color(1.0, 0.5, 0.3)  # Orange tint
+		sprite.play("overheat")
 	
 	AudioManager.play_sfx("player_hurt")
+
+func perform_slam() -> void:
+	if not is_slamming and not is_knocked_out:
+		is_slamming = true
+		if sprite:
+			sprite.play("slam")
+		await get_tree().create_timer(0.4).timeout
+		is_slamming = false
+		_update_animation()
+
+func play_happy() -> void:
+	if sprite and not is_knocked_out:
+		sprite.play("happy")
+		await get_tree().create_timer(0.3).timeout
+		_update_animation()
+
+func take_damage(amount: int) -> void:
+	var old_health = current_health
+	super.take_damage(amount)
+	if current_health > 0 and old_health != current_health and sprite:
+		sprite.play("hurt")
+		await get_tree().create_timer(0.2).timeout
+		_update_animation()
+
+func _knock_out() -> void:
+	if sprite:
+		sprite.play("death")
+	await get_tree().create_timer(0.3).timeout
+	super._knock_out()
+
+func revive(health_percent: float = 0.5) -> void:
+	super.revive(health_percent)
+	is_overheated = false
+	is_slamming = false
+	if sprite:
+		sprite.modulate = Color.WHITE
+		sprite.play("idle")

@@ -1,0 +1,12 @@
+# Garden Gnome Hurt Sprite Placeholder
+
+## Required: gnome_hurt.png (32x32, 3 frames)
+
+**Animation:** 3 frames, 0.15s each
+**Content:** Damage reaction
+**Frame breakdown:**
+- Frame 0: Normal pose
+- Frame 1: Flash white/recoil backward
+- Frame 2: Return to neutral
+
+**Visual effect:** White flash and recoil

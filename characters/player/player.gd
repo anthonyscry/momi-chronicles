@@ -128,7 +128,7 @@ func _update_camera_feel(delta: float) -> void:
 	
 	# --- Combat zoom: zoom in when enemies are close ---
 	var enemies_nearby = false
-	for enemy in get_tree().get_nodes_in_group("enemies"):
+	for enemy in EntityRegistry.get_enemies():
 		if is_instance_valid(enemy) and enemy is Node2D:
 			if global_position.distance_to(enemy.global_position) < COMBAT_ZOOM_RANGE:
 				enemies_nearby = true
@@ -289,7 +289,7 @@ func _on_level_changed(_new_level: int) -> void:
 
 ## Push player away from nearby enemies on level up
 func _push_away_from_enemies() -> void:
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	var push_dir = Vector2.ZERO
 	var close_count = 0
 	

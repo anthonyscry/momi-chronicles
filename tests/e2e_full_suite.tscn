@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://e2e_full_suite_001"]
+
+[ext_resource type="Script" path="res://tests/e2e_full_suite.gd" id="1_e2e"]
+
+[node name="E2EFullSuite" type="Node"]
+script = ExtResource("1_e2e")

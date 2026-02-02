@@ -26,14 +26,54 @@ size = Vector2(20, 16)
 radius = 12.0
 height = 28.0
 
-[node name="AlphaRaccoon" type="CharacterBody2D"]
-collision_layer = 4
-collision_mask = 1
-script = ExtResource("1_alpha")
+[sub_resource type="SpriteFrames" id="SpriteFrames_alpha_raccoon"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon.png"
+}],
+"loop": true,
+"name": &"idle"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon_slam.png"
+}],
+"loop": false,
+"name": &"attack"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon.png"
+}],
+"loop": true,
+"name": &"walk"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon.png"
+}],
+"loop": false,
+"name": &"summon"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon.png"
+}],
+"loop": true,
+"name": &"hurt"
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/bosses/alpha_raccoon.png"
+}],
+"loop": false,
+"name": &"death"
+}]
 
-[node name="Sprite2D" type="Polygon2D" parent="."]
-color = Color(0.35, 0.3, 0.4, 1)
-polygon = PackedVector2Array(-7, -7, 7, -7, 7, 7, -7, 7)
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_alpha_raccoon")
+centered = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 4)

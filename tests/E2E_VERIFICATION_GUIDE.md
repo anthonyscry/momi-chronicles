@@ -31,6 +31,14 @@ The difficulty system consists of:
 
 4. Check console output for detailed verification results
 
+### Headless E2E (New)
+
+Run the full UITester suite in headless mode:
+
+```bash
+godot --headless tests/e2e_full_suite.tscn
+```
+
 ### What the Automated Scene Tests
 
 - ✅ Difficulty selection and switching
@@ -145,31 +153,31 @@ print(DifficultyManager.get_damage_multiplier())  # Should be 1.5
 2. Open pause menu (ESC) and click "Save Game" (or trigger save via code)
 3. Verify save file created:
    - Check console for "Game saved successfully"
-   - Or manually check for `user://save_data.cfg`
+   - Or manually check for `user://save_data.json`
 4. Quit to title screen
 5. Click "Continue" to load saved game
 6. Check console output for loaded difficulty
 
 **Expected Result**:
 ```
-SaveManager: Game saved successfully to user://save_data.cfg
+SaveManager: Game saved successfully to user://save_data.json
 [...later...]
-SaveManager: Game loaded successfully from user://save_data.cfg
+SaveManager: Game loaded successfully from user://save_data.json
 DifficultyManager: Difficulty set to 2 (Challenge)
 ```
 
 **Verification**:
-- [ ] Save file is created at `user://save_data.cfg`
+- [ ] Save file is created at `user://save_data.json`
 - [ ] Loading game restores Challenge difficulty
 - [ ] Difficulty multipliers are correct after load
 - [ ] No errors or warnings in console
 
 **Manual Save File Check**:
 1. Find save file location:
-   - Windows: `%APPDATA%\Godot\app_userdata\[YourProjectName]\save_data.cfg`
-   - Linux: `~/.local/share/godot/app_userdata/[YourProjectName]/save_data.cfg`
-   - macOS: `~/Library/Application Support/Godot/app_userdata/[YourProjectName]/save_data.cfg`
-2. Open `save_data.cfg` in text editor
+   - Windows: `%APPDATA%\Godot\app_userdata\[YourProjectName]\save_data.json`
+   - Linux: `~/.local/share/godot/app_userdata/[YourProjectName]/save_data.json`
+   - macOS: `~/Library/Application Support/Godot/app_userdata/[YourProjectName]/save_data.json`
+2. Open `save_data.json` in text editor
 3. Verify it contains:
    ```ini
    [game]
@@ -322,7 +330,7 @@ All verification results are logged to console with detailed output including:
 **Problem**: Loaded difficulty doesn't match saved difficulty
 
 **Solutions**:
-- Verify `save_data.cfg` contains `difficulty=X` entry
+- Verify `save_data.json` contains `difficulty=X` entry
 - Check SaveManager loads difficulty before other data (line 57-60)
 - Ensure DifficultyManager is in autoload list
 

@@ -1,0 +1,125 @@
+{
+  "dialogues": [
+    {
+      "id": "welcome_start",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "Oh, hello there! Welcome to the neighborhood! You must be new here.",
+      "choices": [],
+      "next_id": "welcome_question",
+      "is_cutscene": false
+    },
+    {
+      "id": "welcome_question",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "Are you settling in okay? This is a pretty quiet place, usually...",
+      "choices": [
+        {
+          "text": "Yes, everything's great!",
+          "next_id": "response_positive"
+        },
+        {
+          "text": "It's a bit strange here...",
+          "next_id": "response_negative"
+        },
+        {
+          "text": "What do you mean 'usually'?",
+          "next_id": "response_curious"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "response_positive",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "That's wonderful! I'm glad to hear it. If you need anything, just let me know!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "response_negative",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "Strange? Well... there have been some odd things happening lately. Nothing to worry about though!",
+      "choices": [],
+      "next_id": "offer_help",
+      "is_cutscene": false
+    },
+    {
+      "id": "response_curious",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "Oh, you know... just the usual neighborhood watch stuff. We like to keep things safe around here.",
+      "choices": [],
+      "next_id": "offer_help",
+      "is_cutscene": false
+    },
+    {
+      "id": "offer_help",
+      "character": "Friendly Neighbor",
+      "portrait": "res://assets/portraits/neighbor.png",
+      "text": "Anyway, if you ever want to help out with the neighborhood watch, come find me!",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "cutscene_example",
+      "character": "Mysterious Figure",
+      "portrait": "res://assets/portraits/mysterious.png",
+      "text": "Wait! Before you go any further, there's something you need to know...",
+      "choices": [],
+      "next_id": "cutscene_reveal",
+      "is_cutscene": true
+    },
+    {
+      "id": "cutscene_reveal",
+      "character": "Mysterious Figure",
+      "portrait": "res://assets/portraits/mysterious.png",
+      "text": "The neighborhood isn't what it seems. Strange creatures have been spotted at night.",
+      "choices": [
+        {
+          "text": "Tell me more.",
+          "next_id": "cutscene_details"
+        },
+        {
+          "text": "I can handle myself.",
+          "next_id": "cutscene_brave"
+        }
+      ],
+      "next_id": "",
+      "is_cutscene": true
+    },
+    {
+      "id": "cutscene_details",
+      "character": "Mysterious Figure",
+      "portrait": "res://assets/portraits/mysterious.png",
+      "text": "They appear when the moon is full. Be careful out there, and trust no one.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": true
+    },
+    {
+      "id": "cutscene_brave",
+      "character": "Mysterious Figure",
+      "portrait": "res://assets/portraits/mysterious.png",
+      "text": "Brave words. Let's hope you can back them up. Good luck, you'll need it.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": true
+    },
+    {
+      "id": "simple_greeting",
+      "character": "Shopkeeper",
+      "portrait": "res://assets/portraits/shopkeeper.png",
+      "text": "Welcome to my shop! Feel free to look around.",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": false
+    }
+  ]
+}

@@ -33,29 +33,6 @@ func _ready() -> void:
 	# Call parent ready
 	super._ready()
 
-	# Shadow appearance: very dark purple amorphous blob
-	if sprite:
-		sprite.color = Color(0.15, 0.05, 0.25)
-		sprite.polygon = PackedVector2Array([
-			Vector2(-5, -7), Vector2(-2, -9), Vector2(2, -9), Vector2(5, -7),
-			Vector2(7, -3), Vector2(6, 2), Vector2(4, 6), Vector2(1, 8),
-			Vector2(-2, 7), Vector2(-5, 4), Vector2(-7, -1)
-		])
-
-	# Create glow aura (larger translucent purple polygon behind sprite)
-	glow_aura = Polygon2D.new()
-	glow_aura.polygon = PackedVector2Array([
-		Vector2(-8, -10), Vector2(-3, -12), Vector2(3, -12), Vector2(8, -10),
-		Vector2(10, -4), Vector2(9, 3), Vector2(6, 9), Vector2(2, 11),
-		Vector2(-3, 10), Vector2(-7, 6), Vector2(-10, -1)
-	])
-	glow_aura.color = Color(0.3, 0.1, 0.5, 0.25)
-	glow_aura.z_index = -1
-	if sprite:
-		sprite.add_child(glow_aura)
-	else:
-		add_child(glow_aura)
-
 
 ## Shadow drops: 80% 2-4 coins, 30% health, 8% guard snack, 5% power treat
 func _init_default_drops() -> void:

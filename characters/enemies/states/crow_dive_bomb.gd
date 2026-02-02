@@ -20,6 +20,8 @@ func enter() -> void:
 	timer = 0.0
 	current_phase = Phase.ASCEND
 	player.velocity = Vector2.ZERO
+	if player.sprite:
+		player.sprite.play("attack")
 	_start_ascend()
 
 func exit() -> void:

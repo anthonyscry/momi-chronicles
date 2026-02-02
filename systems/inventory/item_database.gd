@@ -28,7 +28,8 @@ const ITEMS: Dictionary = {
 		"max_stack": 10,
 		"effect": EffectType.HEAL,
 		"value": 50,
-		"color": Color(1.0, 0.3, 0.3),  # Red
+		"color": Color(1.0, 0.3, 0.3),
+		"icon": "res://art/generated/items/health_potion.png",
 	},
 	"mega_potion": {
 		"id": "mega_potion",
@@ -40,7 +41,8 @@ const ITEMS: Dictionary = {
 		"max_stack": 5,
 		"effect": EffectType.HEAL,
 		"value": 150,
-		"color": Color(1.0, 0.1, 0.5),  # Magenta
+		"color": Color(1.0, 0.1, 0.5),
+		"icon": "res://art/generated/items/mega_potion.png",
 	},
 	"full_heal": {
 		"id": "full_heal",
@@ -51,8 +53,9 @@ const ITEMS: Dictionary = {
 		"stackable": true,
 		"max_stack": 3,
 		"effect": EffectType.HEAL_PERCENT,
-		"value": 1.0,  # 100%
-		"color": Color(1.0, 0.8, 0.9),  # Pink
+		"value": 1.0,
+		"color": Color(1.0, 0.8, 0.9),
+		"icon": "res://art/generated/items/full_heal.png",
 	},
 	
 	# === FOOD ITEMS (from enemy drops) ===
@@ -66,7 +69,8 @@ const ITEMS: Dictionary = {
 		"max_stack": 20,
 		"effect": EffectType.HEAL,
 		"value": 15,
-		"color": Color(0.6, 0.4, 0.2),  # Brown
+		"color": Color(0.6, 0.4, 0.2),
+		"icon": "res://art/generated/items/acorn.png",
 	},
 	"bird_seed": {
 		"id": "bird_seed",
@@ -78,7 +82,8 @@ const ITEMS: Dictionary = {
 		"max_stack": 30,
 		"effect": EffectType.HEAL,
 		"value": 10,
-		"color": Color(0.9, 0.85, 0.6),  # Tan
+		"color": Color(0.9, 0.85, 0.6),
+		"icon": "res://art/generated/items/bird_seed.png",
 	},
 	
 	# === BUFF ITEMS ===
@@ -91,9 +96,10 @@ const ITEMS: Dictionary = {
 		"stackable": true,
 		"max_stack": 5,
 		"effect": EffectType.BUFF_ATTACK,
-		"value": 0.5,  # 50% boost
+		"value": 0.5,
 		"duration": 30.0,
-		"color": Color(1.0, 0.5, 0.0),  # Orange
+		"color": Color(1.0, 0.5, 0.0),
+		"icon": "res://art/generated/items/power_treat.png",
 	},
 	"speed_treat": {
 		"id": "speed_treat",
@@ -106,7 +112,8 @@ const ITEMS: Dictionary = {
 		"effect": EffectType.BUFF_SPEED,
 		"value": 0.3,
 		"duration": 30.0,
-		"color": Color(0.3, 0.9, 1.0),  # Cyan
+		"color": Color(0.3, 0.9, 1.0),
+		"icon": "res://art/generated/items/speed_treat.png",
 	},
 	"tough_treat": {
 		"id": "tough_treat",
@@ -119,7 +126,8 @@ const ITEMS: Dictionary = {
 		"effect": EffectType.BUFF_DEFENSE,
 		"value": 0.3,
 		"duration": 30.0,
-		"color": Color(0.5, 0.5, 0.8),  # Purple-blue
+		"color": Color(0.5, 0.5, 0.8),
+		"icon": "res://art/generated/items/tough_treat.png",
 	},
 	
 	# === GUARD ITEMS (v1.2) ===
@@ -133,7 +141,8 @@ const ITEMS: Dictionary = {
 		"max_stack": 10,
 		"effect": EffectType.RESTORE_GUARD,
 		"value": 100.0,
-		"color": Color(0.4, 0.6, 1.0),  # Blue
+		"color": Color(0.4, 0.6, 1.0),
+		"icon": "res://art/generated/items/guard_snack.png",
 	},
 	
 	# === STATUS CURE ITEMS ===
@@ -146,8 +155,9 @@ const ITEMS: Dictionary = {
 		"stackable": true,
 		"max_stack": 10,
 		"effect": EffectType.CURE_STATUS,
-		"value": 0,  # Cures all negative status
-		"color": Color(0.2, 0.9, 0.4),  # Bright green
+		"value": 0,
+		"color": Color(0.2, 0.9, 0.4),
+		"icon": "res://art/generated/items/antidote.png",
 	},
 	
 	# === TACTICAL ITEMS ===
@@ -160,8 +170,9 @@ const ITEMS: Dictionary = {
 		"stackable": true,
 		"max_stack": 5,
 		"effect": EffectType.INVINCIBLE,
-		"value": 3.0,  # 3 second duration
-		"color": Color(0.5, 0.5, 0.5),  # Gray smoke
+		"value": 3.0,
+		"color": Color(0.5, 0.5, 0.5),
+		"icon": "res://art/generated/items/smoke_bomb.png",
 	},
 	"energy_treat": {
 		"id": "energy_treat",
@@ -171,11 +182,12 @@ const ITEMS: Dictionary = {
 		"consumable": true,
 		"stackable": true,
 		"max_stack": 3,
-		"effect": EffectType.BUFF_ATTACK,  # Primary effect — code applies all 3
+		"effect": EffectType.BUFF_ATTACK,
 		"value": 0.25,
 		"duration": 20.0,
-		"all_buffs": true,  # Special flag: apply ATK + SPD + DEF
-		"color": Color(1.0, 0.85, 0.0),  # Gold
+		"all_buffs": true,
+		"color": Color(1.0, 0.85, 0.0),
+		"icon": "res://art/generated/items/energy_treat.png",
 	},
 	
 	# === REVIVAL ITEMS ===
@@ -188,8 +200,9 @@ const ITEMS: Dictionary = {
 		"stackable": true,
 		"max_stack": 3,
 		"effect": EffectType.REVIVE,
-		"value": 0.5,  # 50% HP
-		"color": Color(1.0, 1.0, 0.8),  # Cream
+		"value": 0.5,
+		"color": Color(1.0, 1.0, 0.8),
+		"icon": "res://art/generated/items/revival_bone.png",
 	},
 }
 

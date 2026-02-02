@@ -34,6 +34,10 @@ func enter() -> void:
 	attack_timer = 0.0
 	hitbox_active = false
 	
+	# Play attack animation
+	if player.sprite:
+		player.sprite.play("attack")
+	
 	# Position hitbox based on facing direction
 	_position_hitbox()
 	

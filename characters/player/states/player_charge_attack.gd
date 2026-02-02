@@ -51,6 +51,10 @@ func enter() -> void:
 	hitbox_active = false
 	bot_target_charge_time = 0.0  # Reset for bot
 	
+	# Play charge animation
+	if player.sprite:
+		player.sprite.play("charge")
+	
 	# Start charge visual
 	_start_charge_visual()
 	

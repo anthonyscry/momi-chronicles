@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://dxt7k5m4p2n8s"]
+
+[ext_resource type="Script" path="res://characters/enemies/projectiles/gnome_bomb.gd" id="1_gnome_bomb"]
+[ext_resource type="Script" path="res://components/hitbox/hitbox.gd" id="2_hitbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bomb"]
+radius = 12.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gnome_bomb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": "res://art/generated/enemies/gnome_bomb.png"
+}],
+"loop": true,
+"name": &"fuse"
+}]
+
+[node name="GnomeBomb" type="Area2D"]
+collision_layer = 128
+collision_mask = 16
+monitoring = true
+monitorable = true
+script = ExtResource("1_gnome_bomb")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_gnome_bomb")
+animation = &"fuse"
+playing = true
+centered = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bomb")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 16
+monitoring = true
+monitorable = false
+script = ExtResource("2_hitbox")
+damage = 25
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_bomb")

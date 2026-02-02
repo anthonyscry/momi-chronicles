@@ -105,6 +105,7 @@ const ZONE_CLEAR_CHECK_INTERVAL: float = 10.0  # Check zone clear status every 1
 const FARM_KILL_TARGET: int = 10               # Kill N enemies before moving on
 const MIN_LEVEL_FOR_SEWERS: int = 3            # Don't enter sewers below level 3
 const MIN_LEVEL_FOR_BOSS: int = 5              # Don't fight boss below level 5
+const MIN_LEVEL_FOR_ROOFTOPS: int = 4          # Don't enter rooftops below level 4
 
 ## Hazard avoidance settings
 const HAZARD_DETECTION_RANGE: float = 120.0   # How far to detect hazards
@@ -951,7 +952,7 @@ func _pick_wander_direction() -> void:
 	var pos = player_ref.global_position if player_ref else Vector2(400, 300)
 	
 	# Find all living enemies and pick closest/best target
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	var closest_enemy: Node = null
 	var closest_dist: float = 999999.0
 	var living_enemy_count: int = 0
@@ -1077,7 +1078,7 @@ func _update_crowd_awareness() -> void:
 		return
 	
 	var player_pos = player_ref.global_position
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	
 	# Reset counters
 	nearby_enemy_count = 0
@@ -1165,7 +1166,7 @@ func _find_nearest_enemy() -> Node:
 	if player_ref == null:
 		return null
 	
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	enemies_found = 0
 	nearest_enemy_dist = 9999.0
 	var best_target: Node = null
@@ -1251,7 +1252,7 @@ func get_debug_info() -> String:
 ## Count living enemies
 func _count_living_enemies() -> int:
 	var count = 0
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	for e in enemies:
 		if is_instance_valid(e) and e.has_method("is_alive") and e.is_alive():
 			count += 1
@@ -1261,7 +1262,7 @@ func _count_living_enemies() -> int:
 ## Log debug status periodically
 func _log_debug_status() -> void:
 	var living_enemies = 0
-	var enemies = get_tree().get_nodes_in_group("enemies")
+	var enemies = EntityRegistry.get_enemies()
 	for e in enemies:
 		if is_instance_valid(e) and e.has_method("is_alive") and e.is_alive():
 			living_enemies += 1
@@ -1293,6 +1294,9 @@ func _generate_patrol_points() -> Array[Vector2]:
 		# Check if zone has corridor_segments (sewers-style layout)
 		if "corridor_segments" in current_zone_ref:
 			return _generate_corridor_patrol_points()
+		# Check if zone has platforms (rooftops-style layout)
+		if "platforms" in current_zone_ref:
+			return _generate_platform_patrol_points()
 	
 	# Default: grid-based patrol for open zones
 	var zs = current_zone_size
@@ -1332,6 +1336,25 @@ func _generate_corridor_patrol_points() -> Array[Vector2]:
 		for room in rooms:
 			var rect: Rect2 = room.rect
 			points.append(rect.position + rect.size / 2.0)
+	
+	return points
+
+
+## Generate patrol points at the center of each rooftop platform and walkway
+func _generate_platform_patrol_points() -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	
+	# Sample center points from each platform
+	var plats: Array = current_zone_ref.platforms
+	for plat in plats:
+		# Center of each platform
+		points.append(plat.position + plat.size / 2.0)
+	
+	# Also add walkway midpoints for traversal between platforms
+	if "walkways" in current_zone_ref:
+		var walks: Array = current_zone_ref.walkways
+		for walk in walks:
+			points.append(walk.position + walk.size / 2.0)
 	
 	return points
 
@@ -1734,13 +1757,17 @@ func _game_loop_clear(zone_id: String, level: int) -> void:
 			game_loop_state = GameLoopState.BOSS
 			DebugLogger.log_bot("GameLoop: CLEAR → BOSS (sewers cleared)")
 		elif zone_id == "neighborhood":
-			# Move to backyard
+			# Move to backyard or rooftops
 			game_loop_state = GameLoopState.TRAVERSE
 			DebugLogger.log_bot("GameLoop: CLEAR → TRAVERSE (neighborhood cleared)")
 		elif zone_id == "backyard":
-			# Move to sewers
+			# Move to rooftops or sewers
 			game_loop_state = GameLoopState.TRAVERSE
 			DebugLogger.log_bot("GameLoop: CLEAR → TRAVERSE (backyard cleared)")
+		elif zone_id == "rooftops":
+			# Move to sewers after clearing rooftops
+			game_loop_state = GameLoopState.TRAVERSE
+			DebugLogger.log_bot("GameLoop: CLEAR → TRAVERSE (rooftops cleared)")
 		else:
 			# Default: go back to farming
 			game_loop_state = GameLoopState.FARM
@@ -1778,15 +1805,25 @@ func _game_loop_boss(zone_id: String) -> void:
 
 
 ## Determine next zone in progression
+## Route: neighborhood → backyard → rooftops → sewers → boss_arena
 func _get_next_zone(current_zone: String, level: int) -> String:
 	match current_zone:
 		"neighborhood":
+			if level >= MIN_LEVEL_FOR_ROOFTOPS:
+				return "rooftops"
 			return "backyard"
 		"backyard":
-			if level >= MIN_LEVEL_FOR_SEWERS:
+			if level >= MIN_LEVEL_FOR_ROOFTOPS:
+				return "rooftops"
+			elif level >= MIN_LEVEL_FOR_SEWERS:
 				return "sewers"
 			else:
 				return "neighborhood"  # Go back to farm more
+		"rooftops":
+			if level >= MIN_LEVEL_FOR_BOSS:
+				return "sewers"  # Sewers leads to boss_arena
+			else:
+				return "neighborhood"  # Go back to farm
 		"sewers":
 			if level >= MIN_LEVEL_FOR_BOSS:
 				return "boss_arena"

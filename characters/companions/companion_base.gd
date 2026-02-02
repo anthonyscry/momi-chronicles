@@ -39,7 +39,7 @@ const ATTACK_DURATION: float = 0.15
 const _CompanionData = preload("res://systems/party/companion_data.gd")
 
 ## Components
-@onready var sprite: Polygon2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $Sprite2D
 @onready var collision: CollisionShape2D = $CollisionShape2D
 @onready var hitbox_area: Area2D = $Hitbox
 @onready var hitbox_shape: CollisionShape2D = $Hitbox/CollisionShape2D
@@ -92,10 +92,6 @@ func _load_companion_data() -> void:
 	meter_value = meter.start_value  # Important: Philo starts at 100!
 	meter_build_rate = meter.build_rate
 	meter_drain_rate = meter.drain_rate
-	
-	# Visuals
-	if sprite:
-		sprite.color = data.color
 
 func _physics_process(delta: float) -> void:
 	if is_knocked_out:

@@ -1,0 +1,15 @@
+# Gnome Bomb Sprite Placeholder
+
+## Required: gnome_bomb.png (16x16, 4 frames)
+
+**Animation:** 4 frames, 0.2s each
+**Content:** Black spherical bomb with fuse
+**Frame breakdown:**
+- Frames 0-1: Fuse sparking (small particles)
+- Frames 2-3: Fuse burning brighter
+
+**Style:**
+- Black spherical bomb
+- Brown fuse
+- Sparking fuse animation
+- 16x16 canvas

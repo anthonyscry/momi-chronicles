@@ -1,0 +1,17 @@
+# Garden Gnome Telegraph Sprite Placeholder
+
+## Required: gnome_telegraph.png (32x32, 8 frames)
+
+**Animation:** 8 frames, 0.1s each
+**Content:** Same gnome base with orange "!" warning overlay
+**Frame breakdown:**
+- Frames 0-2: "!" appears above head, small to large
+- Frames 3-5: Pulse effect, "!" grows/shrinks
+- Frames 6-7: Final pulse, arm starting to raise
+
+**Visual effect:** Orange pulsing "!" warning indicator
+- Scale pulsing: 1.0 → 1.4 → 1.0
+- Color intensity oscillation
+- Slight rotation wobble
+
+**Style:** Orange overlay/glow on gnome figure

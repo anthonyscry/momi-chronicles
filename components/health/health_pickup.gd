@@ -57,7 +57,7 @@ func _process(delta: float) -> void:
 
 
 func _get_player() -> Node:
-	var players = get_tree().get_nodes_in_group("player")
+	var players = EntityRegistry.get_players()
 	return players[0] if players.size() > 0 else null
 
 

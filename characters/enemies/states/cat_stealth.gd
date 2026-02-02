@@ -9,9 +9,8 @@ func enter() -> void:
 	player.velocity = Vector2.ZERO
 	player.is_stealthed = true
 	no_target_timer = 0.0
-	
-	# Fade to stealth transparency
 	if player.sprite:
+		player.sprite.play("stealth")
 		var tween = player.create_tween()
 		tween.tween_property(player.sprite, "modulate:a", player.stealth_alpha, 0.3)
 

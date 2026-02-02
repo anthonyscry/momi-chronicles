@@ -72,6 +72,10 @@ func enter() -> void:
 	# Update player's combo count for UI
 	player.set_combo_count(combo_index + 1)
 	
+	# Play combo attack animation
+	if player.sprite:
+		player.sprite.play("combo_attack")
+	
 	# Visual feedback - different color per combo hit
 	_apply_combo_visual()
 	

@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3 uid="uid://test_npc_dialogue_01"]
+
+[ext_resource type="PackedScene" uid="uid://npc_base_scene" path="res://entities/npc/npc_base.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://dialogue_box_scene" path="res://ui/dialogue/dialogue_box.tscn" id="2"]
+[ext_resource type="Script" path="res://scenes/test_npc_dialogue.gd" id="3"]
+
+[sub_resource type="RectangleShape2D" id="player_shape"]
+size = Vector2(16, 16)
+
+[node name="TestNPCDialogue" type="Node2D"]
+script = ExtResource("3")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(3, 3)
+
+[node name="TestPlayer" type="CharacterBody2D" parent="." groups=["player"]]
+position = Vector2(0, 0)
+
+[node name="Sprite" type="ColorRect" parent="TestPlayer"]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0, 0.7, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TestPlayer"]
+shape = SubResource("player_shape")
+
+[node name="TestNPC" parent="." instance=ExtResource("1")]
+position = Vector2(80, 0)
+dialogue_id = "welcome_start"
+
+[node name="DialogueBox" parent="." instance=ExtResource("2")]
