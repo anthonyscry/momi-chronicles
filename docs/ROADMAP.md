@@ -106,8 +106,10 @@ Plans:
 - SFX gap audit — verify every Events signal that should play audio has a mapped sound
 - AUDIO_README.md corrected (currently references .ogg but all files are .wav)
 
+**Plans:** 1 plan in 1 wave
+
 Plans:
-- [ ] TBD — created by /gsd-plan-phase
+- [ ] 44-01-PLAN.md — Wire rooftops audio mappings + catalog AI candidates + user picks tracks
 
 ---
 
