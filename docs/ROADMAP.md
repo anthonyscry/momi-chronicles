@@ -49,6 +49,7 @@ Momi's Adventure has a complete gameplay loop across 42 phases of development:
 | **v1.6 Visual Polish** | 30-35 | Pixel art sprites replacing all placeholders |
 | **v1.7 Rooftops Zone** | 36-39 | New zone, 3 enemy types, Pigeon King, wave encounters, boss gating, victory screen |
 | **v1.8 Quest System** | 40-42 | NPCs, dialogue, reputation, quest engine, 9 quests, tracking UI |
+| **v1.9 Stabilization** | 43 | Title screen fix (in progress — audio completion next) |
 
 ---
 
@@ -59,7 +60,7 @@ Momi's Adventure has a complete gameplay loop across 42 phases of development:
 ### Phase 43: Title Screen Fix & Game Flow Verification
 **Goal**: Fix the New Game flow so players can actually start the game, and verify all title screen paths work
 
-**Status:** Not started
+**Status:** ✅ Complete
 
 | Issue | Location | Severity | Description |
 |-------|----------|----------|-------------|
@@ -77,7 +78,7 @@ Momi's Adventure has a complete gameplay loop across 42 phases of development:
 **Plans:** 1 plan in 1 wave
 
 Plans:
-- [ ] 43-01-PLAN.md — Fix title screen New Game flow + verify all game entry paths
+- [x] 43-01-PLAN.md — Fix title screen New Game flow + verify all game entry paths
 
 ---
 
