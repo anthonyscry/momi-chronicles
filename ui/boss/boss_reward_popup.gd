@@ -1,10 +1,6 @@
 extends Control
 
-const BossRewardManager = preload("res://autoloads/boss_reward_manager.gd")
-const Events = preload("res://autoloads/events.gd")
-const AudioManager = preload("res://autoloads/audio_manager.gd")
-
-var _current_boss_id: BossRewardManager.BossID = -1
+var _current_boss_id: int = -1
 var _reward_data: Array = []
 
 @onready var reward_icon: TextureRect = $PanelContainer/VBoxContainer/RewardIcon
@@ -18,7 +14,7 @@ func _ready() -> void:
 	claim_button.pressed.connect(_on_claim_button_pressed)
 	hide()
 
-func _on_reward_unlocked(boss_id: BossRewardManager.BossID, rewards: Array) -> void:
+func _on_reward_unlocked(boss_id: int, rewards: Array) -> void:
 	_current_boss_id = boss_id
 	_reward_data = rewards
 
@@ -44,13 +40,15 @@ func _on_claim_button_pressed() -> void:
 	BossRewardManager.mark_reward_claimed(_current_boss_id)
 
 	# Emit event for game systems (e.g., UI updates)
-	Events.boss_reward_claimed.emit(_current_boss_id, _reward_data)
+	# Use first reward as Dictionary for compatibility
+	var first_reward = _reward_data[0] if _reward_data.size() > 0 else {}
+	Events.boss_reward_claimed.emit(_current_boss_id, first_reward)
 
 	# Hide popup and resume game
 	hide()
 	Events.game_resumed.emit()
 
-func _get_boss_icon(boss_id: BossRewardManager.BossID) -> Texture:
+func _get_boss_icon(boss_id: int) -> Texture:
 	match boss_id:
 		BossRewardManager.BossID.ALPHA_RACCOON:
 			return load("res://art/generated/enemies/alpha_raccoon.png")
