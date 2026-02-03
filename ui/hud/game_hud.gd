@@ -1,11 +1,8 @@
 extends CanvasLayer
 class_name GameHUD
 ## Main game HUD containing health bar and debug info.
-## F3 toggles debug panel visibility.
 
 @onready var health_bar: HealthBar = $MarginContainer/VBoxContainer/HealthBar
-@onready var debug_panel: PanelContainer = $MarginContainer/VBoxContainer/DebugPanel
-@onready var autobot_label: Label = $MarginContainer/VBoxContainer/DebugPanel/AutoBotLabel
 
 ## Low HP vignette overlay
 var low_hp_vignette: ColorRect
@@ -28,18 +25,10 @@ var quest_tracker = null
 ## Quest reward notification
 var reward_popup: Label = null
 
-## Whether debug panel is visible
-var debug_visible: bool = DebugConfig.show_debug_ui
+## Boss reward popup
+var boss_reward_popup: Control = null
 
 func _ready() -> void:
-	# Hide debug panel in release builds
-	if not DebugConfig.show_debug_ui:
-		debug_panel.visible = false
-		debug_visible = false
-	else:
-		# Show debug by default in debug builds (can toggle with F3)
-		debug_panel.visible = debug_visible
-	
 	# Create low HP vignette overlay
 	_setup_low_hp_vignette()
 	
@@ -58,6 +47,9 @@ func _ready() -> void:
 	# Create quest reward notification
 	_setup_reward_popup()
 
+	# Create boss reward popup
+	_setup_boss_reward_popup()
+
 	# Connect to health changes
 	Events.player_health_changed.connect(_on_health_changed)
 	
@@ -67,17 +59,6 @@ func _ready() -> void:
 	# Connect to game_loaded to refresh all HUD elements after loading a save
 	Events.game_loaded.connect(_on_game_loaded)
 
-
-func _unhandled_input(event: InputEvent) -> void:
-	# F3 toggles debug panel (only in debug builds)
-	if not DebugConfig.show_debug_ui:
-		return
-
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F3:
-			debug_visible = not debug_visible
-			debug_panel.visible = debug_visible
-			DebugLogger.log_ui("Debug panel: %s (F3 to toggle)" % ("ON" if debug_visible else "OFF"))
 
 
 func _setup_save_indicator() -> void:
@@ -143,11 +124,10 @@ func _setup_buff_icons() -> void:
 
 
 func _setup_tutorial_prompt() -> void:
-	var TutorialPromptScript = preload("res://ui/tutorial/tutorial_prompt.gd")
-	tutorial_prompt = TutorialPromptScript.new()
+	var prompt_scene = preload("res://ui/tutorial/tutorial_prompt.tscn")
+	tutorial_prompt = prompt_scene.instantiate()
 	tutorial_prompt.name = "TutorialPrompt"
 	# Center screen overlay
-	tutorial_prompt.anchors_preset = Control.PRESET_FULL_RECT
 	add_child(tutorial_prompt)
 
 
@@ -176,6 +156,13 @@ func _setup_reward_popup() -> void:
 
 	# Connect to quest completion
 	Events.quest_completed.connect(_on_quest_completed_reward)
+
+
+func _setup_boss_reward_popup() -> void:
+	var popup_scene = preload("res://ui/boss/boss_reward_popup.tscn")
+	boss_reward_popup = popup_scene.instantiate()
+	boss_reward_popup.name = "BossRewardPopup"
+	add_child(boss_reward_popup)
 
 
 func _on_quest_completed_reward(quest_id: String) -> void:
@@ -242,7 +229,7 @@ func _start_vignette_pulse() -> void:
 		vignette_tween.kill()
 	
 	# Looping pulse: fade in -> fade out -> repeat
-	vignette_tween = create_tween().set_loops()
+	vignette_tween = create_tween().set_loops(999999)
 	vignette_tween.tween_property(low_hp_vignette, "color:a", 0.18, 0.6)\
 		.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	vignette_tween.tween_property(low_hp_vignette, "color:a", 0.04, 0.6)\
@@ -256,37 +243,16 @@ func _stop_vignette_pulse() -> void:
 		# Fade out smoothly
 		var fade_out = create_tween()
 		fade_out.tween_property(low_hp_vignette, "color:a", 0.0, 0.3)
-		fade_out.tween_callback(func(): low_hp_vignette.visible = false)
+		var vignette_ref = weakref(low_hp_vignette)
+		var hide_func = func():
+			var node = vignette_ref.get_ref()
+			if node:
+				node.visible = false
+		var hide_ref = weakref(hide_func)
+		fade_out.tween_callback(func():
+			var cb = hide_ref.get_ref()
+			if cb:
+				cb.call()
+		)
 
 
-func _process(_delta: float) -> void:
-	# Only update if debug panel is visible
-	if not debug_visible or not debug_panel.visible:
-		return
-	
-	# Update AutoBot status label
-	if autobot_label and is_instance_valid(AutoBot):
-		var status = AutoBot.get_status()
-		if AutoBot.enabled:
-			# Show detailed debug info
-			autobot_label.text = AutoBot.get_debug_info() + "\nF1=Bot | F3=Hide"
-			
-			# Color based on state
-			match status:
-				"ATTACKING", "DESPERATE_ATTACK":
-					autobot_label.modulate = Color(1, 0.4, 0.4, 1)  # Red when attacking
-				"CLOSING":
-					autobot_label.modulate = Color(1, 0.7, 0.3, 1)  # Orange when closing
-				"HUNTING", "FINISH_THEM":
-					autobot_label.modulate = Color(1, 0.9, 0.3, 1)  # Yellow when hunting
-				"WANDERING":
-					autobot_label.modulate = Color(0.4, 1, 0.6, 1)  # Green when wandering
-				"KITING", "ESCAPING", "RETREATING":
-					autobot_label.modulate = Color(0.4, 0.8, 1, 1)  # Blue when defensive
-				"LAST_STAND":
-					autobot_label.modulate = Color(1, 0.2, 0.8, 1)  # Purple for last stand
-				_:
-					autobot_label.modulate = Color(0.7, 0.7, 0.7, 1)  # Gray for other
-		else:
-			autobot_label.text = "[AutoBot: OFF]\nF1=Bot | F3=Hide"
-			autobot_label.modulate = Color(1, 0.5, 0.4, 1)
