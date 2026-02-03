@@ -18,10 +18,11 @@ const RING_GLOW_COLORS: Dictionary = {
 	1: Color(0.4, 0.6, 1.0, 0.2),    # EQUIPMENT - Blue
 	2: Color(1.0, 0.6, 0.3, 0.2),    # COMPANIONS - Orange
 	3: Color(0.6, 0.6, 0.6, 0.2),    # OPTIONS - Silver
+	4: Color(1.0, 0.2, 0.2, 0.8),    # BOSS - Purple
 }
 
 ## Ring types
-enum RingType { ITEMS, EQUIPMENT, COMPANIONS, OPTIONS }
+enum RingType { ITEMS, EQUIPMENT, COMPANIONS, BOSS, OPTIONS }
 
 ## Current state
 var is_open: bool = false
@@ -35,6 +36,7 @@ var rings: Dictionary = {
 	RingType.ITEMS: [],
 	RingType.EQUIPMENT: [],
 	RingType.COMPANIONS: [],
+	RingType.BOSS: [],
 	RingType.OPTIONS: []
 }
 
@@ -43,7 +45,8 @@ var ring_names: Dictionary = {
 	RingType.ITEMS: "Items",
 	RingType.EQUIPMENT: "Equipment",
 	RingType.COMPANIONS: "Companions",
-	RingType.OPTIONS: "Options"
+	RingType.BOSS: "Bosses",
+	RingType.OPTIONS: "Options",
 }
 
 ## Node references
@@ -53,6 +56,8 @@ var ring_names: Dictionary = {
 @onready var ring_label: Label = $Container/RingLabel
 @onready var item_name_label: Label = $Container/ItemNameLabel
 @onready var item_desc_label: Label = $Container/ItemDescLabel
+@onready var bosses_menu: Control = $Container/BossesMenu
+@onready var boss_back_button: Button = get_node_or_null("Container/BossesMenu/BossesBackground/BossesVBox/BossesScrollContainer/BossesListVBox/BackButton")
 
 ## Pooled ring items
 var ring_items: Array = []  # Array of RingItem nodes
@@ -77,6 +82,7 @@ func _ready() -> void:
 	
 	# Set up default options ring
 	_setup_default_options()
+	_setup_default_boss_ring()
 
 func _setup_default_options() -> void:
 	rings[RingType.OPTIONS] = [
@@ -86,7 +92,19 @@ func _setup_default_options() -> void:
 		{"id": "quit", "name": "Quit", "type": "option", "desc": "Return to title screen"},
 	]
 
+func _setup_default_boss_ring() -> void:
+	rings[RingType.BOSS] = [
+		{"id": "boss_tracker", "name": "Boss Tracker", "type": "boss", "desc": "View defeated bosses"},
+	]
+
 func _unhandled_input(event: InputEvent) -> void:
+	# Close boss tracker if open
+	if bosses_menu and bosses_menu.visible:
+		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("dodge") or event.is_action_pressed("ring_menu"):
+			_on_boss_back_pressed()
+			get_viewport().set_input_as_handled()
+		return
+
 	# Close quest log if open
 	if _quest_log_overlay and is_instance_valid(_quest_log_overlay):
 		if event.is_action_pressed("ui_cancel") or event.is_action_pressed("dodge") or event.is_action_pressed("ring_menu"):
@@ -150,6 +168,9 @@ func open_menu() -> void:
 	
 	is_open = true
 	visible = true
+	if bosses_menu:
+		bosses_menu.visible = false
+	_set_ring_ui_visible(true)
 	
 	# Animate open (scale from 0 to 1, fade in)
 	container.scale = Vector2.ZERO
@@ -184,6 +205,8 @@ func close_menu() -> void:
 		return
 	
 	is_open = false
+	if bosses_menu:
+		bosses_menu.visible = false
 	
 	# Animate close
 	if open_tween:
@@ -193,7 +216,17 @@ func close_menu() -> void:
 	open_tween.set_trans(Tween.TRANS_BACK)
 	open_tween.tween_property(container, "scale", Vector2.ZERO, CLOSE_DURATION)
 	open_tween.parallel().tween_property(container, "modulate:a", 0.0, CLOSE_DURATION)
-	open_tween.tween_callback(func(): visible = false)
+	var self_ref = weakref(self)
+	var hide_func = func():
+		var node = self_ref.get_ref()
+		if node:
+			node.visible = false
+	var hide_ref = weakref(hide_func)
+	open_tween.tween_callback(func():
+		var cb = hide_ref.get_ref()
+		if cb:
+			cb.call()
+	)
 	
 	# Resume game
 	GameManager.resume_game()
@@ -256,8 +289,143 @@ func activate_selected() -> void:
 			_equip_item(item)
 		RingType.COMPANIONS:
 			_switch_companion(item)
+		RingType.BOSS:
+			_show_boss_tracker()
 		RingType.OPTIONS:
 			_handle_option(item)
+
+func _show_boss_tracker() -> void:
+	# Show boss tracker menu
+	is_open = false	# Hide ring menu, show boss tracker
+	if bosses_menu:
+		bosses_menu.visible = true
+	_set_ring_ui_visible(false)
+	
+	# Play sound
+	AudioManager.play_sfx("menu_select")
+	
+	# Populate boss list
+	_populate_boss_tracker()
+	
+	# Connect back button
+	if is_instance_valid(boss_back_button):
+		if not boss_back_button.is_connected("pressed", _on_boss_back_pressed):
+			boss_back_button.pressed.connect(_on_boss_back_pressed)
+	
+	# Pause game
+	GameManager.pause_game()
+
+func _on_boss_back_pressed() -> void:
+	# Close boss tracker, return to ring menu
+	if bosses_menu:
+		bosses_menu.visible = false
+	_set_ring_ui_visible(true)
+	# Re-open ring menu at original ring
+	is_open = true
+	_refresh_ring()
+	AudioManager.play_sfx("menu_navigate")
+
+func _populate_boss_tracker() -> void:
+	var boss_container = get_node_or_null("Container/BossesMenu/BossesBackground/BossesVBox/BossesScrollContainer/BossesListVBox")
+	if not boss_container:
+		return
+	
+	# Clear existing entries
+	for child in boss_container.get_children():
+		if child.name.begins_with("BossEntry_"):
+			child.queue_free()
+	
+	# Get all boss IDs from BossRewardManager
+	var all_bosses = [0, 1, 2, 3] # BossID enum values
+	for boss_id in all_bosses:
+		var entry = _create_boss_entry(boss_id)
+		boss_container.add_child(entry)
+
+func _create_boss_entry(boss_id: int) -> Control:
+	var is_defeated = BossRewardManager.is_boss_defeated(boss_id)
+	var is_claimed = BossRewardManager.is_reward_claimed(boss_id)
+	var boss_name = BossRewardManager.BOSS_NAMES[boss_id]
+	
+	var entry = HBoxContainer.new()
+	entry.name = "BossEntry_%d" % boss_id
+	
+	# Boss icon
+	var icon = TextureRect.new()
+	if is_defeated:
+		icon.texture = _get_defeated_icon(boss_id)
+		icon.custom_minimum_size = Vector2(32, 32)
+		entry.add_child(icon)
+	else:
+		# Fallback: Use ColorRect for locked icon (no locked.png yet)
+		var locked_icon = ColorRect.new()
+		locked_icon.color = Color(0.5, 0.5, 0.5, 1)
+		locked_icon.custom_minimum_size = Vector2(32, 32)
+		entry.add_child(locked_icon)
+	
+	# Boss name
+	var label = Label.new()
+	label.text = boss_name if is_defeated else "%s [LOCKED]" % boss_name
+	label.custom_minimum_size = Vector2(200, 32)
+	entry.add_child(label)
+	
+	# Status indicator
+	var status = Label.new()
+	if is_defeated:
+		if is_claimed:
+			status.text = "Defeated"
+			status.modulate = Color(0, 1, 0, 1) # Green
+		else:
+			status.text = "Reward Available"
+			status.modulate = Color(1, 0.85, 0.2, 1) # Gold
+	else:
+		status.text = "---"
+		status.modulate = Color(0.7, 0.7, 0.7, 1) # Gray
+	status.custom_minimum_size = Vector2(100, 32)
+	entry.add_child(status)
+
+	if is_defeated and not is_claimed:
+		var claim_button = Button.new()
+		claim_button.text = "Claim"
+		claim_button.custom_minimum_size = Vector2(64, 28)
+		claim_button.pressed.connect(_on_boss_claim_pressed.bind(boss_id))
+		entry.add_child(claim_button)
+	
+	return entry
+
+func _on_boss_claim_pressed(boss_id: int) -> void:
+	if not BossRewardManager.is_boss_defeated(boss_id):
+		return
+	if BossRewardManager.is_reward_claimed(boss_id):
+		return
+	BossRewardManager.mark_reward_claimed(boss_id)
+	var rewards = BossRewardManager.get_boss_rewards(boss_id)
+	Events.boss_reward_claimed.emit(boss_id, rewards)
+	_populate_boss_tracker()
+
+func _set_ring_ui_visible(is_visible: bool) -> void:
+	if ring_label:
+		ring_label.visible = is_visible
+	if item_name_label:
+		item_name_label.visible = is_visible
+	if item_desc_label:
+		item_desc_label.visible = is_visible
+	for ring_item in ring_items:
+		ring_item.visible = is_visible
+
+func _get_defeated_icon(boss_id: BossRewardManager.BossID) -> Texture:
+	# Return boss portrait or sprite texture
+	# For now, use existing sprite
+	match boss_id:
+		BossRewardManager.BossID.ALPHA_RACCOON:
+			return load("res://art/generated/enemies/alpha_raccoon.png")
+		BossRewardManager.BossID.CROW_MATRIARCH:
+			return load("res://art/generated/enemies/crow_matriarch.png")
+		BossRewardManager.BossID.RAT_KING:
+			return load("res://art/generated/enemies/rat_king.png")
+		BossRewardManager.BossID.PIGEON_KING:
+			return load("res://art/generated/enemies/pigeon_king.png")
+		_:
+			return load("res://art/generated/enemies/crow_matriarch.png") # Fallback
 
 # =============================================================================
 # RING DISPLAY
@@ -440,8 +608,10 @@ func _handle_option(item: Dictionary) -> void:
 ## Get current player level via group lookup. Returns 1 if player not found.
 func _get_player_level() -> int:
 	var player = get_tree().get_first_node_in_group("player")
-	if player and player.has_node("ProgressionComponent"):
-		return player.get_node("ProgressionComponent").get_level()
+	if player:
+		var progression = player.get_node_or_null("ProgressionComponent")
+		if progression:
+			return progression.get_level()
 	return 1
 
 # =============================================================================
@@ -500,4 +670,3 @@ func _close_quest_log() -> void:
 		_quest_log_overlay.queue_free()
 		_quest_log_overlay = null
 	GameManager.resume_game()
-

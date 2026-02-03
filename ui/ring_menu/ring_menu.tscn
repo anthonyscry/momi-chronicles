@@ -81,3 +81,66 @@ theme_override_constants/outline_size = 1
 text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="BossesMenu" type="Control" parent="Container"]
+anchors_preset = 8
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+visible = false
+
+[node name="BossesBackground" type="ColorRect" parent="Container/BossesMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.05, 0.1, 0.9)
+
+[node name="BossesVBox" type="VBoxContainer" parent="Container/BossesMenu/BossesBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 20.0
+offset_bottom = 20.0
+
+[node name="BossesTitle" type="Label" parent="Container/BossesMenu/BossesBackground/BossesVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "Boss Progress"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Container/BossesMenu/BossesBackground/BossesVBox"]
+modulate = Color(1, 0.85, 0, 1)
+
+[node name="BossesScrollContainer" type="ScrollContainer" parent="Container/BossesMenu/BossesBackground/BossesVBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 60.0
+offset_right = 0.0
+offset_bottom = 0.0
+size_flags_vertical = 3
+
+[node name="BossesListVBox" type="VBoxContainer" parent="Container/BossesMenu/BossesBackground/BossesVBox/BossesScrollContainer"]
+
+[node name="HSeparator" type="HSeparator" parent="Container/BossesMenu/BossesBackground/BossesVBox/BossesScrollContainer/BossesListVBox"]
+
+[node name="BackButton" type="Button" parent="Container/BossesMenu/BossesBackground/BossesVBox/BossesScrollContainer/BossesListVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "Back"
