@@ -67,6 +67,12 @@ func load_game() -> bool:
 func get_save_info() -> Dictionary:
 	return _read_save_file()
 
+func get_boss_defeats() -> Dictionary:
+	var data = _read_save_file()
+	if data.is_empty():
+		return {}
+	return data.get("boss_defeats", {})
+
 # =============================================================================
 # PRIVATE METHODS - DATA
 # =============================================================================
@@ -140,7 +146,89 @@ func _gather_save_data() -> Dictionary:
 
 	return data
 
-func _apply_save_data(data: Dictionary) -> bool:	var version = data.get("version", 1)	if version > SAVE_VERSION:		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(version), SAVE_VERSION])		return false		## MIGRATION: v3 -> v4 - add boss_defeats tracking	if version < 4:		DebugLogger.log_save("SaveManager: Migrating v3 save to v4 format")		# Initialize empty boss_defeats for v3 saves (backward compatible)		if not data.has("boss_defeats"):			data["boss_defeats"] = {}		DebugLogger.log_save("SaveManager: v4 save data initialized with boss_defeats tracking")		if data.has("difficulty") and DifficultyManager:		DifficultyManager.set_difficulty(data["difficulty"])		GameManager.set_coins(data.get("coins", 0))	GameManager.boss_defeated = data.get("boss_defeated", false)	GameManager.mini_bosses_defeated = data.get("mini_bosses_defeated", {		"alpha_raccoon": false,		"crow_matriarch": false,		"rat_king": false,	})	GameManager.unlocked_zones = []	for zone_id in data.get("unlocked_zones", []):		GameManager.unlocked_zones.append(zone_id)		# Restore NPC reputation	var rep_data = data.get("npc_reputation", {})	for npc_id in rep_data:		GameManager.npc_reputation[npc_id] = int(rep_data[npc_id])		var pos_data = data.get("player_position", {})	if pos_data.has("x") and pos_data.has("y"):		GameManager.player_position = Vector2(pos_data["x"], pos_data["y"])		var target_zone = data.get("current_zone", "neighborhood")	if target_zone.is_empty():		target_zone = "neighborhood"	GameManager.current_zone = target_zone		var equipment_data = data.get("equipment", {})	if not equipment_data.is_empty() and GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):		GameManager.equipment_manager.load_save_data(equipment_data)		var inventory_data = data.get("inventory", {})	if not inventory_data.is_empty() and GameManager.inventory and is_instance_valid(GameManager.inventory):		GameManager.inventory.load_save_data(inventory_data)		var party_data = data.get("party", {})	if not party_data.is_empty() and GameManager.party_manager and is_instance_valid(GameManager.party_manager):		GameManager.party_manager.load_save_data(party_data)		if data.has("tutorial") and TutorialManager:		TutorialManager.load_save_data(data["tutorial"])		if data.has("quests") and QuestManager:		QuestManager.load_save_data(data["quests"])		## BOSS REWARD MANAGER INTEGRATION: Load boss defeats from save	if BossRewardManager:		var boss_defeats = data.get("boss_defeats", {})		BossRewardManager.load_defeats(boss_defeats)		DebugLogger.log_save("SaveManager: Loaded %d boss defeats from save" % boss_defeats.size())		_pending_level = data.get("level", 1)	_pending_exp = data.get("total_exp", 0)		if not Events.zone_entered.is_connected(_on_zone_entered_after_load):		Events.zone_entered.connect(_on_zone_entered_after_load, CONNECT_ONE_SHOT)		GameManager.load_zone(target_zone, "default")	Events.game_loaded.emit()	return true# PRIVATE METHODS - FILE I/O
+func _apply_save_data(data: Dictionary) -> bool:
+	var version = data.get("version", 1)
+	if version > SAVE_VERSION:
+		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(version), SAVE_VERSION])
+		return false
+
+	## MIGRATION: v3 -> v4 - add boss_defeats tracking
+	if version < 4:
+		DebugLogger.log_save("SaveManager: Migrating v3 save to v4 format")
+		# Initialize empty boss_defeats for v3 saves (backward compatible)
+		if not data.has("boss_defeats"):
+			data["boss_defeats"] = {}
+		DebugLogger.log_save("SaveManager: v4 save data initialized with boss_defeats tracking")
+
+	if data.has("difficulty") and DifficultyManager:
+		DifficultyManager.set_difficulty(data["difficulty"])
+
+	GameManager.set_coins(data.get("coins", 0))
+	GameManager.boss_defeated = data.get("boss_defeated", false)
+	GameManager.mini_bosses_defeated = data.get("mini_bosses_defeated", {
+		"alpha_raccoon": false,
+		"crow_matriarch": false,
+		"rat_king": false,
+	})
+
+	GameManager.unlocked_zones = {}
+	var saved_zones = data.get("unlocked_zones", {})
+	if saved_zones is Array:
+		for zone_id in saved_zones:
+			GameManager.unlocked_zones[zone_id] = true
+	elif saved_zones is Dictionary:
+		for zone_id in saved_zones.keys():
+			GameManager.unlocked_zones[zone_id] = bool(saved_zones[zone_id])
+
+	# Restore NPC reputation
+	var rep_data = data.get("npc_reputation", {})
+	for npc_id in rep_data:
+		GameManager.npc_reputation[npc_id] = int(rep_data[npc_id])
+
+	var pos_data = data.get("player_position", {})
+	if pos_data.has("x") and pos_data.has("y"):
+		GameManager.player_position = Vector2(pos_data["x"], pos_data["y"])
+
+	var target_zone = data.get("current_zone", "neighborhood")
+	if target_zone.is_empty():
+		target_zone = "neighborhood"
+	GameManager.current_zone = target_zone
+
+	var equipment_data = data.get("equipment", {})
+	if not equipment_data.is_empty() and GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
+		GameManager.equipment_manager.load_save_data(equipment_data)
+
+	var inventory_data = data.get("inventory", {})
+	if not inventory_data.is_empty() and GameManager.inventory and is_instance_valid(GameManager.inventory):
+		GameManager.inventory.load_save_data(inventory_data)
+
+	var party_data = data.get("party", {})
+	if not party_data.is_empty() and GameManager.party_manager and is_instance_valid(GameManager.party_manager):
+		GameManager.party_manager.load_save_data(party_data)
+
+	if data.has("tutorial") and TutorialManager:
+		TutorialManager.load_save_data(data["tutorial"])
+
+	if data.has("quests") and QuestManager:
+		QuestManager.load_save_data(data["quests"])
+
+	## BOSS REWARD MANAGER INTEGRATION: Load boss defeats from save
+	if BossRewardManager:
+		var boss_defeats = data.get("boss_defeats", {})
+		BossRewardManager.load_defeats(boss_defeats)
+		DebugLogger.log_save("SaveManager: Loaded %d boss defeats from save" % boss_defeats.size())
+
+	_pending_level = int(data.get("level", 1))
+	_pending_exp = int(data.get("total_exp", 0))
+
+	if not Events.zone_entered.is_connected(_on_zone_entered_after_load):
+		Events.zone_entered.connect(_on_zone_entered_after_load, CONNECT_ONE_SHOT)
+
+	GameManager.load_zone(target_zone, "default")
+	Events.game_loaded.emit()
+	return true
+
+# PRIVATE METHODS - FILE I/O
 # =============================================================================
 
 func _write_save_file(data: Dictionary) -> bool:

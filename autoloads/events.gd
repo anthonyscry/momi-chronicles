@@ -251,6 +251,13 @@ signal gnome_died(gnome)
 signal gnome_hurt(gnome, damage)
 
 # =============================================================================
+# BOSS REWARD EVENTS
+# =============================================================================
+
+signal boss_reward_unlocked(boss_id: int, rewards: Array)
+signal boss_reward_claimed(boss_id: int, reward: Dictionary)
+
+# =============================================================================
 # NPC REPUTATION EVENTS
 # =============================================================================
 

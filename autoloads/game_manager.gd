@@ -20,6 +20,15 @@ var is_player_alive: bool = true
 var coins: int = 0
 var current_zone: String = ""
 
+var boss_defeated: bool = false
+var game_complete: bool = false
+var mini_bosses_defeated: Dictionary = {
+	"alpha_raccoon": false,
+	"crow_matriarch": false,
+	"rat_king": false,
+	"pigeon_king": false,
+}
+
 var zone_scenes: Dictionary = {
 	"neighborhood": "res://world/zones/neighborhood.tscn",
 	"backyard": "res://world/zones/backyard.tscn",
@@ -29,15 +38,10 @@ var zone_scenes: Dictionary = {
 	"rooftops": "res://world/zones/rooftops.tscn",
 }
 
-var unlocked_zones: Array[String] = []
-
-var boss_defeated: bool = false
-var game_complete: bool = false
-var mini_bosses_defeated: Dictionary = {
-	"alpha_raccoon": false,
-	"crow_matriarch": false,
-	"rat_king": false,
-	"pigeon_king": false,
+## Zone unlock tracking - zones unlocked via boss rewards
+var unlocked_zones: Dictionary = {
+	"backyard_deep": false,
+	"rooftops": false
 }
 
 var pending_spawn_point: String = ""
@@ -59,6 +63,12 @@ var _fade_overlay: CanvasLayer = null
 var _fade_rect: ColorRect = null
 var _is_transitioning: bool = false
 
+## Per-run session stats (not saved to disk)
+var session_stats: Dictionary = {
+	"enemies_defeated": 0,
+	"session_start_time": 0,
+}
+
 # =============================================================================
 # LIFECYCLE
 # =============================================================================
@@ -69,6 +79,8 @@ func _ready() -> void:
 	Events.zone_transition_requested.connect(_on_zone_transition_requested)
 	Events.boss_defeated.connect(_on_boss_defeated)
 	Events.mini_boss_defeated.connect(_on_mini_boss_defeated)
+
+	Events.enemy_defeated.connect(_on_enemy_defeated_session)
 
 	Events.zone_entered.connect(_on_zone_entered_autosave)
 	Events.boss_defeated.connect(_on_boss_defeated_autosave)
@@ -88,6 +100,9 @@ func _ready() -> void:
 
 	if unlocked_zones.is_empty():
 		unlock_zone("neighborhood")
+
+	# Initialize session stats timer
+	session_stats.session_start_time = Time.get_ticks_msec()
 
 	DebugLogger.log_system("GameManager initialized")
 
@@ -204,8 +219,19 @@ func boost_all_reputation(amount: int) -> void:
 # ZONE MANAGEMENT
 # =============================================================================
 
+## Zone Unlock Constants
+const ZONE_BACKYARD_DEEP: String = "backyard_deep"
+const ZONE_ROOFTOPS: String = "rooftops"
+
+## Zone requirement definitions (boss_id needed to unlock each zone)
+## Links to BossRewardManager.BossID enum values
+const ZONE_REQUIREMENTS: Dictionary = {
+	ZONE_BACKYARD_DEEP: BossRewardManager.BossID.ALPHA_RACCOON,
+	ZONE_ROOFTOPS: BossRewardManager.BossID.RAT_KING,
+}
+
 func is_zone_unlocked(zone_id: String) -> bool:
-	return zone_id in unlocked_zones
+	return unlocked_zones.get(zone_id, false)
 
 func unlock_zone(zone_id: String) -> void:
 	if zone_id.is_empty():
@@ -214,12 +240,43 @@ func unlock_zone(zone_id: String) -> void:
 	if is_zone_unlocked(zone_id):
 		DebugLogger.log_system("Zone already unlocked: %s" % zone_id)
 		return
-	unlocked_zones.append(zone_id)
+	# Mark zone as unlocked
+	unlocked_zones[zone_id] = true
+	SaveManager.save_game()
 	Events.zone_unlocked.emit(zone_id)
 	DebugLogger.log_system("Zone unlocked: %s" % zone_id)
 
+## Check if player can enter a zone (enforces boss defeat requirement)
+## Returns true if unlocked or allowed, false if locked (shows UI message)
+func can_enter_zone(zone_id: String) -> bool:
+	# Check if zone exists in zone_scenes
+	if not zone_scenes.has(zone_id):
+		DebugLogger.log_error("GameManager: Unknown zone requested: %s" % zone_id)
+		return false
+	
+	if is_zone_unlocked(zone_id):
+		return true
+
+	# Get required boss for this zone (null = no requirement)
+	var required_boss_id = ZONE_REQUIREMENTS.get(zone_id, null)
+	if required_boss_id == null or BossRewardManager.is_boss_defeated(required_boss_id):
+		unlock_zone(zone_id)
+		DebugLogger.log_system("Zone access allowed: %s" % zone_id)
+		return true
+
+	# Zone is locked - show requirement message
+	var boss_name = BossRewardManager.get_boss_name(required_boss_id)
+	var message = "This area is locked.\n\nDefeat %s to access this area." % boss_name
+	Events.ui_message.emit(message)
+	DebugLogger.log_system("Zone access blocked: %s (requires %s)" % [zone_id, boss_name])
+	return false
+
 func get_unlocked_zones() -> Array[String]:
-	return unlocked_zones.duplicate()
+	var zones: Array[String] = []
+	for zone_id in unlocked_zones.keys():
+		if unlocked_zones.get(zone_id, false):
+			zones.append(zone_id)
+	return zones
 
 func reset_zones() -> void:
 	unlocked_zones.clear()
@@ -237,7 +294,7 @@ func save_game() -> Dictionary:
 			"x": player_position.x,
 			"y": player_position.y,
 		},
-		"unlocked_zones": unlocked_zones.duplicate(),
+		"unlocked_zones": unlocked_zones,
 		"npc_reputation": npc_reputation.duplicate(),
 	}
 
@@ -250,9 +307,11 @@ func load_game(save_data: Dictionary) -> void:
 		var pos = save_data["player_position"]
 		player_position = Vector2(pos.get("x", 0.0), pos.get("y", 0.0))
 	if save_data.has("unlocked_zones"):
-		unlocked_zones = []
-		for zone_id in save_data["unlocked_zones"]:
-			unlocked_zones.append(zone_id)
+		# Restore unlocked zones from save data (Dictionary format)
+		var saved_zones = save_data["unlocked_zones"]
+		unlocked_zones = {}
+		for zone_id in saved_zones:
+			unlocked_zones[zone_id] = saved_zones[zone_id]
 	if unlocked_zones.is_empty():
 		unlock_zone("neighborhood")
 
@@ -307,8 +366,9 @@ func _fade_to_black(duration: float) -> void:
 	_fade_rect.color.a = 0.0
 	var tween = create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(_fade_rect, "color:a", 1.0, duration)
-		.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	var fade = tween.tween_property(_fade_rect, "color:a", 1.0, duration)
+	fade.set_ease(Tween.EASE_IN)
+	fade.set_trans(Tween.TRANS_QUAD)
 	await tween.finished
 
 func _fade_from_black(duration: float) -> void:
@@ -316,8 +376,9 @@ func _fade_from_black(duration: float) -> void:
 	_fade_rect.color.a = 1.0
 	var tween = create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(_fade_rect, "color:a", 0.0, duration)
-		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	var fade = tween.tween_property(_fade_rect, "color:a", 0.0, duration)
+	fade.set_ease(Tween.EASE_OUT)
+	fade.set_trans(Tween.TRANS_QUAD)
 	await tween.finished
 
 # =============================================================================
@@ -382,6 +443,18 @@ func _on_mini_boss_defeated_autosave(_boss: Node, _boss_key: String) -> void:
 		return
 	DebugLogger.log_save("Auto-saved after mini-boss defeat")
 
+## Get session stats with computed time survived
+func get_session_stats() -> Dictionary:
+	var elapsed_ms = Time.get_ticks_msec() - session_stats.session_start_time
+	var time_survived_seconds = int(elapsed_ms / 1000.0)
+	return {
+		"enemies_defeated": session_stats.enemies_defeated,
+		"time_survived_seconds": time_survived_seconds,
+	}
+
+func _on_enemy_defeated_session(_enemy: Node) -> void:
+	session_stats.enemies_defeated += 1
+
 func reset_game() -> void:
 	coins = 0
 	current_zone = ""
@@ -400,10 +473,18 @@ func reset_game() -> void:
 		"kids_gang": 30,
 		"henderson": 0,
 	}
-	reset_zones()
+	session_stats = {
+		"enemies_defeated": 0,
+		"session_start_time": Time.get_ticks_msec(),
+	}
+	# Reset unlocked zones to default state (only neighborhood)
+	unlocked_zones = {
+		"backyard_deep": false,
+		"rooftops": false,
+	}
 	if QuestManager:
 		QuestManager.active_quests.clear()
 		QuestManager.completed_quest_ids.clear()
 		QuestManager.failed_quest_ids.clear()
 		QuestManager.current_active_quest_id = ""
-	DebugLogger.log_system("Game state reset")
+		DebugLogger.log_system("Game state reset")

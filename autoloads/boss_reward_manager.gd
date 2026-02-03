@@ -30,34 +30,42 @@ enum RewardType {
 	COMPANION_SLOT
 }
 
-## Boss Rewards - data structure for each boss's reward
+## Boss Rewards - data structure for each boss's rewards
 ## Fields: type (RewardType), description (String), value (Variant)
 const BOSS_REWARDS: Dictionary = {
-	BossID.ALPHA_RACCOON: {
-		"type": RewardType.ZONE_UNLOCK,
-		"description": "Unlocks Backyard Deep zone",
-		"value": "backyard_deep"
-	},
-	BossID.CROW_MATRIARCH: {
-		"type": RewardType.EQUIPMENT_TIER,
-		"description": "Unlocks Tier 3 Crow Armor",
-		"value": 3
-	},
-	BossID.RAT_KING: {
-		"type": RewardType.ZONE_UNLOCK,
-		"description": "Unlocks Rooftops access",
-		"value": "rooftops"
-	},
-	BossID.RAT_KING: {
-		"type": RewardType.ABILITY_UNLOCK,
-		"description": "Grants Poison Resistance",
-		"value": "poison_resist"
-	},
-	BossID.PIGEON_KING: {
-		"type": RewardType.COMPANION_SLOT,
-		"description": "Unlocks 4th Companion Slot",
-		"value": 4
-	}
+	BossID.ALPHA_RACCOON: [
+		{
+			"type": RewardType.ZONE_UNLOCK,
+			"description": "Unlocks Backyard Deep zone",
+			"value": "backyard_deep"
+		}
+	],
+	BossID.CROW_MATRIARCH: [
+		{
+			"type": RewardType.EQUIPMENT_TIER,
+			"description": "Unlocks Tier 3 Crow Armor",
+			"value": 3
+		}
+	],
+	BossID.RAT_KING: [
+		{
+			"type": RewardType.ZONE_UNLOCK,
+			"description": "Unlocks Rooftops access",
+			"value": "rooftops"
+		},
+		{
+			"type": RewardType.ABILITY_UNLOCK,
+			"description": "Grants Poison Resistance",
+			"value": "poison_resist"
+		}
+	],
+	BossID.PIGEON_KING: [
+		{
+			"type": RewardType.COMPANION_SLOT,
+			"description": "Unlocks 4th Companion Slot",
+			"value": 4
+		}
+	]
 }
 
 # =============================================================================
@@ -73,6 +81,21 @@ var _defeated_bosses: Dictionary = {}
 func _ready() -> void:
 	DebugLogger.log_system("BossRewardManager initialized")
 	_load_from_save_data()
+
+## Load boss defeats from save data
+## Called by SaveManager.load_game() after loading save data
+## Save data format: {"boss_defeats": {"0": {"timestamp": 1234567, "reward_claimed": true}}
+func _load_from_save_data() -> void:
+	if not SaveManager:
+		return
+	var save_data = SaveManager.get_boss_defeats()
+	if save_data:
+		_defeated_bosses = {}
+		for boss_key in save_data:
+			var timestamp = save_data[boss_key].get("timestamp", 0)
+			var reward_claimed = save_data[boss_key].get("reward_claimed", false)
+			_defeated_bosses[boss_key] = {"timestamp": timestamp, "reward_claimed": reward_claimed}
+	DebugLogger.log_system("Loaded %d boss defeats from save" % save_data.size())
 
 # =============================================================================
 # PUBLIC API - DEFEAT TRACKING
@@ -91,14 +114,14 @@ func mark_boss_defeated(boss_id: BossID) -> void:
 	
 	DebugLogger.log_system("Boss defeated: %s at %d" % [BOSS_NAMES.get(boss_id, "Unknown"), timestamp])
 	
-	# Get reward for this boss
-	var reward = get_boss_reward(boss_id)
+	# Get rewards for this boss
+	var rewards = get_boss_rewards(boss_id)
 	
 	# Emit boss_defeated signal first (for other systems like mini_boss_base)
 	Events.boss_defeated.emit(boss_id)
 	
 	# Emit reward unlock signal with full reward data
-	Events.boss_reward_unlocked.emit(boss_id, reward)
+	Events.boss_reward_unlocked.emit(boss_id, rewards)
 	
 	# Trigger save to persist defeat
 	if SaveManager:
@@ -109,12 +132,25 @@ func is_boss_defeated(boss_id: BossID) -> bool:
 	var boss_key = str(boss_id)
 	return _defeated_bosses.has(boss_key)
 
+## Check if boss reward has been claimed
+func is_reward_claimed(boss_id: BossID) -> bool:
+	var boss_key = str(boss_id)
+	if not _defeated_bosses.has(boss_key):
+		return false
+	return _defeated_bosses[boss_key].get("reward_claimed", false)
+
 ## Get reward data for specific boss
 func get_boss_reward(boss_id: BossID) -> Dictionary:
-	if not BOSS_REWARDS.has(boss_id):
+	var rewards = get_boss_rewards(boss_id)
+	if rewards.is_empty():
 		DebugLogger.log_error("BossRewardManager: Invalid boss_id %d in get_boss_reward" % boss_id)
-		return null
-	
+		return {}
+	return rewards[0]
+
+## Get rewards for specific boss (supports multi-reward bosses)
+func get_boss_rewards(boss_id: BossID) -> Array:
+	if not BOSS_REWARDS.has(boss_id):
+		return []
 	return BOSS_REWARDS[boss_id]
 
 ## Get all defeated boss IDs
@@ -128,25 +164,30 @@ func get_all_defeated_bosses() -> Array[BossID]:
 
 ## Get human-readable reward description
 func get_reward_description(boss_id: BossID) -> String:
-	var reward = get_boss_reward(boss_id)
-	if reward.is_empty():
+	var rewards = get_boss_rewards(boss_id)
+	if rewards.is_empty():
 		return "No reward"
 	
-	var reward_type = reward.get("type", RewardType.ZONE_UNLOCK)
-	var reward_value = reward.get("value", "")
-	
-	# Build description based on reward type
-	match reward_type:
-		RewardType.ZONE_UNLOCK:
-			return "Zone unlock: %s" % reward_value
-		RewardType.EQUIPMENT_TIER:
-			return "Equipment tier %d unlocked" % reward_value
-		RewardType.ABILITY_UNLOCK:
-			return "Ability: %s" % reward_value
-		RewardType.COMPANION_SLOT:
-			return "%d companion slots" % reward_value
-		_:
-			return reward.get("description", "Unknown reward")
+	var parts: Array = []
+	for reward in rewards:
+		var reward_type = reward.get("type", RewardType.ZONE_UNLOCK)
+		var reward_value = reward.get("value", "")
+		match reward_type:
+			RewardType.ZONE_UNLOCK:
+				parts.append("Zone unlock: %s" % reward_value)
+			RewardType.EQUIPMENT_TIER:
+				parts.append("Equipment tier %d unlocked" % reward_value)
+			RewardType.ABILITY_UNLOCK:
+				parts.append("Ability: %s" % reward_value)
+			RewardType.COMPANION_SLOT:
+				parts.append("%d companion slots" % reward_value)
+			_:
+				parts.append(reward.get("description", "Unknown reward"))
+	return "; ".join(parts)
+
+## Get human-readable boss name
+func get_boss_name(boss_id: BossID) -> String:
+	return BOSS_NAMES.get(boss_id, "Unknown Boss")
 
 # =============================================================================
 # PUBLIC API - SAVE/LOAD INTEGRATION
@@ -154,7 +195,13 @@ func get_reward_description(boss_id: BossID) -> String:
 
 ## Load boss defeats from save data (called by SaveManager)
 func load_defeats(boss_defeats_data: Dictionary) -> void:
-	_defeated_bosses = boss_defeats_data.duplicate()
+	_defeated_bosses = {}
+	for boss_key in boss_defeats_data.keys():
+		var entry = boss_defeats_data[boss_key]
+		_defeated_bosses[boss_key] = {
+			"timestamp": entry.get("timestamp", 0),
+			"reward_claimed": entry.get("reward_claimed", false)
+		}
 	DebugLogger.log_system("BossRewardManager: Loaded %d defeated bosses from save" % _defeated_bosses.size())
 
 ## Get boss defeats for save serialization
@@ -166,6 +213,15 @@ func get_save_data() -> Dictionary:
 		save_defeats[boss_key] = defeat_data
 	
 	return save_defeats
+
+## Mark reward as claimed for a boss
+func mark_reward_claimed(boss_id: BossID) -> void:
+	var boss_key = str(boss_id)
+	if not _defeated_bosses.has(boss_key):
+		return
+	_defeated_bosses[boss_key]["reward_claimed"] = true
+	if SaveManager:
+		SaveManager.save_game()
 
 ## Reset all boss defeats (for new game)
 func reset_defeats() -> void:
