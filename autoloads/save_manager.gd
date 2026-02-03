@@ -7,7 +7,7 @@ extends Node
 
 const SAVE_FILE_PATH = "user://save_data.json"
 const BACKUP_PATH = "user://save_data.backup.json"
-const SAVE_VERSION = 3
+const SAVE_VERSION = 4
 
 # =============================================================================
 # STATE
@@ -85,6 +85,7 @@ func _get_default_data() -> Dictionary:
 			"crow_matriarch": false,
 			"rat_king": false,
 		},
+		"boss_defeats": {},  # Dictionary[String, Dictionary] - boss_id -> {timestamp, reward_claimed}
 		"unlocked_zones": [],
 		"player_position": {"x": 0.0, "y": 0.0},
 	}
@@ -103,6 +104,11 @@ func _gather_save_data() -> Dictionary:
 
 	data["boss_defeated"] = GameManager.boss_defeated
 	data["mini_bosses_defeated"] = GameManager.mini_bosses_defeated.duplicate()
+	
+	## BOSS REWARD MANAGER INTEGRATION: Serialize boss defeats
+	if BossRewardManager:
+		data["boss_defeats"] = BossRewardManager.get_save_data()
+		DebugLogger.log_save("SaveManager: Saving %d boss defeats" % data["boss_defeats"].size())
 
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.progression:
@@ -112,17 +118,17 @@ func _gather_save_data() -> Dictionary:
 	if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager):
 		data["equipment"] = GameManager.equipment_manager.get_save_data()
 	else:
-		DebugLogger.log_error("SaveManager: equipment_manager not valid during save")
+		DebugLogger.log_system("SaveManager: equipment_manager not ready; skipping")
 
 	if GameManager.inventory and is_instance_valid(GameManager.inventory):
 		data["inventory"] = GameManager.inventory.get_save_data()
 	else:
-		DebugLogger.log_error("SaveManager: inventory not valid during save")
+		DebugLogger.log_system("SaveManager: inventory not ready; skipping")
 
 	if GameManager.party_manager and is_instance_valid(GameManager.party_manager):
 		data["party"] = GameManager.party_manager.get_save_data()
 	else:
-		DebugLogger.log_error("SaveManager: party_manager not valid during save")
+		DebugLogger.log_system("SaveManager: party_manager not ready; skipping")
 
 	if TutorialManager:
 		data["tutorial"] = TutorialManager.get_save_data()
@@ -150,7 +156,9 @@ func _apply_save_data(data: Dictionary) -> bool:
 		"crow_matriarch": false,
 		"rat_king": false,
 	})
-	GameManager.unlocked_zones = data.get("unlocked_zones", [])
+	GameManager.unlocked_zones = []
+	for zone_id in data.get("unlocked_zones", []):
+		GameManager.unlocked_zones.append(zone_id)
 
 	# Restore NPC reputation
 	var rep_data = data.get("npc_reputation", {})
@@ -162,6 +170,8 @@ func _apply_save_data(data: Dictionary) -> bool:
 		GameManager.player_position = Vector2(pos_data["x"], pos_data["y"])
 
 	var target_zone = data.get("current_zone", "neighborhood")
+	if target_zone.is_empty():
+		target_zone = "neighborhood"
 	GameManager.current_zone = target_zone
 
 	var equipment_data = data.get("equipment", {})
@@ -197,6 +207,22 @@ func _apply_save_data(data: Dictionary) -> bool:
 # =============================================================================
 
 func _write_save_file(data: Dictionary) -> bool:
+	var json_string = JSON.stringify(data, "  ")
+
+	# Web exports use Emscripten's virtual FS backed by IndexedDB.
+	# Atomic write (tmp + rename) may fail on the virtual FS, so write directly.
+	if OS.has_feature("web"):
+		var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
+		if not file:
+			DebugLogger.log_error("SaveManager: [web] Failed to open save file for writing")
+			return false
+		file.store_string(json_string)
+		file.close()
+		Events.game_saved.emit()
+		DebugLogger.log_save("Game saved successfully (web)")
+		return true
+
+	# Desktop: atomic write with backup
 	if FileAccess.file_exists(SAVE_FILE_PATH):
 		if FileAccess.file_exists(BACKUP_PATH):
 			DirAccess.remove_absolute(BACKUP_PATH)
@@ -208,7 +234,6 @@ func _write_save_file(data: Dictionary) -> bool:
 		DebugLogger.log_error("SaveManager: Failed to open temp file for writing: %s" % temp_path)
 		return false
 
-	var json_string = JSON.stringify(data, "  ")
 	file.store_string(json_string)
 	file.close()
 
