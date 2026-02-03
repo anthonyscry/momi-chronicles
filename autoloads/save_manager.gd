@@ -146,6 +146,20 @@ func _apply_save_data(data: Dictionary) -> bool:
 		DebugLogger.log_error("SaveManager: Incompatible save version (got %s, max %d)" % [str(version), SAVE_VERSION])
 		return false
 
+	## MIGRATION: v3 -> v4 - add boss_defeats tracking
+	if version < 4:
+		DebugLogger.log_save("SaveManager: Migrating v3 save to v4 format")
+		# Initialize empty boss_defeats for v3 saves (backward compatible)
+		if not data.has("boss_defeats"):
+			data["boss_defeats"] = {}
+		DebugLogger.log_save("SaveManager: v4 save data initialized with boss_defeats tracking")
+
+	## BOSS REWARD MANAGER INTEGRATION: Load boss defeats from save
+	if BossRewardManager:
+		var boss_defeats = data.get("boss_defeats", {})
+		BossRewardManager.load_defeats(boss_defeats)
+		DebugLogger.log_save("SaveManager: Loaded %%d boss defeats from save" %% boss_defeats.size())
+	
 	if data.has("difficulty") and DifficultyManager:
 		DifficultyManager.set_difficulty(data["difficulty"])
 
