@@ -4,6 +4,26 @@ extends Node
 ## NOTE: This is an autoload, so don't use class_name.
 
 # =============================================================================
+# EQUIPMENT TIER SYSTEM
+# =============================================================================
+
+## Equipment Tiers - gated by boss defeats
+enum EquipmentTier {
+	TIER_1 = 1,  # Starter gear (always available)
+	TIER_2 = 2,  # Requires Alpha Raccoon defeat
+	TIER_3 = 3,  # Requires Crow Matriarch defeat
+	TIER_4 = 4   # Requires Rat King defeat
+}
+
+## Boss requirement per tier (which boss must be defeated to unlock each tier)
+## Links to BossRewardManager.BossID enum values
+const TIER_REQUIREMENTS: Dictionary = {
+	EquipmentTier.TIER_2: [BossRewardManager.BossID.ALPHA_RACCOON],
+	EquipmentTier.TIER_3: [BossRewardManager.BossID.CROW_MATRIARCH],
+	EquipmentTier.TIER_4: [BossRewardManager.BossID.RAT_KING],
+}
+
+# =============================================================================
 # PRICE DATA
 # =============================================================================
 
@@ -121,7 +141,7 @@ func restock() -> void:
 	
 	# Restock equipment (skip already-owned)
 	for equip_id in DEFAULT_EQUIPMENT_STOCK:
-		if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(equip_id):
+		if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager) and GameManager.equipment_manager.has_equipment(equip_id):
 			shop_stock[equip_id] = 0
 		else:
 			shop_stock[equip_id] = DEFAULT_EQUIPMENT_STOCK[equip_id]
@@ -172,10 +192,21 @@ func can_afford(item_id: String) -> bool:
 # VALIDATION HELPERS
 # =============================================================================
 
+## Check if equipment tier is unlocked based on boss defeats
+## Returns true if tier is available, false if locked (requires boss defeat)
+func is_tier_unlocked(tier: EquipmentTier) -> bool:
+	var requirements = TIER_REQUIREMENTS.get(tier, [])
+	if requirements.is_empty():
+		return true  # No requirements = always available
+	for boss_id in requirements:
+		if not BossRewardManager.is_boss_defeated(boss_id):
+			return false
+	return true
+
 ## Check if a piece of equipment can be purchased.
 ## Returns {'can_buy': bool, 'reason': String} after validating:
 ## (1) equipment exists in shop, (2) stock > 0, (3) player level >= min_level,
-## (4) not already owned, (5) can afford.
+## (4) tier is unlocked, (5) not already owned, (6) can afford.
 func can_buy_equipment(equip_id: String) -> Dictionary:
 	# Check equipment exists in shop
 	if not SHOP_EQUIPMENT.has(equip_id):
@@ -191,13 +222,26 @@ func can_buy_equipment(equip_id: String) -> Dictionary:
 		var min_level = equip_data.get("min_level", 1)
 		if min_level > 1:
 			var player = get_tree().get_first_node_in_group("player")
-			if player and player.has_node("ProgressionComponent"):
-				var current_level = player.get_node("ProgressionComponent").get_level()
-				if current_level < min_level:
-					return {"can_buy": false, "reason": "Requires Level %d" % min_level}
+			if player:
+				var progression = player.get_node_or_null("ProgressionComponent")
+				if progression:
+					var current_level = progression.get_level()
+					if current_level < min_level:
+						return {"can_buy": false, "reason": "Requires Level %d" % min_level}
+
+	# Check equipment tier unlock status
+	var tier = equip_data.get("tier", EquipmentTier.TIER_1)
+	if not is_tier_unlocked(tier):
+		# Get boss requirement name for locked tier
+		var requirements = TIER_REQUIREMENTS.get(tier, [])
+		if not requirements.is_empty():
+			var boss_id = requirements[0]
+			var boss_name = BossRewardManager.get_boss_name(boss_id)
+			return {"can_buy": false, "reason": "Locked - Defeat %s to unlock" % boss_name}
+		return {"can_buy": false, "reason": "Tier %d not unlocked yet" % tier}
 
 	# Check not already owned
-	if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(equip_id):
+	if GameManager.equipment_manager and is_instance_valid(GameManager.equipment_manager) and GameManager.equipment_manager.has_equipment(equip_id):
 		return {"can_buy": false, "reason": "Already owned"}
 
 	# Check can afford
@@ -211,23 +255,8 @@ func can_buy_equipment(equip_id: String) -> Dictionary:
 # CATALOG QUERIES
 # =============================================================================
 
-## Get all shop items with full data (from ItemDatabase) plus buy_price.
-## Only returns items with stock > 0.
-func get_all_shop_items() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for item_id in SHOP_ITEMS:
-		if get_stock(item_id) <= 0:
-			continue
-		var data = ItemDatabase.get_item(item_id)
-		if not data.is_empty():
-			data["buy_price"] = SHOP_ITEMS[item_id]
-			data["stock"] = get_stock(item_id)
-			result.append(data)
-	return result
-
-
 ## Get all shop equipment with full data (from EquipmentDatabase) plus buy_price.
-## Only returns equipment with stock > 0.
+## Includes tier and locked status for UI.
 func get_all_shop_equipment() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for equip_id in SHOP_EQUIPMENT:
@@ -237,6 +266,17 @@ func get_all_shop_equipment() -> Array[Dictionary]:
 		if not data.is_empty():
 			data["buy_price"] = SHOP_EQUIPMENT[equip_id]
 			data["stock"] = get_stock(equip_id)
+			# Add tier information for lock status
+			var tier = data.get("tier", EquipmentTier.TIER_1)
+			data["tier"] = tier
+			# Check if tier is unlocked
+			data["locked"] = not is_tier_unlocked(tier)
+			# If locked, add boss requirement info
+			if data["locked"]:
+				var requirements = TIER_REQUIREMENTS.get(tier, [])
+				if not requirements.is_empty():
+					var boss_id = requirements[0]
+					data["required_boss"] = BossRewardManager.get_boss_name(boss_id)
 			result.append(data)
 	return result
 
