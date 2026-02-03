@@ -352,7 +352,7 @@ func _create_boss_entry(boss_id: int) -> Control:
 	# Boss icon
 	var icon = TextureRect.new()
 	if is_defeated:
-		icon.texture = _get_defeated_icon(boss_id)
+		icon.texture = BossRewardManager.get_boss_icon_texture(boss_id)
 		icon.custom_minimum_size = Vector2(32, 32)
 		entry.add_child(icon)
 	else:
@@ -412,20 +412,8 @@ func _set_ring_ui_visible(is_visible: bool) -> void:
 	for ring_item in ring_items:
 		ring_item.visible = is_visible
 
-func _get_defeated_icon(boss_id: BossRewardManager.BossID) -> Texture:
-	# Return boss portrait or sprite texture
-	# For now, use existing sprite
-	match boss_id:
-		BossRewardManager.BossID.ALPHA_RACCOON:
-			return load("res://art/generated/enemies/alpha_raccoon.png")
-		BossRewardManager.BossID.CROW_MATRIARCH:
-			return load("res://art/generated/enemies/crow_matriarch.png")
-		BossRewardManager.BossID.RAT_KING:
-			return load("res://art/generated/enemies/rat_king.png")
-		BossRewardManager.BossID.PIGEON_KING:
-			return load("res://art/generated/enemies/pigeon_king.png")
-		_:
-			return load("res://art/generated/enemies/crow_matriarch.png") # Fallback
+
+
 
 # =============================================================================
 # RING DISPLAY

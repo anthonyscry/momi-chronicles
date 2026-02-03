@@ -189,6 +189,16 @@ func get_reward_description(boss_id: BossID) -> String:
 func get_boss_name(boss_id: BossID) -> String:
 	return BOSS_NAMES.get(boss_id, "Unknown Boss")
 
+## Get boss icon texture for UI
+func get_boss_icon_texture(boss_id: BossID) -> Texture:
+	var path = "res://art/generated/enemies/"
+	match boss_id:
+		BossID.ALPHA_RACCOON: return load(path + "alpha_raccoon.png")
+		BossID.CROW_MATRIARCH: return load(path + "crow_matriarch.png")
+		BossID.RAT_KING: return load(path + "rat_king.png")
+		BossID.PIGEON_KING: return load(path + "pigeon_king.png")
+	return load(path + "crow_matriarch.png")
+
 # =============================================================================
 # PUBLIC API - SAVE/LOAD INTEGRATION
 # =============================================================================

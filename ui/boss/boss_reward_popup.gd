@@ -19,70 +19,46 @@ func _on_reward_unlocked(boss_id: int, rewards: Array) -> void:
 	_reward_data = rewards
 
 	# Update UI elements
-	reward_icon.texture = _get_boss_icon(boss_id)
+	reward_icon.texture = BossRewardManager.get_boss_icon_texture(boss_id)
 	boss_name_label.text = "%s DEFEATED!" % BossRewardManager.get_boss_name(boss_id)
-	reward_description_label.text = _format_reward_description(_reward_data)
-	unlock_info_label.text = _format_unlock_info(_reward_data)
+	
+	# Format reward description
+	if rewards.is_empty():
+		reward_description_label.text = "Reward unlocked"
+	else:
+		var parts = []
+		for r in rewards:
+			parts.append(r.get("description", "Reward unlocked"))
+		reward_description_label.text = "\n".join(parts)
+	
+	# Format unlock info
+	if rewards.is_empty():
+		unlock_info_label.text = "Reward Unlocked!"
+	else:
+		var lines = []
+		for r in rewards:
+			match r.get("type", BossRewardManager.RewardType.ZONE_UNLOCK):
+				BossRewardManager.RewardType.ZONE_UNLOCK:
+					lines.append("Zone Unlocked: %s" % r.get("value", ""))
+				BossRewardManager.RewardType.EQUIPMENT_TIER:
+					lines.append("Equipment Tier %d Unlocked!" % r.get("value", 0))
+				BossRewardManager.RewardType.ABILITY_UNLOCK:
+					lines.append("Ability Unlocked: %s" % r.get("value", ""))
+				BossRewardManager.RewardType.COMPANION_SLOT:
+					lines.append("Companion Slot Unlocked!")
+				_: lines.append("Reward Unlocked!")
+		unlock_info_label.text = "\n".join(lines)
 
 	# Show popup with animation
 	show()
 	AudioManager.play_sfx("boss_defeat")
-	Events.game_paused.emit() # Pause game during reward screen
-
-	# Enable claim button
+	Events.game_paused.emit()
 	claim_button.disabled = false
 
 func _on_claim_button_pressed() -> void:
-	if _current_boss_id < 0:
-		return
-
-	# Claim reward (mark as received in save)
+	if _current_boss_id < 0: return
 	BossRewardManager.mark_reward_claimed(_current_boss_id)
-
-	# Emit event for game systems (e.g., UI updates)
-	# Use first reward as Dictionary for compatibility
 	var first_reward = _reward_data[0] if _reward_data.size() > 0 else {}
 	Events.boss_reward_claimed.emit(_current_boss_id, first_reward)
-
-	# Hide popup and resume game
 	hide()
 	Events.game_resumed.emit()
-
-func _get_boss_icon(boss_id: int) -> Texture:
-	match boss_id:
-		BossRewardManager.BossID.ALPHA_RACCOON:
-			return load("res://art/generated/enemies/alpha_raccoon.png")
-		BossRewardManager.BossID.CROW_MATRIARCH:
-			return load("res://art/generated/enemies/crow_matriarch.png")
-		BossRewardManager.BossID.RAT_KING:
-			return load("res://art/generated/enemies/rat_king.png")
-		BossRewardManager.BossID.PIGEON_KING:
-			return load("res://art/generated/enemies/pigeon_king.png")
-		_:
-			return load("res://art/generated/enemies/crow_matriarch.png")
-
-func _format_reward_description(rewards: Array) -> String:
-	if rewards.is_empty():
-		return "Reward unlocked"
-	var parts: Array = []
-	for reward in rewards:
-		parts.append(reward.get("description", "Reward unlocked"))
-	return "\n".join(parts)
-
-func _format_unlock_info(rewards: Array) -> String:
-	if rewards.is_empty():
-		return "Reward Unlocked!"
-	var lines: Array = []
-	for reward_data in rewards:
-		match reward_data.get("type", BossRewardManager.RewardType.ZONE_UNLOCK):
-			BossRewardManager.RewardType.ZONE_UNLOCK:
-				lines.append("Zone Unlocked: %s" % reward_data.get("value", ""))
-			BossRewardManager.RewardType.EQUIPMENT_TIER:
-				lines.append("Equipment Tier %d Unlocked!" % reward_data.get("value", 0))
-			BossRewardManager.RewardType.ABILITY_UNLOCK:
-				lines.append("Ability Unlocked: %s" % reward_data.get("value", ""))
-			BossRewardManager.RewardType.COMPANION_SLOT:
-				lines.append("Companion Slot Unlocked!")
-			_:
-				lines.append("Reward Unlocked!")
-	return "\n".join(lines)
