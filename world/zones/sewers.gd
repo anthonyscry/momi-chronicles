@@ -12,6 +12,7 @@ const SHADOW_CREATURE_SCENE = preload("res://characters/enemies/shadow_creature.
 const ZONE_EXIT_SCENE = preload("res://components/zone_exit/zone_exit.tscn")
 const TOXIC_PUDDLE_SCRIPT = preload("res://components/hazards/toxic_puddle.gd")
 const RAT_KING_SCENE = preload("res://characters/enemies/rat_king.tscn")
+const QUEST_ITEM_PICKUP_SCRIPT = preload("res://components/quest_item_pickup/quest_item_pickup.gd")
 
 ## Color palette
 const COLOR_BACKGROUND := Color(0.06, 0.04, 0.1)
@@ -85,6 +86,12 @@ var side_rooms: Array[Dictionary] = [
 		"type": "hazard",
 		"connector": Rect2(560, 190, 48, 16),
 	},
+	# Room 3b: Echo room (off upper horizontal, upward)
+	{
+		"rect": Rect2(620, 110, 90, 80),
+		"type": "echo_room",
+		"connector": Rect2(640, 190, 48, 16),
+	},
 	# Room 4: Deep ambush room (off boss approach, downward)
 	{
 		"rect": Rect2(790, 390, 90, 80),
@@ -100,6 +107,7 @@ var side_rooms: Array[Dictionary] = [
 func _setup_zone() -> void:
 	zone_id = "sewers"
 	_build_mini_boss_trigger()
+	DialogueManager.load_dialogue_file("res://resources/dialogues/echo_room.json")
 	
 	# Build the entire dungeon programmatically
 	_build_background()
@@ -108,8 +116,10 @@ func _setup_zone() -> void:
 	_build_walls()
 	_build_water()
 	_build_decorations()
+	_build_echo_room()
 	_build_hazards()
 	_build_enemies()
+	_build_quest_pickups()
 	_build_boss_door()
 	_build_zone_exits()
 	_build_boundaries()
@@ -574,6 +584,57 @@ func _build_boss_warnings(parent: Node) -> void:
 	parent.add_child(health_v)
 
 
+# =============================================================================
+# ECHO ROOM
+# =============================================================================
+
+var _echo_room_triggered: bool = false
+
+func _build_echo_room() -> void:
+	var echo_center = Vector2(665, 150)
+
+	var altar = ColorRect.new()
+	altar.name = "EchoAltar"
+	altar.position = echo_center + Vector2(-12, -6)
+	altar.size = Vector2(24, 12)
+	altar.color = Color(0.2, 0.22, 0.28)
+	add_child(altar)
+
+	var shimmer = ColorRect.new()
+	shimmer.name = "EchoShimmer"
+	shimmer.position = echo_center + Vector2(-10, -22)
+	shimmer.size = Vector2(20, 6)
+	shimmer.color = Color(0.6, 0.7, 0.9, 0.4)
+	add_child(shimmer)
+
+	var trigger = Area2D.new()
+	trigger.name = "EchoRoomTrigger"
+	trigger.collision_layer = 0
+	trigger.collision_mask = 2
+	trigger.position = echo_center
+	add_child(trigger)
+
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = Vector2(60, 40)
+	shape.shape = rect
+	trigger.add_child(shape)
+
+	trigger.body_entered.connect(_on_echo_room_triggered)
+
+
+func _on_echo_room_triggered(body: Node2D) -> void:
+	if not body.is_in_group("player"):
+		return
+	if _echo_room_triggered:
+		return
+	if not QuestManager.is_quest_active("echoes_in_pipes"):
+		return
+
+	_echo_room_triggered = true
+	DialogueManager.start_dialogue("echo_room_memory")
+
+
 func _build_hazards() -> void:
 	var hazards_container: Node2D
 	if has_node("Hazards"):
@@ -604,6 +665,39 @@ func _build_hazards() -> void:
 		puddle.is_camouflaged = config.camo
 		puddle.puddle_size = config.size
 		hazards_container.add_child(puddle)
+
+
+# =============================================================================
+# QUEST ITEM PICKUPS
+# =============================================================================
+
+func _build_quest_pickups() -> void:
+	_build_bait_box_pickup()
+	_build_valve_wheel_pickup()
+
+func _build_bait_box_pickup() -> void:
+	# Bait box for "Missing Bait" quest (Maurice)
+	var pickup = Area2D.new()
+	pickup.set_script(QUEST_ITEM_PICKUP_SCRIPT)
+	pickup.name = "BaitBoxPickup"
+	pickup.item_id = "bait_box"
+	pickup.quest_id = "missing_bait"
+	pickup.pickup_color = Color(0.8, 0.5, 0.2)
+	pickup.label_text = "Bait"
+	pickup.position = Vector2(300, 510)
+	add_child(pickup)
+
+func _build_valve_wheel_pickup() -> void:
+	# Valve wheel for "Guard the Grate" quest (Henderson)
+	var pickup = Area2D.new()
+	pickup.set_script(QUEST_ITEM_PICKUP_SCRIPT)
+	pickup.name = "ValveWheelPickup"
+	pickup.item_id = "valve_wheel"
+	pickup.quest_id = "guard_grate"
+	pickup.pickup_color = Color(0.6, 0.6, 0.7)
+	pickup.label_text = "Valve"
+	pickup.position = Vector2(830, 420)
+	add_child(pickup)
 
 
 func _build_enemies() -> void:

@@ -1,0 +1,22 @@
+{
+  "dialogues": [
+    {
+      "id": "echo_room_memory",
+      "character": "Echo Chamber",
+      "portrait": "",
+      "text": "A crackling tape hisses to life... 'If anyone hears this, protect the neighborhood. The hoarder below isn't a myth.'",
+      "choices": [],
+      "next_id": "echo_room_memory_2",
+      "is_cutscene": true
+    },
+    {
+      "id": "echo_room_memory_2",
+      "character": "Echo Chamber",
+      "portrait": "",
+      "text": "'We kept their hunger at bay, but the tunnels are changing. Keep your pack close.'",
+      "choices": [],
+      "next_id": "",
+      "is_cutscene": true
+    }
+  ]
+}

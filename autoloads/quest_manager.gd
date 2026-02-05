@@ -578,6 +578,57 @@ func _register_all_quests() -> void:
 	q9.rewards = {"coins": 150, "exp": 75, "reputation": {"gertrude": 20, "maurice": 10, "kids_gang": 10, "henderson": 10}}
 	register_quest_data(q9)
 
+	# Quest 10: Missing Bait (requires meet_neighbors)
+	var q10 = QuestData.new()
+	q10.id = "missing_bait"
+	q10.title = "Missing Bait"
+	q10.description = "Maurice lost a bait box in the sewers. Recover it so he can finish his route."
+	q10.is_main_quest = false
+	q10.quest_giver_id = "maurice"
+	q10.prerequisite_quest_ids = ["meet_neighbors"]
+	q10.objective_descriptions = ["Defeat 3 sewer rats", "Find the bait box in the sewers", "Return to Maurice"]
+	q10.optional_objectives = [false, false, false]
+	q10.objective_trigger_types = ["enemy_kill", "item_collect", "dialogue"]
+	q10.objective_trigger_ids = ["sewer_rat", "bait_box", "maurice"]
+	q10.objective_target_counts = [3, 1, 1]
+	q10.objective_requires_prior = [false, true, true]
+	q10.rewards = {"coins": 60, "exp": 35, "reputation": {"maurice": 10}}
+	register_quest_data(q10)
+
+	# Quest 11: Echoes in the Pipes (requires meet_neighbors)
+	var q11 = QuestData.new()
+	q11.id = "echoes_in_pipes"
+	q11.title = "Echoes in the Pipes"
+	q11.description = "Gertrude heard a voice in the sewers. Find the Echo Room and report back."
+	q11.is_main_quest = true
+	q11.quest_giver_id = "gertrude"
+	q11.prerequisite_quest_ids = ["meet_neighbors"]
+	q11.objective_descriptions = ["Find the Echo Room in the sewers", "Return to Gertrude"]
+	q11.optional_objectives = [false, false]
+	q11.objective_trigger_types = ["dialogue", "dialogue"]
+	q11.objective_trigger_ids = ["echo_room_memory", "gertrude"]
+	q11.objective_target_counts = [1, 1]
+	q11.objective_requires_prior = [false, true]
+	q11.rewards = {"coins": 80, "exp": 45, "reputation": {"gertrude": 10}}
+	register_quest_data(q11)
+
+	# Quest 12: Guard the Grate (requires meet_neighbors)
+	var q12 = QuestData.new()
+	q12.id = "guard_grate"
+	q12.title = "Guard the Grate"
+	q12.description = "Henderson wants the sewer grate secured. Clear the pests and restore the valve."
+	q12.is_main_quest = false
+	q12.quest_giver_id = "henderson"
+	q12.prerequisite_quest_ids = ["meet_neighbors"]
+	q12.objective_descriptions = ["Defeat 5 enemies near the grate", "Restore the broken valve", "Report back to Henderson"]
+	q12.optional_objectives = [false, false, false]
+	q12.objective_trigger_types = ["enemy_kill", "item_collect", "dialogue"]
+	q12.objective_trigger_ids = ["any", "valve_wheel", "henderson"]
+	q12.objective_target_counts = [5, 1, 1]
+	q12.objective_requires_prior = [false, true, true]
+	q12.rewards = {"coins": 90, "exp": 50, "reputation": {"henderson": 15}}
+	register_quest_data(q12)
+
 # =============================================================================
 # EVENT-DRIVEN QUEST COMPLETION
 # =============================================================================
@@ -714,4 +765,3 @@ func _check_item_collect_objectives(item_id: String) -> void:
 					Events.quest_updated.emit(quest_id, i)
 					if quest.all_objectives_completed():
 						complete_quest(quest_id)
-

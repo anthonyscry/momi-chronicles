@@ -160,6 +160,30 @@ const ITEMS: Dictionary = {
 		"icon": "res://art/generated/items/antidote.png",
 	},
 	
+	# === CRAFTING MATERIALS ===
+	"rat_gland": {
+		"id": "rat_gland",
+		"name": "Rat Gland",
+		"desc": "A pungent gland from sewer rats",
+		"type": "material",
+		"consumable": false,
+		"stackable": true,
+		"max_stack": 20,
+		"color": Color(0.6, 0.4, 0.3),
+		"icon": "res://art/generated/items/rat_gland.png",
+	},
+	"herb": {
+		"id": "herb",
+		"name": "Herb",
+		"desc": "A fresh herb with a clean scent",
+		"type": "material",
+		"consumable": false,
+		"stackable": true,
+		"max_stack": 30,
+		"color": Color(0.3, 0.8, 0.4),
+		"icon": "res://art/generated/items/herb.png",
+	},
+	
 	# === TACTICAL ITEMS ===
 	"smoke_bomb": {
 		"id": "smoke_bomb",

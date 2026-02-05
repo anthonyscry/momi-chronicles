@@ -29,16 +29,27 @@ const PANEL_HEIGHT: int = 160
 const VISIBLE_ROWS: int = 7
 const ROW_HEIGHT: int = 14
 
+## Crafting
+const CRAFTING_CATALOG = preload("res://systems/crafting/crafting_catalog.gd")
+const CRAFTING_MANAGER = preload("res://systems/crafting/crafting_manager.gd")
+
+## Categories
+const CATEGORY_ITEMS: int = 0
+const CATEGORY_EQUIPMENT: int = 1
+const CATEGORY_CRAFT: int = 2
+
 # =============================================================================
 # STATE
 # =============================================================================
 
 var is_open: bool = false
 var current_tab: int = 0       # 0=BUY, 1=SELL
-var current_category: int = 0  # 0=Items, 1=Equipment
+var current_category: int = 0  # 0=Items, 1=Equipment, 2=Craft
 var selected_index: int = 0
 var scroll_offset: int = 0
 var current_list: Array = []
+var _icon_cache: Dictionary = {}
+var _icon_cache_warmed: bool = false
 
 # =============================================================================
 # NODE REFERENCES (built in _ready)
@@ -72,6 +83,7 @@ func _ready() -> void:
 	visible = false
 	
 	_build_ui()
+	_prewarm_icon_cache()
 	
 	Events.shop_interact_requested.connect(open_shop)
 	Events.coins_changed.connect(_on_coins_changed)
@@ -468,6 +480,8 @@ func _switch_tab(direction: int) -> void:
 		return
 	
 	current_tab = new_tab
+	if current_tab == 1 and current_category == CATEGORY_CRAFT:
+		current_category = CATEGORY_ITEMS
 	selected_index = 0
 	scroll_offset = 0
 	_refresh_list()
@@ -476,7 +490,10 @@ func _switch_tab(direction: int) -> void:
 
 
 func _toggle_category() -> void:
-	current_category = 1 - current_category
+	var max_category = CATEGORY_EQUIPMENT
+	if current_tab == 0:
+		max_category = CATEGORY_CRAFT
+	current_category = (current_category + 1) % (max_category + 1)
 	selected_index = 0
 	scroll_offset = 0
 	_refresh_list()
@@ -490,12 +507,14 @@ func _toggle_category() -> void:
 
 func _refresh_list() -> void:
 	if current_tab == 0:  # BUY
-		if current_category == 0:  # Items
+		if current_category == CATEGORY_ITEMS:  # Items
 			current_list = ShopCatalog.get_all_shop_items()
-		else:  # Equipment
+		elif current_category == CATEGORY_EQUIPMENT:  # Equipment
 			current_list = ShopCatalog.get_all_shop_equipment()
+		else:  # Craft
+			current_list = CRAFTING_CATALOG.get_all_recipes()
 	else:  # SELL
-		if current_category == 0:  # Items
+		if current_category == CATEGORY_ITEMS:  # Items
 			current_list = _get_sell_items()
 		else:  # Equipment
 			current_list = _get_sell_equipment()
@@ -522,6 +541,10 @@ func _update_rows() -> void:
 		row.visible = true
 		var item = current_list[list_index]
 		var is_selected = (list_index == selected_index)
+		var is_craft = current_tab == 0 and current_category == CATEGORY_CRAFT
+		var recipe_output: Dictionary = {}
+		if is_craft:
+			recipe_output = _get_recipe_output_item(item)
 		
 		# Update row background color
 		var row_style = row.get_theme_stylebox("panel") as StyleBoxFlat
@@ -531,37 +554,61 @@ func _update_rows() -> void:
 		# Swatch icon
 		var swatch = row.get_node("Swatch") as TextureRect
 		if swatch:
-			var icon_path = item.get("icon", "")
-			if icon_path and ResourceLoader.exists(icon_path):
-				swatch.texture = load(icon_path)
+			var icon_path = ""
+			var tint_color = Color.WHITE
+			if is_craft:
+				var output_data: Dictionary = recipe_output.get("data", {})
+				icon_path = output_data.get("icon", "")
+				tint_color = output_data.get("color", Color.WHITE)
+			else:
+				icon_path = item.get("icon", "")
+				tint_color = item.get("color", Color.WHITE)
+			var icon_texture = _get_icon_texture(icon_path)
+			if icon_texture:
+				swatch.texture = icon_texture
+				swatch.modulate = Color.WHITE
 			else:
 				swatch.texture = null
-				swatch.modulate = item.get("color", Color.WHITE)
+				swatch.modulate = tint_color
 		
 		# Item name
 		var name_lbl = row.get_node("ItemName") as Label
 		if name_lbl:
-			name_lbl.text = item.get("name", "???")
+			if is_craft:
+				var output_data: Dictionary = recipe_output.get("data", {})
+				var output_name = output_data.get("name", "")
+				name_lbl.text = output_name if output_name != "" else item.get("name", "???")
+			else:
+				name_lbl.text = item.get("name", "???")
 		
 		# Price and Quantity depend on tab
 		var price_lbl = row.get_node("Price") as Label
 		var qty_lbl = row.get_node("Quantity") as Label
 		
 		if current_tab == 0:  # BUY
-			var price = item.get("buy_price", 0)
-			var stock = item.get("stock", 0)
-			var can_afford = GameManager.coins >= price
-			if price_lbl:
-				price_lbl.text = str(price) + "g"
-				price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_afford else COLOR_PRICE_EXPENSIVE)
-			if qty_lbl:
-				if item.get("type") == "equipment":
-					if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(item.get("id", "")):
-						qty_lbl.text = "Own"
+			if is_craft:
+				var output_quantity = recipe_output.get("quantity", 1)
+				var can_craft = CRAFTING_MANAGER.can_craft(item.get("id", ""))
+				if price_lbl:
+					price_lbl.text = "Craft"
+					price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_craft else COLOR_PRICE_EXPENSIVE)
+				if qty_lbl:
+					qty_lbl.text = "x%d" % output_quantity
+			else:
+				var price = item.get("buy_price", 0)
+				var stock = item.get("stock", 0)
+				var can_afford = GameManager.coins >= price
+				if price_lbl:
+					price_lbl.text = str(price) + "g"
+					price_lbl.add_theme_color_override("font_color", COLOR_PRICE_AFFORD if can_afford else COLOR_PRICE_EXPENSIVE)
+				if qty_lbl:
+					if item.get("type") == "equipment":
+						if GameManager.equipment_manager and GameManager.equipment_manager.has_equipment(item.get("id", "")):
+							qty_lbl.text = "Own"
+						else:
+							qty_lbl.text = "x%d" % stock
 					else:
 						qty_lbl.text = "x%d" % stock
-				else:
-					qty_lbl.text = "x%d" % stock
 		else:  # SELL
 			var sell_price = item.get("sell_price", 0)
 			if price_lbl:
@@ -592,12 +639,38 @@ func _update_detail() -> void:
 	var item = current_list[selected_index]
 	var item_id = item.get("id", "")
 	var is_equipment = item.get("type") == "equipment"
+	var is_craft = current_tab == 0 and current_category == CATEGORY_CRAFT
 	
 	# Name
 	detail_name.text = item.get("name", "???")
 	
 	# Description
 	detail_desc.text = item.get("desc", "")
+
+	if is_craft:
+		var recipe_output = _get_recipe_output_item(item)
+		var output_data: Dictionary = recipe_output.get("data", {})
+		var output_name = output_data.get("name", "")
+		var output_desc = output_data.get("desc", "")
+		if output_name != "":
+			detail_name.text = output_name
+			detail_desc.text = output_desc
+
+		var inputs_value = item.get("inputs", {})
+		var inputs: Dictionary = inputs_value if inputs_value is Dictionary else {}
+		detail_price.text = "Ingredients: %s" % _format_recipe_inputs(inputs)
+		detail_price.add_theme_color_override("font_color", COLOR_TEXT)
+		detail_stats.text = ""
+		detail_stats.add_theme_color_override("font_color", Color(0.6, 0.85, 0.5, 1))
+
+		var can_craft = CRAFTING_MANAGER.can_craft(item.get("id", ""))
+		if can_craft:
+			detail_action.text = "[Z] Craft"
+			detail_action.add_theme_color_override("font_color", COLOR_TAB_ACTIVE)
+		else:
+			detail_action.text = "Missing materials"
+			detail_action.add_theme_color_override("font_color", COLOR_PRICE_EXPENSIVE)
+		return
 	
 	if current_tab == 1:  # SELL detail
 		var sell_price = item.get("sell_price", 0)
@@ -690,12 +763,83 @@ func _get_stat_name(stat_type: int) -> String:
 	return "???"
 
 
+func _get_recipe_output_item(recipe: Dictionary) -> Dictionary:
+	var output_value = recipe.get("output", {})
+	var output: Dictionary = output_value if output_value is Dictionary else {}
+	var output_item_id = output.get("item_id", "")
+	var output_quantity = output.get("quantity", 1)
+	var item_data: Dictionary = {}
+	if output_item_id != "" and ItemDatabase.has_item(output_item_id):
+		item_data = ItemDatabase.get_item(output_item_id)
+	return {
+		"item_id": output_item_id,
+		"quantity": output_quantity,
+		"data": item_data,
+	}
+
+
+func _get_icon_texture(path: String) -> Texture2D:
+	if path == "":
+		return null
+	return _icon_cache.get(path)
+
+
+func _cache_icon(path: String) -> void:
+	if path == "":
+		return
+	if _icon_cache.has(path):
+		return
+	if not ResourceLoader.exists(path):
+		_icon_cache[path] = null
+		return
+	var texture = load(path) as Texture2D
+	_icon_cache[path] = texture
+
+
+func _prewarm_icon_cache() -> void:
+	if _icon_cache_warmed:
+		return
+	_icon_cache_warmed = true
+	for item_id in ItemDatabase.ITEMS:
+		var item_data = ItemDatabase.ITEMS[item_id]
+		_cache_icon(item_data.get("icon", ""))
+	for equip_id in EquipmentDatabase.EQUIPMENT:
+		var equip_data = EquipmentDatabase.EQUIPMENT[equip_id]
+		_cache_icon(equip_data.get("icon", ""))
+
+
+func _format_recipe_inputs(inputs: Dictionary) -> String:
+	if inputs.is_empty():
+		return "None"
+	var parts: Array[String] = []
+	for item_id in inputs:
+		var quantity = int(inputs[item_id])
+		var display_name = item_id
+		if ItemDatabase.has_item(item_id):
+			var item_data = ItemDatabase.get_item(item_id)
+			display_name = item_data.get("name", item_id)
+		parts.append("%s x%d" % [display_name, quantity])
+	return ", ".join(parts)
+
+
 # =============================================================================
 # BUY TRANSACTION
 # =============================================================================
 
 func _buy_selected() -> void:
 	if current_list.is_empty() or current_tab != 0:
+		return
+	if current_category == CATEGORY_CRAFT:
+		var recipe = current_list[selected_index]
+		var recipe_id = recipe.get("id", "")
+		var crafted = CRAFTING_MANAGER.craft(recipe_id)
+		if crafted:
+			_flash_feedback(COLOR_SUCCESS_FLASH)
+			AudioManager.play_sfx("health_pickup")
+		else:
+			_flash_feedback(COLOR_FAIL_FLASH)
+			AudioManager.play_sfx("menu_navigate")
+		_refresh_list()
 		return
 	
 	var item = current_list[selected_index]
@@ -708,7 +852,7 @@ func _buy_selected() -> void:
 		if GameManager.equipment_manager.has_equipment(item_id):
 			_flash_feedback(COLOR_OWNED_GRAY)
 			AudioManager.play_sfx("menu_navigate")
-			print("[Shop] Already owned: %s" % item.get("name", ""))
+			DebugLogger.log_ui("[Shop] Already owned: %s" % item.get("name", ""))
 			return
 
 	# Check level requirement (equipment)
@@ -727,7 +871,7 @@ func _buy_selected() -> void:
 		_flash_feedback(COLOR_FAIL_FLASH)
 		_shake_coin_label()
 		AudioManager.play_sfx("menu_navigate")
-		print("[Shop] Not enough coins for: %s (need %d, have %d)" % [item.get("name", ""), price, GameManager.coins])
+		DebugLogger.log_ui("[Shop] Not enough coins for: %s (need %d, have %d)" % [item.get("name", ""), price, GameManager.coins])
 		return
 	
 	# Success - add to inventory
@@ -744,7 +888,7 @@ func _buy_selected() -> void:
 	# Feedback
 	_flash_feedback(COLOR_SUCCESS_FLASH)
 	AudioManager.play_sfx("health_pickup")
-	print("[Shop] Bought: %s for %d coins" % [item.get("name", ""), price])
+	DebugLogger.log_ui("[Shop] Bought: %s for %d coins" % [item.get("name", ""), price])
 	
 	# Refresh display (items with 0 stock disappear)
 	_refresh_list()
@@ -788,7 +932,7 @@ func _sell_selected() -> void:
 	_flash_feedback(COLOR_SELL_GOLD_FLASH)
 	_spawn_sell_coin_text(sell_price)
 	AudioManager.play_sfx("health_pickup")
-	print("[Shop] Sold: %s for %d coins" % [item_name, sell_price])
+	DebugLogger.log_ui("[Shop] Sold: %s for %d coins" % [item_name, sell_price])
 	
 	# Refresh display
 	_refresh_list()
@@ -907,10 +1051,18 @@ func _update_category_label() -> void:
 	if not category_label:
 		return
 	
-	if current_category == 0:
-		category_label.text = "[Q] Items (%d)" % current_list.size()
+	if current_tab == 0:
+		if current_category == CATEGORY_ITEMS:
+			category_label.text = "[Q] Items (%d)" % current_list.size()
+		elif current_category == CATEGORY_EQUIPMENT:
+			category_label.text = "[Q] Equipment (%d)" % current_list.size()
+		else:
+			category_label.text = "[Q] Craft (%d)" % current_list.size()
 	else:
-		category_label.text = "[Q] Equipment (%d)" % current_list.size()
+		if current_category == CATEGORY_ITEMS:
+			category_label.text = "[Q] Items (%d)" % current_list.size()
+		else:
+			category_label.text = "[Q] Equipment (%d)" % current_list.size()
 
 
 # =============================================================================
