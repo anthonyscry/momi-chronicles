@@ -13,6 +13,10 @@
         {
           "text": "Any interesting deliveries lately?",
           "next_id": "maurice_deliveries"
+        },
+        {
+          "text": "Lose anything on your route?",
+          "next_id": "maurice_bait"
         }
       ],
       "next_id": "",
@@ -61,6 +65,15 @@
       "text": "Ha! I wish it were a prank. But I've seen things on my route... strange shadows, overturned garbage, glowing eyes in the dark alleys.",
       "choices": [],
       "next_id": "maurice_offer",
+      "is_cutscene": false
+    },
+    {
+      "id": "maurice_bait",
+      "character": "Mailman Maurice",
+      "portrait": "",
+      "text": "Actually, yeah. My bait box slid down the manhole by the alley. If you spot it in the sewers, could you bring it back?",
+      "choices": [],
+      "next_id": "",
       "is_cutscene": false
     },
     {

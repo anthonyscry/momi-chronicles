@@ -13,6 +13,10 @@
         {
           "text": "Just passing through!",
           "next_id": "gertrude_passing"
+        },
+        {
+          "text": "Heard anything about the sewers?",
+          "next_id": "gertrude_echo_room"
         }
       ],
       "next_id": "",
@@ -25,6 +29,15 @@
       "text": "Those dreadful raccoons have been rummaging through everyone's bins! And I swear I saw their leader... the Raccoon King himself, lurking in the sewers.",
       "choices": [],
       "next_id": "gertrude_hint",
+      "is_cutscene": false
+    },
+    {
+      "id": "gertrude_echo_room",
+      "character": "Old Lady Gertrude",
+      "portrait": "",
+      "text": "There's a chamber the neighbors call the Echo Room. Sounds carry through those pipes. If you go down there, keep your ears sharp, dearie.",
+      "choices": [],
+      "next_id": "",
       "is_cutscene": false
     },
     {

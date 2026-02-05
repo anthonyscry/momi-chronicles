@@ -58,7 +58,7 @@ Use this checklist to manually verify tutorial persistence across save/load oper
 - [ ] Open console and run: `TutorialManager.is_tutorial_completed("movement")`
 - [ ] **Expected**: Returns `true`
 
-**Test 1 Result**: ☐ PASS ☐ FAIL
+**Test 1 Result**: [ ] PASS [ ] FAIL
 
 ---
 
@@ -92,7 +92,7 @@ Use this checklist to manually verify tutorial persistence across save/load oper
 - [ ] **Expected**: Dodge and block tutorials do NOT appear
 - [ ] All completed tutorials should remain hidden
 
-**Test 2 Result**: ☐ PASS ☐ FAIL
+**Test 2 Result**: [ ] PASS [ ] FAIL
 
 ---
 
@@ -114,7 +114,7 @@ Use this checklist to manually verify tutorial persistence across save/load oper
 - [ ] Play through various actions (move, attack, dodge, etc.)
 - [ ] **Expected**: NO tutorial prompts appear at all
 
-**Test 3 Result**: ☐ PASS ☐ FAIL
+**Test 3 Result**: [ ] PASS [ ] FAIL
 
 ---
 
@@ -143,7 +143,7 @@ Use this checklist to manually verify tutorial persistence across save/load oper
 - [ ] Save game again
 - [ ] Verify save file now shows `"attack": true` in `tutorials_completed`
 
-**Test 4 Result**: ☐ PASS ☐ FAIL
+**Test 4 Result**: [ ] PASS [ ] FAIL
 
 ---
 
@@ -166,19 +166,19 @@ Use this checklist to manually verify tutorial persistence across save/load oper
 - [ ] **Expected**: Returns `false` and logs "Failed to parse save file JSON"
 - [ ] **Expected**: Game doesn't crash, tutorials work from fresh state
 
-**Test 5 Result**: ☐ PASS ☐ FAIL
+**Test 5 Result**: [ ] PASS [ ] FAIL
 
 ---
 
 ## Overall Test Summary
 
-- Test 1 (Movement Tutorial Persistence): ☐ PASS ☐ FAIL
-- Test 2 (Multiple Tutorial Persistence): ☐ PASS ☐ FAIL
-- Test 3 (Tutorial Enabled/Disabled State): ☐ PASS ☐ FAIL
-- Test 4 (Partial Tutorial Progress): ☐ PASS ☐ FAIL
-- Test 5 (Save File Corruption Handling): ☐ PASS ☐ FAIL
+- Test 1 (Movement Tutorial Persistence): [ ] PASS [ ] FAIL
+- Test 2 (Multiple Tutorial Persistence): [ ] PASS [ ] FAIL
+- Test 3 (Tutorial Enabled/Disabled State): [ ] PASS [ ] FAIL
+- Test 4 (Partial Tutorial Progress): [ ] PASS [ ] FAIL
+- Test 5 (Save File Corruption Handling): [ ] PASS [ ] FAIL
 
-**All Tests**: ☐ PASS ☐ FAIL
+**All Tests**: [ ] PASS [ ] FAIL
 
 ---
 
@@ -208,5 +208,76 @@ Record any unexpected behavior or issues encountered during testing:
 - **Tester Name**: ___________________________
 - **Test Date**: ___________________________
 - **Game Version**: ___________________________
-- **Platform**: ☐ Windows ☐ Linux ☐ macOS
-- **Test Environment**: ☐ Editor ☐ Debug Build ☐ Release Build
+- **Platform**: [ ] Windows [ ] Linux [ ] macOS
+- **Test Environment**: [ ] Editor [ ] Debug Build [ ] Release Build
+
+---
+
+## Vertical Slice - Echo Room
+
+### Prerequisites
+
+- [ ] Quest "echoes_in_pipes" is active
+
+### Steps
+
+- [ ] Enter sewers while "echoes_in_pipes" is active
+- [ ] Walk into Echo Room
+- [ ] **Expected**: cutscene starts, player input disabled
+- [ ] **Expected**: quest objective completes after cutscene
+
+**Echo Room Result**: [ ] PASS [ ] FAIL
+
+---
+
+## Vertical Slice - Dialogue Hooks
+
+### Steps
+
+- [ ] Talk to Maurice
+- [ ] Choose the option that leads to the bait box line (e.g., "Lose anything on your route?" or similar) to reach maurice_bait
+- [ ] **Expected**: New quest-related line about a bait box down the manhole
+- [ ] Talk to Gertrude
+- [ ] Choose the option that mentions sewers/Echo Room to reach gertrude_echo_room
+- [ ] **Expected**: New quest-related line mentioning the Echo Room
+- [ ] Talk to Henderson
+- [ ] Talk to Henderson again (repeat interaction)
+- [ ] Choose the guard-grate option to reach henderson_guard_grate
+- [ ] **Expected**: New quest-related line asking to guard the grate
+
+**Dialogue Hooks Result**: [ ] PASS [ ] FAIL
+
+---
+
+## Vertical Slice - Crafting UI
+
+### Steps
+
+- [ ] Open shop
+- [ ] Switch to Craft category
+- [ ] Ensure required ingredients (rat_gland + herb) are in inventory (buy from shop or grant via debug)
+- [ ] Craft Antidote
+- [ ] **Expected**: materials removed and Antidote added
+
+**Crafting UI Result**: [ ] PASS [ ] FAIL
+
+---
+
+## Vertical Slice - Full Run
+
+### Steps
+
+- [ ] Start New Game
+- [ ] **Expected**: Player spawns in town and can move
+- [ ] Accept Missing Bait, Echoes in the Pipes, Guard the Grate
+- [ ] **Expected**: All three quests appear in the quest log
+- [ ] Complete objectives in Sewers
+- [ ] **Expected**: Sewer objectives update/complete in the quest log
+- [ ] Trigger Echo Room cutscene
+- [ ] **Expected**: Cutscene plays and the Echoes in the Pipes objective completes
+- [ ] Return to town and turn in
+- [ ] **Expected**: Quest turn-ins complete and rewards are granted
+- [ ] Craft an Antidote
+- [ ] **Expected**: Required materials are consumed and Antidote is added to inventory
+
+**Full Run Result**: [ ] PASS [ ] FAIL

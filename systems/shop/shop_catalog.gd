@@ -40,6 +40,8 @@ const SHOP_ITEMS: Dictionary = {
 	"revival_bone": 100,
 	"bird_seed": 3,
 	"antidote": 15,
+	"rat_gland": 8,
+	"herb": 6,
 	"smoke_bomb": 60,
 	"energy_treat": 150,
 }
@@ -87,6 +89,8 @@ const DEFAULT_ITEM_STOCK: Dictionary = {
 	"guard_snack": 5,
 	"revival_bone": 2,
 	"antidote": 5,
+	"rat_gland": 5,
+	"herb": 8,
 	"smoke_bomb": 2,
 	"energy_treat": 1,
 }

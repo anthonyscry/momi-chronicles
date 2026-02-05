@@ -49,8 +49,21 @@
         {
           "text": "I'll be going.",
           "next_id": "henderson_grudge_leave"
+        },
+        {
+          "text": "Need me to guard the grate?",
+          "next_id": "henderson_guard_grate"
         }
       ],
+      "next_id": "",
+      "is_cutscene": false
+    },
+    {
+      "id": "henderson_guard_grate",
+      "character": "Mr. Henderson",
+      "portrait": "",
+      "text": "If you're so eager to help, guard the grate by the old buildings. The raccoons keep prying it up at night.",
+      "choices": [],
       "next_id": "",
       "is_cutscene": false
     },
